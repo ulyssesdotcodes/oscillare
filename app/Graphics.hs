@@ -10,6 +10,7 @@ import Control.Monad.Except (ExceptT, runExceptT)
 import Control.Monad.Trans
 import Control.Monad.Trans.Resource
 import Control.Monad.Trans.Maybe
+import Data.Time.Clock
 import Graphics.Luminance
 import Sound.OSC.Core
 
@@ -47,20 +48,27 @@ run fragV mw = do
 createFragment :: G.Window -> ResourceT (ExceptT Error IO) Stage -> MVar String -> String -> IO ()
 createFragment mw vertexShader fragV frag = do
   fragmentShader <- createStageFromFile frag FragmentShader
+  time <- fmap utctDayTime getCurrentTime 
   (x::Either Error String) <- runExceptT . runResourceT $ do
-    p <- sequenceA [vertexShader, fragmentShader] >>= createProgram_
+    vertexS <- vertexShader
+    fragmentS <- fragmentShader
+    p <- createProgram [vertexS, fragmentS] $ \uni -> do
+        uni (UniformName "i_time")
+    updateUniforms p (.=  ((realToFrac time)::Float))
     quad <- createGeometry vertices Nothing Triangle
     liftIO $ loop mw fragV p quad
   either (print . show) (createFragment mw vertexShader fragV) x
 
-loop :: G.Window -> MVar String -> Program () -> Geometry -> IO String
+loop :: G.Window -> MVar String -> Program (U Float) -> Geometry -> IO String
 loop window fragV prog geo =
   let
     rcmd = renderCmd Nothing False
-    sbp geo = pureDraw $ rcmd geo
+    sbp geo = pureDraw  $ rcmd geo
     fbb prog geo = defaultFrameCmd [ShadingCmd prog (\a -> mempty) [sbp geo]]
   in
     do
+      time <- fmap utctDayTime getCurrentTime
+      updateUniforms prog (.= ((realToFrac time)::Float))
       void . draw $ fbb prog geo
       G.swapBuffers window
       mf <- tryTakeMVar fragV

@@ -1,5 +1,6 @@
 uniform float i_size;
-//uniform vec2 i_resolution;
+uniform vec2 i_resolution;
+uniform float i_time;
 
 out vec4 fragColor;
 
@@ -26,7 +27,7 @@ void main(void)
 
 	vec3 color;
 	color.x = cuv.x;
-	color.y = 1.0;
+	color.y = sin(i_time);
 	color.z = max(0, min(1, 0.5));
 
   fragColor = vec4(hsv2rgb(color), 1.0);
