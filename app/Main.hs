@@ -42,7 +42,7 @@ main :: IO ()
 main = do
   messageChan <- newChan
   _ <- forkIO $ handleUDPMessages messageChan
-  fragV <- newMVar "app/shaders/basic.frag"
+  fragV <- newMVar (ShaderProgram "app/shaders/basic.frag" ["i_time"] [0.5])
   thread <- forkOS $ do
     successfulInit <- G.init
     if successfulInit then do
@@ -60,6 +60,6 @@ main = do
       G.terminate
     else
       print "Couldn't init"
-  threadDelay 1000000
-  putMVar fragV "app/shaders/sin.frag"
+  threadDelay 10000000
+  putMVar fragV (ShaderProgram "app/shaders/sin.frag" [] [])
   infinirun

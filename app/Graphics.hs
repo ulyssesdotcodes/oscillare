@@ -26,6 +26,16 @@ instance HasStageError Error where
 instance HasProgramError Error where
   fromProgramError = ErrorProgram
 
+data ShaderProgram =
+  ShaderProgram { file :: String
+                , uniformNames :: [String]
+                , uniformVals :: [Float]
+                }
+
+data UniformTypes =
+  Float
+  | Int
+
 vertices :: [V 2 Float]
 vertices =
   [
@@ -39,40 +49,41 @@ vertices =
   ]
 
 
-run :: MVar String -> G.Window -> IO ()
+run :: MVar ShaderProgram -> G.Window -> IO ()
 run fragV mw = do
   vertexShader <- createStageFromFile "app/shaders/passthrough.vert" VertexShader
   frag <- takeMVar fragV
   createFragment mw vertexShader fragV frag
 
-createFragment :: G.Window -> ResourceT (ExceptT Error IO) Stage -> MVar String -> String -> IO ()
+createFragment :: G.Window -> ResourceT (ExceptT Error IO) Stage -> MVar ShaderProgram -> ShaderProgram -> IO ()
 createFragment mw vertexShader fragV frag = do
-  fragmentShader <- createStageFromFile frag FragmentShader
-  time <- fmap utctDayTime getCurrentTime 
-  (x::Either Error String) <- runExceptT . runResourceT $ do
+  fragmentShader <- createStageFromFile (file frag) FragmentShader
+  time <- fmap utctDayTime getCurrentTime
+  (x::Either Error ShaderProgram) <- runExceptT . runResourceT $ do
     vertexS <- vertexShader
     fragmentS <- fragmentShader
     p <- createProgram [vertexS, fragmentS] $ \uni -> do
-        uni (UniformName "i_time")
-    updateUniforms p (.=  ((realToFrac time)::Float))
+      u1 <- uni (UniformName ((uniformNames frag) !! 0))
+      pure [u1]
     quad <- createGeometry vertices Nothing Triangle
-    liftIO $ loop mw fragV p quad
+    liftIO $ loop mw fragV frag p quad
   either (print . show) (createFragment mw vertexShader fragV) x
 
-loop :: G.Window -> MVar String -> Program (U Float) -> Geometry -> IO String
-loop window fragV prog geo =
+loop :: G.Window -> MVar ShaderProgram -> ShaderProgram -> Program [U Float] -> Geometry -> IO ShaderProgram
+loop window fragV sp prog geo =
   let
     rcmd = renderCmd Nothing False
     sbp geo = pureDraw  $ rcmd geo
     fbb prog geo = defaultFrameCmd [ShadingCmd prog (\a -> mempty) [sbp geo]]
+    sp' time = ShaderProgram (file sp) (uniformNames sp) [realToFrac time]
   in
     do
       time <- fmap utctDayTime getCurrentTime
-      updateUniforms prog (.= ((realToFrac time)::Float))
+      updateUniforms prog (\us -> foldr1 (<>) (zipWith (.=) us (uniformVals (sp' time))))
       void . draw $ fbb prog geo
       G.swapBuffers window
       mf <- tryTakeMVar fragV
-      maybe (loop window fragV prog geo) return mf
+      maybe (loop window fragV (sp' time) prog geo) return mf
 
 createStageFromFile :: (CME.MonadError e m, MonadResource m, HasStageError e) => FilePath -> StageType -> IO (m Stage)
 createStageFromFile f s =
