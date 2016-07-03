@@ -56,18 +56,20 @@ run fragV mw = do
   createFragment mw vertexShader fragV frag
 
 createFragment :: G.Window -> ResourceT (ExceptT Error IO) Stage -> MVar ShaderProgram -> ShaderProgram -> IO ()
-createFragment mw vertexShader fragV frag = do
-  fragmentShader <- createStageFromFile (file frag) FragmentShader
-  time <- fmap utctDayTime getCurrentTime
-  (x::Either Error ShaderProgram) <- runExceptT . runResourceT $ do
-    vertexS <- vertexShader
-    fragmentS <- fragmentShader
-    p <- createProgram [vertexS, fragmentS] $ \uni -> do
-      u1 <- uni (UniformName ((uniformNames frag) !! 0))
-      pure [u1]
-    quad <- createGeometry vertices Nothing Triangle
-    liftIO $ loop mw fragV frag p quad
-  either (print . show) (createFragment mw vertexShader fragV) x
+createFragment mw vertexShader fragV frag =
+  let
+    stagesR = transResourceT (\vShader -> (vShader, createStageFromFile (file frag) FragmentShader)) vertexShader
+    createProgR (vertexS, fragmentS) = createProgram [vertexS, fragmentS] $ \uni -> do
+        u1 <- uni (UniformName ((uniformNames frag) !! 0))
+        pure [u1]
+    progR = transResourceT createProgR stagesR
+  in do
+    time <- fmap utctDayTime getCurrentTime
+    (x::Either Error ShaderProgram) <- runExceptT . runResourceT $ do
+      p <- progR
+      quad <- createGeometry vertices Nothing Triangle
+      liftIO $ loop mw fragV frag p quad
+    either (print . show) (createFragment mw vertexShader fragV) x
 
 loop :: G.Window -> MVar ShaderProgram -> ShaderProgram -> Program [U Float] -> Geometry -> IO ShaderProgram
 loop window fragV sp prog geo =
