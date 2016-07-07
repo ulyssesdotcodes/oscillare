@@ -14,3 +14,7 @@ nextSam = (1+) . sam
 
 cyclePos :: Time -> Time
 cyclePos t = t - sam t
+
+
+isIn :: Arc -> Time -> Bool
+isIn (s,e) t = t >= s && t < e

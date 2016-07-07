@@ -30,6 +30,7 @@ executable oschader-exe
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   build-depends: base
                , bytestring >= 0.10
+               , containers >= 0.5
                , GLFW-b >= 1.4
                , hosc >= 0.15
                , luminance 

@@ -1,6 +1,9 @@
 module Pattern where
 
+import Data.Ratio
+
 import Time
+import Utils
 
 data Pattern a = Pattern { arc :: Arc -> [Event a] }
 
@@ -23,3 +26,20 @@ instance Applicative Pattern where
                  (\(_, a', _) -> isIn a' s)
                  (xs, (s', e'))
                 )
+
+instance Monoid (Pattern a) where
+  mempty = blank
+  mappend = overlay
+
+instance Monad Pattern where
+  return = pure
+  p >>= f = unwrap (f <$> p)
+
+unwrap :: Pattern (Pattern a) -> Pattern a
+unwrap p = Pattern $ \a -> concatMap ((\p' -> arc p' a) . thd') (arc p a)
+
+blank :: Pattern a
+blank = Pattern $ const []
+
+overlay :: Pattern a -> Pattern a -> Pattern a
+overlay p p' = Pattern $ (\a -> (arc p a) ++ (arc p' a))
