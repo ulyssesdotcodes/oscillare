@@ -14,45 +14,58 @@ import qualified Data.ByteString.Char8 as BS
 
 type MessageQueue = Chan Message
 
-main = do
-  conn <- openUDP "127.0.0.1" 9001
-  forkIO $ sync conn
-  keepSending conn sendBoth
-
 ostr = ASCII_String . BS.pack
 
-keepSending :: UDP -> ReaderT UDP IO () -> IO ()
-keepSending t r = do
-  runReaderT r t
-  threadDelay 1000000
-  print "next"
-  keepSending t r
+main = do
+  conn <- openUDP "127.0.0.1" 9001
+  forkIO $ runReaderT sync conn
+  flip runReaderT conn $ do
+    _ <- sendScale
+    sendBoth
 
-sync :: UDP -> IO ()
-sync t = do
-  runReaderT sendTime t
-  threadDelay 16000
-  sync t
+-- keepSending :: UDP -> ReaderT UDP IO () -> IO ()
+-- keepSending t r = do
+--   runReaderT r t
+--   threadDelay 1000000
+--   print "next"
+--   keepSending t r
+
+sync :: (T.Transport t) => ReaderT t IO ()
+sync = do
+  sendTime
+  liftIO $ threadDelay 16000
+  sync
 
 sendBoth :: (T.Transport t) => ReaderT t IO ()
 sendBoth = do
-  _ <- sendSine
+  sendSine
   liftIO $ threadDelay 1000000
-  -- _ <- sendLine
-  return ()
+  sendLine
+  liftIO $ threadDelay 1000000
+  sendBoth
 
 sendSine :: (T.Transport t) => ReaderT t IO ()
 sendSine =
-  sendOSC $ Message "/shader" [ostr "sine"]
+  sendOSC $ Message "/progs" [ostr "p1", ostr "sine"]
 
 sendLine :: (T.Transport t) => ReaderT t IO ()
 sendLine =
-  sendOSC $ Message "/shader" [ostr "line_down"]
+  sendOSC $ Message "/progs" [ostr "p1", ostr "line_down"]
+
+sendScale :: (T.Transport t) => ReaderT t IO ()
+sendScale = do
+  sendOSC $ Message "/shader" [ostr "scale"]
+  sendOSC $ Message "/shader/base" [ostr "p1"]
+  sendOSC $ Message "/shader/uniform/scale" [float (1.2 :: Float)]
 
 sendTime :: (T.Transport t) => ReaderT t IO ()
 sendTime = do
   now <- liftIO getCurrentTime
-  sendOSC $ Message "/shader/uniform/time" [float . realToFrac $ utctDayTime now]
+  let floatNow = realToFrac $ utctDayTime now
+  sendOSC $ Message "/shader/uniform/time" [float floatNow]
+  sendOSC $ Message "/progs/uniform" [ostr "p1", ostr "time", float floatNow]
+  sendOSC $ Message "/shader/uniform/scale" [float (0.5 + sin floatNow)]
+
 
 
 
