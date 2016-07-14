@@ -22,11 +22,9 @@ ostr = ASCII_String . encodeUtf8
 
 main = do
   now <- getCurrentTime
-  mvarT <- newMVar $ TempoState (progName (pack "p1") Sine [timeUniform, perCycle 2 $ uniformPattern (pack "scale") (sin <$> (* 3.1415) <$> timePattern)]) (utctDayTime now) 60
-  startT <- readMVar mvarT
-  args <- getArgs
-  runStateT (update $ read $ head  args) startT
-
+  conn <- openUDP "127.0.0.1" 3333
+  mvarT <- newMVar $ TempoState conn (progName (pack "p1") Sine [timeUniform, perCycle 2 $ uniformPattern (pack "scale") (sin <$> (* 3.1415) <$> timePattern)]) (utctDayTime now) 60 0
+  sync mvarT
 
 instance Functor Pattern where
   fmap f (Pattern a) = Pattern (\t -> f <$> a t)
@@ -91,10 +89,30 @@ progName n p us = mappend progMsg $ mconcat uMsgs
 uniformMessage :: Text -> Uniform Float -> Message
 uniformMessage n u = Message "/progs/uniform" [ostr n, ostr $ name u, float $ value u]
 
-data TempoState = TempoState { pattern :: Pattern Message, start :: DiffTime, length :: Float }
+data TempoState = TempoState { conn :: Transport t, pattern :: Pattern Message, start :: DiffTime, cycleLength :: DiffTime, current :: Int }
 
-update :: MonadIO io => Int -> StateT TempoState io TempoState
-update input = do
+updateCycle :: MonadIO io => DiffTime -> StateT TempoState io TempoState
+updateCycle now = do
   tState <- get
-  liftIO $ print $ arc (pattern tState) input
-  pure tState
+  let diffTime = now - start tState
+  if diffTime > cycleLength tState then
+    pure tState { start = now, current = 0 }
+  else
+    pure tState { current = round (diffTime * (fromIntegral 128)) }
+
+sendMessages :: MonadIO io => StateT TempoState io ()
+sendMessages = do
+  tState <- get
+  sendOSC (conn tState) $ Bundle 0 $ arc (pattern tState) (current tState)
+
+frame :: MonadIO io => StateT TempoState io TempoState
+frame = do
+  now <- liftIO getCurrentTime
+  sendMessages
+  updateCycle $ utctDayTime now
+
+sync :: MVar TempoState -> IO ()
+sync ts = do
+  ts' <- readMVar ts
+  runState frame ts'
+  sync ts
