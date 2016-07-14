@@ -6,12 +6,13 @@ import Control.Concurrent.MVar
 import Control.Concurrent.Chan
 import Control.Monad
 import Control.Monad.Reader
-import Control.Monad.Trans.Maybe
+import Control.Monad.Trans.State
 import Data.Fixed
-import Data.Text
+import Data.Text (Text, pack)
 import Data.Text.Encoding
 import Data.Time.Clock
 import Sound.OSC
+import System.Environment
 import qualified Data.ByteString.Char8 as BS
 import qualified Sound.OSC.Transport.FD as T
 
@@ -20,8 +21,11 @@ data Pattern a = Pattern { arc :: Int -> [a] } -- From 0-128
 ostr = ASCII_String . encodeUtf8
 
 main = do
-  conn <- openUDP "127.0.0.1" 9001
-  flip runReaderT conn $ sendOSC $ Message "/connection" []
+  now <- getCurrentTime
+  mvarT <- newMVar $ TempoState (progName (pack "p1") Sine [timeUniform, perCycle 2 $ uniformPattern (pack "scale") (sin <$> (* 3.1415) <$> timePattern)]) (utctDayTime now) 60
+  startT <- readMVar mvarT
+  args <- getArgs
+  runStateT (update $ read $ head  args) startT
 
 
 instance Functor Pattern where
@@ -30,6 +34,23 @@ instance Functor Pattern where
 instance Applicative Pattern where
   pure p = Pattern $ const [p]
   Pattern fs <*> Pattern ms = Pattern (\t -> fs t <*> ms t)
+
+instance Monad Pattern where
+  return = pure
+  p >>= f = unwrap (f <$> p)
+
+unwrap :: Pattern (Pattern a) -> Pattern a
+unwrap p = Pattern $ \t -> concatMap (`arc` t) (arc p t)
+
+instance Monoid (Pattern a) where
+  mempty = Pattern $ const []
+  mappend = overlay
+
+overlay :: Pattern a -> Pattern a -> Pattern a
+overlay p q = Pattern (\t -> arc p t ++ arc q t)
+
+flatten :: Pattern [a] -> Pattern a
+flatten ps = Pattern (\t -> concat (arc ps t))
 
 perCycle :: Int -> Pattern a -> Pattern a
 perCycle times (Pattern pf) = Pattern timeF
@@ -61,11 +82,19 @@ programText Sine = "sine"
 programText Line = "line"
 programText Scale = "scale"
 
-progName :: Text -> Program -> [Pattern (Uniform Float)] -> [Pattern Message]
-progName n p us = progMsg:uMsgs
+progName :: Text -> Program -> [Pattern (Uniform Float)] -> Pattern Message
+progName n p us = mappend progMsg $ mconcat uMsgs
   where
     progMsg = perCycle 1 <$> pure $ Message "/progs" [ostr n, ostr $ programText p]
     uMsgs = (uniformMessage n <$>) <$> us
 
 uniformMessage :: Text -> Uniform Float -> Message
 uniformMessage n u = Message "/progs/uniform" [ostr n, ostr $ name u, float $ value u]
+
+data TempoState = TempoState { pattern :: Pattern Message, start :: DiffTime, length :: Float }
+
+update :: MonadIO io => Int -> StateT TempoState io TempoState
+update input = do
+  tState <- get
+  liftIO $ print $ arc (pattern tState) input
+  pure tState
