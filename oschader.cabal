@@ -38,6 +38,7 @@ executable oschader-exe
                , oschader
                , parsec
                , resourcet
+               , text >= 1.2
                , time
                , transformers
   default-language:    Haskell2010
