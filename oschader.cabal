@@ -33,6 +33,7 @@ executable oschader-exe
                , containers >= 0.5
                , GLFW-b >= 1.4
                , hosc >= 0.15
+               , lens >= 4.13
                , luminance 
                , mtl
                , oschader
