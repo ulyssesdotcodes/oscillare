@@ -45,11 +45,20 @@ revEngines = do
 gunEngines :: MVar TempoState -> IO (ThreadId)
 gunEngines = forkIO . sync
 
+run :: IO (MVar TempoState, ThreadId)
+run = do
+  mts <- revEngines
+  ti <- gunEngines mts
+  return (mts, ti)
+
 setProg :: Text -> Pattern Message -> TempoState -> TempoState
 setProg n p = over pattern (insert n p)
 
 runProg :: String -> Pattern Message -> MVar TempoState -> IO ()
 runProg t p = flip modifyMVar_ (return <$> setProg (pack t) p)
+
+changeTempo :: Float -> MVar TempoState -> IO ()
+changeTempo t = flip modifyMVar_ (return <$> set cycleLength (fromRational $ toRational t))
 
 sineProg :: Pattern Message
 sineProg = programMessage (progName Sine) [timeUniform]
@@ -110,7 +119,7 @@ data Effect
 
 programText :: Program -> Text
 programText Sine = "sine"
-programText Line = "line"
+programText Line = "line_down"
 
 effectText :: Effect -> Text
 effectText Scale = "scale"
