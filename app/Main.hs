@@ -23,7 +23,7 @@ ostr = ASCII_String . encodeUtf8
 main = do
   now <- getCurrentTime
   conn <- openUDP "127.0.0.1" 3333
-  mvarT <- newMVar $ TempoState conn (progName (pack "p1") Sine [timeUniform, perCycle 2 $ uniformPattern (pack "scale") (sin <$> (* 3.1415) <$> timePattern)]) (utctDayTime now) 60 0
+  mvarT <- newMVar $ TempoState conn (progName (pack "p1") Sine [timeUniform, perCycle 2 $ uniformPattern (pack "scale") (sin <$> (* 3.1415) <$> timePattern)]) (utctDayTime now) (secondsToDiffTime 1) 0
   sync mvarT
 
 instance Functor Pattern where
@@ -89,23 +89,24 @@ progName n p us = mappend progMsg $ mconcat uMsgs
 uniformMessage :: Text -> Uniform Float -> Message
 uniformMessage n u = Message "/progs/uniform" [ostr n, ostr $ name u, float $ value u]
 
-data TempoState = TempoState { conn :: Transport t, pattern :: Pattern Message, start :: DiffTime, cycleLength :: DiffTime, current :: Int }
+data TempoState = TempoState { conn :: UDP, pattern :: Pattern Message, start :: DiffTime, cycleLength :: DiffTime, current :: Int }
 
-updateCycle :: MonadIO io => DiffTime -> StateT TempoState io TempoState
+updateCycle :: MonadIO io => DiffTime -> StateT TempoState io ()
 updateCycle now = do
   tState <- get
   let diffTime = now - start tState
   if diffTime > cycleLength tState then
-    pure tState { start = now, current = 0 }
+    put $ tState { start = now, current = 0 }
   else
-    pure tState { current = round (diffTime * (fromIntegral 128)) }
+    put $ tState { current = round (diffTime * (fromIntegral 128)) }
 
 sendMessages :: MonadIO io => StateT TempoState io ()
 sendMessages = do
   tState <- get
-  sendOSC (conn tState) $ Bundle 0 $ arc (pattern tState) (current tState)
+  -- liftIO $ T.sendOSC (conn tState) $ Bundle 0 $ arc (pattern tState) (current tState)
+  liftIO $ print $ arc (pattern tState) (current tState)
 
-frame :: MonadIO io => StateT TempoState io TempoState
+frame :: MonadIO io => StateT TempoState io ()
 frame = do
   now <- liftIO getCurrentTime
   sendMessages
@@ -113,6 +114,8 @@ frame = do
 
 sync :: MVar TempoState -> IO ()
 sync ts = do
-  ts' <- readMVar ts
-  runState frame ts'
+  now <- utctDayTime <$> getCurrentTime
+  modifyMVar_ ts (\ts' -> snd <$> runStateT frame ts')
+  now' <- utctDayTime <$> getCurrentTime
+  threadDelay (16000 - round ((now' - now) * 1000))
   sync ts
