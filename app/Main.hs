@@ -110,6 +110,9 @@ timeUniform = uniformPattern "time" timePattern
 uniformPattern :: Text -> Pattern Float -> Pattern (Uniform Float)
 uniformPattern n = fmap (Uniform n)
 
+up :: String -> Pattern Float -> Pattern (Uniform Float)
+up s = uniformPattern (pack s)
+
 data Program
   = Sine
   | Line
