@@ -40,10 +40,6 @@
                               (line-end-position))))
     (oscillare-send-string s)))
 
-(defun oscillare-mode-keybindings (map)
-  "Oscillare keybindings"
-  (define-key map [?\C-c ?\C-c] 'oscillare-run-line))
-
 (defun chunk-string (n s)
   "Split a string into chunks of n characters"
   (let* ((l (length s))
@@ -62,3 +58,27 @@
         (goto-char (point-max))
         (save-selected-window
           (set-window-point window (point-max)))))))
+
+(defun oscillare-mode-keybindings (map)
+  "Oscillare keybindings"
+  (define-key map [?\C-c ?\C-s] 'oscillare-see-output)
+  (define-key map [?\C-c ?\C-c] 'oscillare-run-line))
+
+(defvar oscillare-mode-map nil
+  "Keymap for oscillare")
+
+(if oscillare-mode-map
+    ()
+  (let ((map (make-sparse-keymap "Oscillare")))
+    (oscillare-mode-keybindings map)
+    (setq oscillare-mode-map map)))
+
+(define-derived-mode
+  oscillare-mode
+  haskell-mode
+  "Oscillare"
+  "Major mode for interacting with oscillare.")
+
+(add-to-list 'auto-mode-alist '("\\.osc$" . oscillare-mode))
+
+(provide 'oscillare)

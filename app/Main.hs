@@ -39,7 +39,7 @@ revEngines :: IO (MVar TempoState)
 revEngines = do
   now <- getCurrentTime
   conn <- openUDP "127.0.0.1" 9001
-  mVarT <- newMVar $ TempoState conn (fromList [("p1", sineProg), ("s", scaleEffect)]) (utctDayTime now) (secondsToDiffTime 1) 0
+  mVarT <- newMVar $ TempoState conn (fromList [("s", sineProg), ("p1", scaleEffect)]) (utctDayTime now) (secondsToDiffTime 1) 0
   return mVarT
 
 gunEngines :: MVar TempoState -> IO (ThreadId)
@@ -61,10 +61,10 @@ changeTempo :: MVar TempoState -> Float -> IO ()
 changeTempo mts t = modifyMVar_ mts $ return <$> set cycleLength (fromRational $ toRational t)
 
 sineProg :: Pattern Message
-sineProg = programMessage (progName Sine) [timeUniform]
+sineProg = programMessage (progName Sine) (Just "p1") [timeUniform]
 
 scaleEffect :: Pattern Message
-scaleEffect = effectMessage Scale (pack "p1") [uniformPattern "scale" ((* 0.5) . sin . (* (3.1415 * 2)) <$> timePattern)]
+scaleEffect = programMessage (effectName Scale) Nothing [uniformPattern "scale" ((* 0.5) . sin . (* (3.1415 * 2)) <$> timePattern)]
 
 instance Functor Pattern where
   fmap f (Pattern a) = Pattern (\t -> f <$> a t)
@@ -135,17 +135,12 @@ progName t = ProgramName t programText
 effectName :: Effect -> ProgramName Effect
 effectName t = ProgramName t effectText
 
-programMessage :: ProgramName a -> [Pattern (Uniform Float)] -> Pattern Message
-programMessage p us = mappend progMsg $ mconcat uMsgs
+programMessage :: ProgramName a -> Maybe Text -> [Pattern (Uniform Float)] -> Pattern Message
+programMessage p me us = mconcat $ (progMsg:maybe [] ((:[]) . effectMsg) me) ++ uMsgs
   where
+    effectMsg e = perCycle 1 <$> pure $ Message "/progs/effect" [ostr e]
     progMsg = perCycle 1 <$> pure $ Message "/progs" [ostr $ nameF p (prog p)]
     uMsgs = (uniformMessage <$>) <$> us
-
-effectMessage :: Effect -> Text -> [Pattern (Uniform Float)] -> Pattern Message
-effectMessage e b us = mappend progMsg baseMsg
-  where
-    progMsg = programMessage (effectName e) us
-    baseMsg = perCycle 1 <$> pure $ Message "/progs/base" [ostr b]
 
 uniformMessage :: Uniform Float -> Message
 uniformMessage u = Message "/progs/uniform" [ostr $ name u, float $ value u]
