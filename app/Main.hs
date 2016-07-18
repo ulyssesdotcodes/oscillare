@@ -39,7 +39,7 @@ revEngines :: IO (MVar TempoState)
 revEngines = do
   now <- getCurrentTime
   conn <- openUDP "127.0.0.1" 9001
-  mVarT <- newMVar $ TempoState conn (fromList [("s", sineProg), ("p1", scaleEffect)]) (utctDayTime now) (secondsToDiffTime 1) 0
+  mVarT <- newMVar $ TempoState conn (fromList []) (utctDayTime now) (secondsToDiffTime 1) 0
   return mVarT
 
 gunEngines :: MVar TempoState -> IO (ThreadId)
@@ -119,6 +119,7 @@ data Program
 
 data Effect
   = Scale
+  | Fade
 
 programText :: Program -> Text
 programText Sine = "sine"
@@ -126,6 +127,7 @@ programText Line = "line_down"
 
 effectText :: Effect -> Text
 effectText Scale = "scale"
+effectText Fade = "fade"
 
 data ProgramName a = ProgramName { prog :: a, nameF :: (a -> Text) }
 
@@ -136,11 +138,18 @@ effectName :: Effect -> ProgramName Effect
 effectName t = ProgramName t effectText
 
 programMessage :: ProgramName a -> Maybe Text -> [Pattern (Uniform Float)] -> Pattern Message
-programMessage p me us = mconcat $ (progMsg:maybe [] ((:[]) . effectMsg) me) ++ uMsgs
+programMessage p me us = mconcat $ (progMsg:maybe [clearMsg] ((:[]) . effectMsg) me) ++ uMsgs
   where
     effectMsg e = perCycle 1 <$> pure $ Message "/progs/effect" [ostr e]
+    clearMsg = perCycle 1 <$> pure $ Message "/progs/effect/clear" []
     progMsg = perCycle 1 <$> pure $ Message "/progs" [ostr $ nameF p (prog p)]
     uMsgs = (uniformMessage <$>) <$> us
+
+pme :: ProgramName a -> String -> [Pattern (Uniform Float)] -> Pattern Message
+pme p t = programMessage p (Just $ pack t)
+
+pm :: ProgramName a -> [Pattern (Uniform Float)] -> Pattern Message
+pm p = programMessage p Nothing
 
 uniformMessage :: Uniform Float -> Message
 uniformMessage u = Message "/progs/uniform" [ostr $ name u, float $ value u]
