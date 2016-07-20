@@ -64,7 +64,7 @@ sineProg :: Pattern Message
 sineProg = programMessage (progName Sine) (Just "p1") [timeUniform]
 
 scaleEffect :: Pattern Message
-scaleEffect = programMessage (effectName Scale) Nothing [uniformPattern "scale" ((* 0.5) . sin . (* (3.1415 * 2)) <$> timePattern)]
+scaleEffect = programMessage (effectName Scale) Nothing [uniformPattern "scale" (uf . (* 0.5) . sin . (* (3.1415 * 2)) <$> timePattern)]
 
 instance Functor Pattern where
   fmap f (Pattern a) = Pattern (\t -> f <$> a t)
@@ -100,22 +100,33 @@ perCycle times (Pattern pf) = Pattern timeF
 timePattern :: Pattern Float
 timePattern = Pattern $ (:[])
 
-data UniformType = UniformFloat Float
+data UniformType = UniformFloat Float | UniformInput (InputType, Float)
+
+data InputType = AudioTexture | Volume
+
+inputText :: InputType -> Text
+inputText AudioTexture = "audio_texture"
+inputText Volume = "volume"
+
+uf = UniformFloat
+ui = UniformInput
+
 
 data Uniform a =  Uniform { name :: Text, value :: a }
 
-timeUniform :: Pattern (Uniform Float)
-timeUniform = uniformPattern "time" timePattern
+timeUniform :: Pattern (Uniform UniformType)
+timeUniform = uniformPattern "time" (UniformFloat <$> timePattern)
 
-uniformPattern :: Text -> Pattern Float -> Pattern (Uniform Float)
+uniformPattern :: Text -> Pattern UniformType -> Pattern (Uniform UniformType)
 uniformPattern n = fmap (Uniform n)
 
-up :: String -> Pattern Float -> Pattern (Uniform Float)
+up :: String -> Pattern UniformType -> Pattern (Uniform UniformType)
 up s = uniformPattern (pack s)
 
 data Program
   = Sine
   | Line
+  | AudioData
 
 data Effect
   = Scale
@@ -124,6 +135,7 @@ data Effect
 programText :: Program -> Text
 programText Sine = "sine"
 programText Line = "line_down"
+programText AudioData = "audio_data"
 
 effectText :: Effect -> Text
 effectText Scale = "scale"
@@ -137,7 +149,7 @@ progName t = ProgramName t programText
 effectName :: Effect -> ProgramName Effect
 effectName t = ProgramName t effectText
 
-programMessage :: ProgramName a -> Maybe Text -> [Pattern (Uniform Float)] -> Pattern Message
+programMessage :: ProgramName a -> Maybe Text -> [Pattern (Uniform UniformType)] -> Pattern Message
 programMessage p me us = mconcat $ (progMsg:maybe [clearMsg] ((:[]) . effectMsg) me) ++ uMsgs
   where
     effectMsg e = perCycle 1 <$> pure $ Message "/progs/effect" [ostr e]
@@ -145,14 +157,20 @@ programMessage p me us = mconcat $ (progMsg:maybe [clearMsg] ((:[]) . effectMsg)
     progMsg = perCycle 1 <$> pure $ Message "/progs" [ostr $ nameF p (prog p)]
     uMsgs = (uniformMessage <$>) <$> us
 
-pme :: ProgramName a -> String -> [Pattern (Uniform Float)] -> Pattern Message
+pme :: ProgramName a -> String -> [Pattern (Uniform UniformType)] -> Pattern Message
 pme p t = programMessage p (Just $ pack t)
 
-pm :: ProgramName a -> [Pattern (Uniform Float)] -> Pattern Message
+pm :: ProgramName a -> [Pattern (Uniform UniformType)] -> Pattern Message
 pm p = programMessage p Nothing
 
-uniformMessage :: Uniform Float -> Message
-uniformMessage u = Message "/progs/uniform" [ostr $ name u, float $ value u]
+uniformMessage :: Uniform UniformType -> Message
+uniformMessage (Uniform n (UniformFloat f)) =
+  Message "/progs/uniform" [ostr n, float f]
+uniformMessage (Uniform n (UniformInput (i, m))) =
+  Message "/progs/uniform" [ostr n, ostr $ inputText i, float m]
+
+zipui :: InputType -> Float -> UniformType
+zipui i f = UniformInput (i, f)
 
 addName :: Text -> Pattern Message -> Pattern Message
 addName n p = appendDatum (ostr n) <$> p
