@@ -20,14 +20,14 @@ import System.Environment
 import qualified Data.ByteString.Char8 as BS
 import qualified Sound.OSC.Transport.FD as T
 
-data Pattern a = Pattern { arc :: Float -> [a] }
+data Pattern a = Pattern { arc :: Float -> Float -> [a] }
 
-data TempoState = TempoState { _conn :: UDP, _pattern :: Map Text (Pattern Message), _start :: DiffTime, _cycleLength :: DiffTime, _current :: Float }
+data TempoState = TempoState { _conn :: UDP, _pattern :: Map Text (Pattern Message), _start :: DiffTime, _cycleLength :: DiffTime, _prev :: Float, _current :: Float }
 
 makeLenses ''TempoState
 
 instance Show TempoState where
-  show (TempoState c p s cy cu) = "{ messages " ++ show (arc (addName `foldMapWithKey` p) cu) ++ " cu " ++ (show cu) ++ " }"
+  show (TempoState c p s cy pr cu) = "{ messages " ++ show (arc (addName `foldMapWithKey` p) pr cu) ++ " cu " ++ (show cu) ++ " }"
 
 ostr = ASCII_String . encodeUtf8
 
@@ -39,7 +39,7 @@ revEngines :: IO (MVar TempoState)
 revEngines = do
   now <- getCurrentTime
   conn <- openUDP "127.0.0.1" 9001
-  mVarT <- newMVar $ TempoState conn (fromList []) (utctDayTime now) (secondsToDiffTime 1) 0
+  mVarT <- newMVar $ TempoState conn (fromList []) (utctDayTime now) (secondsToDiffTime 1) 0 0
   return mVarT
 
 gunEngines :: MVar TempoState -> IO (ThreadId)
@@ -67,38 +67,34 @@ scaleEffect :: Pattern Message
 scaleEffect = programMessage (effectName Scale) Nothing [uniformPattern "scale" (uf . (* 0.5) . sin . (* (3.1415 * 2)) <$> timePattern)]
 
 instance Functor Pattern where
-  fmap f (Pattern a) = Pattern (\t -> f <$> a t)
+  fmap f (Pattern a) = Pattern (\p t -> f <$> a p t)
 
 instance Applicative Pattern where
-  pure p = Pattern $ const [p]
-  Pattern fs <*> Pattern ms = Pattern (\t -> fs t <*> ms t)
+  pure as = Pattern $ const . const [as]
+  Pattern fs <*> Pattern ms = Pattern (\p t -> fs p t <*> ms p t)
 
 instance Monad Pattern where
   return = pure
   p >>= f = unwrap (f <$> p)
 
 unwrap :: Pattern (Pattern a) -> Pattern a
-unwrap p = Pattern $ \t -> concatMap (`arc` t) (arc p t)
+unwrap p = Pattern $ \pr t -> concatMap (\p' -> arc p' pr t) (arc p pr t)
 
 instance Monoid (Pattern a) where
-  mempty = Pattern $ const []
+  mempty = Pattern $ const . const []
   mappend = overlay
 
 overlay :: Pattern a -> Pattern a -> Pattern a
-overlay p q = Pattern (\t -> arc p t ++ arc q t)
+overlay p q = Pattern (\pr t -> arc p pr t ++ arc q pr t)
 
 flatten :: Pattern [a] -> Pattern a
-flatten ps = Pattern (\t -> concat (arc ps t))
+flatten ps = Pattern (\pr t -> concat (arc ps pr t))
 
-perCycle :: Int -> Pattern a -> Pattern a
-perCycle times (Pattern pf) = Pattern timeF
-  where
-    timeFrac = quot 128 times
-    timeF t =
-      if (round (t * 128) `mod` timeFrac) == 0 then pf t else []
+att :: Float -> Pattern a -> Pattern a
+att t' p = Pattern (\pr t -> if t' >= pr && t' < t then arc p pr t else [])
 
 timePattern :: Pattern Float
-timePattern = Pattern $ (:[])
+timePattern = Pattern (\_ t -> [t])
 
 data UniformType = UniformFloat Float | UniformInput (InputType, Float)
 
@@ -152,9 +148,9 @@ effectName t = ProgramName t effectText
 programMessage :: ProgramName a -> Maybe Text -> [Pattern (Uniform UniformType)] -> Pattern Message
 programMessage p me us = mconcat $ (progMsg:maybe [clearMsg] ((:[]) . effectMsg) me) ++ uMsgs
   where
-    effectMsg e = perCycle 1 <$> pure $ Message "/progs/effect" [ostr e]
-    clearMsg = perCycle 1 <$> pure $ Message "/progs/effect/clear" []
-    progMsg = perCycle 1 <$> pure $ Message "/progs" [ostr $ nameF p (prog p)]
+    effectMsg e = att 0 <$> pure $ Message "/progs/effect" [ostr e]
+    clearMsg = att 0 <$> pure $ Message "/progs/effect/clear" []
+    progMsg = att 0 <$> pure $ Message "/progs" [ostr $ nameF p (prog p)]
     uMsgs = (uniformMessage <$>) <$> us
 
 pme :: ProgramName a -> String -> [Pattern (Uniform UniformType)] -> Pattern Message
@@ -185,12 +181,12 @@ updateCycle now = do
   if diffTime > view cycleLength tState then
     put $ tState & start .~ now & current .~ 0
   else
-    put $ tState & current .~ (fromRational . toRational) (diffTime / view cycleLength tState)
+    put $ tState & current .~ (fromRational . toRational) (diffTime / view cycleLength tState) & prev .~ view current tState
 
 sendMessages :: MonadIO io => StateT TempoState io ()
 sendMessages = do
   tState <- get
-  liftIO $ T.sendOSC (view conn tState) $ Bundle 0 $ arc (addName `foldMapWithKey` (view pattern tState)) (view current tState)
+  liftIO $ T.sendOSC (view conn tState) $ Bundle 0 $ arc (addName `foldMapWithKey` (view pattern tState)) (view prev tState) (view current tState)
   -- liftIO $ print $ arc (addName `foldMapWithKey` pattern tState) (current tState)
 
 frame :: MonadIO io => StateT TempoState io ()
