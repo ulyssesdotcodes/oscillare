@@ -93,6 +93,9 @@ flatten ps = Pattern (\pr t -> concat (arc ps pr t))
 att :: Float -> Pattern a -> Pattern a
 att t' p = Pattern (\pr t -> if t' >= pr && t' < t then arc p pr t else [])
 
+offset :: Float -> Pattern a -> Pattern a
+offset o p = Pattern (\pr t -> arc p ((pr + o) `mod'` 1) ((t + o) `mod'` 1))
+
 timePattern :: Pattern Float
 timePattern = Pattern (\_ t -> [t])
 
