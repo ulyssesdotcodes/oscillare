@@ -27,7 +27,7 @@ data TempoState = TempoState { _conn :: UDP, _pattern :: Map Text (Pattern Messa
 makeLenses ''TempoState
 
 instance Show TempoState where
-  show (TempoState c p s cy pr cu) = "{ messages " ++ show (arc (addName `foldMapWithKey` p) pr cu) ++ " cu " ++ (show cu) ++ " }"
+   show (TempoState c p s cy pr cu) = "{ messages " ++ show (arc (addName `foldMapWithKey` p) pr cu) ++ " pr " ++ (show pr) ++ " cu " ++ (show cu) ++ " }"
 
 ostr = ASCII_String . encodeUtf8
 
@@ -90,11 +90,24 @@ overlay p q = Pattern (\pr t -> arc p pr t ++ arc q pr t)
 flatten :: Pattern [a] -> Pattern a
 flatten ps = Pattern (\pr t -> concat (arc ps pr t))
 
+once :: Pattern a -> Pattern a
+once = att 0
+
 att :: Float -> Pattern a -> Pattern a
-att t' p = Pattern (\pr t -> if t' >= pr && t' < t then arc p pr t else [])
+att t p = Pattern (\pr cu -> if t >= pr && t < cu then arc p pr t else [])
 
 offset :: Float -> Pattern a -> Pattern a
-offset o p = Pattern (\pr t -> arc p ((pr + o) `mod'` 1) ((t + o) `mod'` 1))
+offset o p = Pattern (\pr t -> arc p ((pr - o) `mod'` 1) ((t - o) `mod'` 1))
+
+seqp :: [Pattern a] -> Pattern a
+seqp ps = seqpN 0 (length ps) ps
+
+seqpN :: Int -> Int -> [Pattern a] -> Pattern a
+seqpN i n (p:ps) = mappend (offset (seg * (fromIntegral i)) (Pattern timeGuard)) (seqpN (i+1) n ps)
+  where
+    seg = (1 :: Float) / (fromIntegral n)
+    timeGuard pr t = if t >= 0 && t < seg then arc p pr t else arc p pr t
+seqpN _ _ [] = mempty
 
 timePattern :: Pattern Float
 timePattern = Pattern (\_ t -> [t])
@@ -151,9 +164,9 @@ effectName t = ProgramName t effectText
 programMessage :: ProgramName a -> Maybe Text -> [Pattern (Uniform UniformType)] -> Pattern Message
 programMessage p me us = mconcat $ (progMsg:maybe [clearMsg] ((:[]) . effectMsg) me) ++ uMsgs
   where
-    effectMsg e = att 0 <$> pure $ Message "/progs/effect" [ostr e]
-    clearMsg = att 0 <$> pure $ Message "/progs/effect/clear" []
-    progMsg = att 0 <$> pure $ Message "/progs" [ostr $ nameF p (prog p)]
+    effectMsg e = once <$> pure $ Message "/progs/effect" [ostr e]
+    clearMsg = once <$> pure $ Message "/progs/effect/clear" []
+    progMsg = once <$> pure $ Message "/progs" [ostr $ nameF p (prog p)]
     uMsgs = (uniformMessage <$>) <$> us
 
 pme :: ProgramName a -> String -> [Pattern (Uniform UniformType)] -> Pattern Message
@@ -189,6 +202,7 @@ updateCycle now = do
 sendMessages :: MonadIO io => StateT TempoState io ()
 sendMessages = do
   tState <- get
+  -- liftIO $ print tState
   liftIO $ T.sendOSC (view conn tState) $ Bundle 0 $ arc (addName `foldMapWithKey` (view pattern tState)) (view prev tState) (view current tState)
   -- liftIO $ print $ arc (addName `foldMapWithKey` pattern tState) (current tState)
 
