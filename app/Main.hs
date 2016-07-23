@@ -94,10 +94,14 @@ once :: Pattern a -> Pattern a
 once = att 0
 
 att :: Float -> Pattern a -> Pattern a
-att t p = Pattern (\pr cu -> if t >= pr && t < cu then arc p pr t else [])
+att t p = Pattern (\pr cu -> if (match pr cu) then arc p pr cu else [])
+  where
+    matchSame pr cu = t >= pr && t < cu
+    matchWrap pr cu = (cu < pr) && (t >= pr || t < cu)
+    match pr cu = (matchSame pr cu || matchWrap pr cu)
 
 offset :: Float -> Pattern a -> Pattern a
-offset o p = Pattern (\pr t -> arc p ((pr - o) `mod'` 1) ((t - o) `mod'` 1))
+offset o (Pattern a) = Pattern (\pr t -> a ((pr - o) `mod'` 1) ((t - o) `mod'` 1))
 
 seqp :: [Pattern a] -> Pattern a
 seqp ps = seqpN 0 (length ps) ps
