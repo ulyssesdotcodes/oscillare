@@ -4,10 +4,7 @@
 module Main where
 
 import Control.Concurrent
-import Control.Concurrent.MVar
-import Control.Concurrent.Chan
 import Control.Lens
-import Control.Monad
 import Control.Monad.Reader
 import Control.Monad.Trans.State
 import Data.Fixed
@@ -16,8 +13,6 @@ import Data.Text (Text, pack)
 import Data.Text.Encoding
 import Data.Time.Clock
 import Sound.OSC
-import System.Environment
-import qualified Data.ByteString.Char8 as BS
 import qualified Sound.OSC.Transport.FD as T
 
 data Pattern a = Pattern { arc :: Float -> Float -> [a] }
@@ -26,20 +21,18 @@ data TempoState = TempoState { _conn :: UDP, _pattern :: Map Text (Pattern Messa
 
 makeLenses ''TempoState
 
+main = print "Nope"
+
 instance Show TempoState where
-   show (TempoState c p s cy pr cu) = "{ messages " ++ show (arc (addName `foldMapWithKey` p) pr cu) ++ " pr " ++ (show pr) ++ " cu " ++ (show cu) ++ " }"
+   show (TempoState _ p _ _ pr cu) = "{ messages " ++ show (arc (addName `foldMapWithKey` p) pr cu) ++ " pr " ++ (show pr) ++ " cu " ++ (show cu) ++ " }"
 
 ostr = ASCII_String . encodeUtf8
-
-main = do
-  mvarT <- revEngines
-  sync mvarT
 
 revEngines :: IO (MVar TempoState)
 revEngines = do
   now <- getCurrentTime
-  conn <- openUDP "127.0.0.1" 9001
-  mVarT <- newMVar $ TempoState conn (fromList []) (utctDayTime now) (secondsToDiffTime 1) 0 0
+  conn' <- openUDP "127.0.0.1" 9001
+  mVarT <- newMVar $ TempoState conn' (fromList []) (utctDayTime now) (secondsToDiffTime 1) 0 0
   return mVarT
 
 gunEngines :: MVar TempoState -> IO (ThreadId)
@@ -110,7 +103,7 @@ seqpN :: Int -> Int -> [Pattern a] -> Pattern a
 seqpN i n (p:ps) = mappend (offset (seg * (fromIntegral i)) (Pattern timeGuard)) (seqpN (i+1) n ps)
   where
     seg = (1 :: Float) / (fromIntegral n)
-    timeGuard pr t = if t >= 0 && t < seg then arc p pr t else arc p pr t
+    timeGuard pr t = if t >= 0 && t < seg then arc p pr t else []
 seqpN _ _ [] = mempty
 
 timePattern :: Pattern Float
@@ -140,9 +133,9 @@ up :: String -> Pattern UniformType -> Pattern (Uniform UniformType)
 up s = uniformPattern (pack s)
 
 data Program
-  = Sine
+  = AudioData
   | Line
-  | AudioData
+  | Sine
 
 data Effect
   = Scale
@@ -165,13 +158,23 @@ progName t = ProgramName t programText
 effectName :: Effect -> ProgramName Effect
 effectName t = ProgramName t effectText
 
-programMessage :: ProgramName a -> Maybe Text -> [Pattern (Uniform UniformType)] -> Pattern Message
+programMessage :: ProgramName a -> Maybe (Text) -> [Pattern (Uniform UniformType)] -> Pattern Message
 programMessage p me us = mconcat $ (progMsg:maybe [clearMsg] ((:[]) . effectMsg) me) ++ uMsgs
   where
     effectMsg e = once <$> pure $ Message "/progs/effect" [ostr e]
     clearMsg = once <$> pure $ Message "/progs/effect/clear" []
     progMsg = once <$> pure $ Message "/progs" [ostr $ nameF p (prog p)]
     uMsgs = (uniformMessage <$>) <$> us
+
+passthrough :: Pattern Text -> Pattern Message
+passthrough ep = mappend progMsg effectMsg
+   where
+     effectMsg = (\e -> Message "/progs/effect" [ostr e]) <$> ep
+     progMsg = once <$> pure $ Message "/progs" [ostr $ pack "passthrough"]
+
+pt :: Pattern String -> Pattern Message
+pt = passthrough . fmap pack
+
 
 pme :: ProgramName a -> String -> [Pattern (Uniform UniformType)] -> Pattern Message
 pme p t = programMessage p (Just $ pack t)

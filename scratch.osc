@@ -5,14 +5,16 @@ p "s" $ pme (progName AudioData) "p2" [up "tex_audio" (ui <$> pure (AudioTexture
 
 p  "s" $ seqp [pme (progName AudioData) "p2" [up "tex_audio" (ui <$> pure (AudioTexture, 2))], pme (progName Sine) "p2" [timeUniform]]
 
-p "p1" $ pm (effectName Scale) [up "scale" (uf . (* (-0.005)) . (+ 1) .sin . (* (3.1415 * 4)) <$> timePattern)]
+p "p2" $ pm (effectName Scale) [up "scale" (uf . (* (-0.005)) . (+ 1) .sin . (* (3.1415 * 4)) <$> timePattern)]
+
+p "p2" $ pt $ seqp $ (pure ) <$> ["p3", "p4"]
 
 p "p3" $ pm (effectName Scale) [up "scale" $ uf <$> seqp [pure 0, timePattern]]
 
 t 2.3
 
 p "p2" $ pme (effectName Fade) "p3" [up "fade" $ uf <$> offset 0.5 $ mconcat [att 0 $ pure 0, att 0.5 $ pure 0.9]]
-p "p2" $ pme (effectName Fade) "p3" [up "fade" $ uf <$> pure 0.97]
+p "p4" $ pme (effectName Fade) "p3" [up "fade" $ uf <$> pure 0.97]
 p "p2" $ pme (effectName Fade) "p3" [up "fade" $ uf <$> pure 0]
 
  scaleEffect = programMessage (effectName Scale) Nothing [uniformPattern "scale" ((* 0.5) . sin . (* (3.1415 * 2)) <$> timePattern)]
