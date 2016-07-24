@@ -111,11 +111,12 @@ timePattern = Pattern (\_ t -> [t])
 
 data UniformType = UniformFloat Float | UniformInput (InputType, Float)
 
-data InputType = AudioTexture | Volume
+data InputType = AudioTexture | Volume | EqTexture
 
 inputText :: InputType -> Text
 inputText AudioTexture = "audio_texture"
 inputText Volume = "volume"
+inputText EqTexture = "eq_texture"
 
 uf = UniformFloat
 ui = UniformInput
@@ -136,6 +137,7 @@ data Program
   = AudioData
   | Line
   | Sine
+  | Dots
 
 data Effect
   = Scale
@@ -146,6 +148,7 @@ programText :: Program -> Text
 programText Sine = "sine"
 programText Line = "line_down"
 programText AudioData = "audio_data"
+programText Dots = "dots"
 
 effectText :: Effect -> Text
 effectText Scale = "scale"
