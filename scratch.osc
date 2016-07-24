@@ -1,8 +1,14 @@
-p "s" $ pt $ seqp $ pure <$> ["s1", "s2"]
-p "s1" $ offset 0.5 $ pme (progName Sine) "p2" [ up "amplitude" $ uf <$> pure 0.2, timeUniform]
-p "s" $ pme (progName AudioData) "p4" [up "tex_audio" (ui <$> pure (EqTexture, 12))]
-p "s" $ pme (progName Dots) "p4" [up "eqs" (ui <$> pure (EqTexture, 4)), timeUniform]
+p "s" $ pme (progName Dots) "p1" [up "eqs" (ui <$> pure (EqTexture, 10))]
+p "s" $ pme (progName Sine) "p1" []
 
+
+p "p1" $ pme (effectName Add) "p2" []
+
+p "p2" $ pme (progName AudioData) "bl" [up "tex_audio" (ui <$> pure (AudioTexture, 2))]
+
+-------------------------------------------
+
+p "s" $ pme (progName Dots) "p4" [up "eqs" ((zipui EqTexture) . (+ 1) . (* 8) . sin . (* 3.1415) <$> timePattern), timeUniform]
 p "s" $ pme (progName AudioData) "p4" [up "tex_audio" (ui <$> pure (AudioTexture, 2))]
 p "p2" $ pme (effectName Repeat) "p3" [up "times" $ uf . (* 3) . sin . (* 3.1415) <$> timePattern]
 

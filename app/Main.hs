@@ -143,6 +143,7 @@ data Effect
   = Scale
   | Fade
   | Repeat
+  | Add
 
 programText :: Program -> Text
 programText Sine = "sine"
@@ -154,6 +155,7 @@ effectText :: Effect -> Text
 effectText Scale = "scale"
 effectText Fade = "fade"
 effectText Repeat = "repeat"
+effectText Add = "add"
 
 data ProgramName a = ProgramName { prog :: a, nameF :: (a -> Text) }
 
