@@ -1,13 +1,15 @@
-p "s" $ pme (progName Sine) "p1" [timeUniform]
-p "s" $ pme (progName Sine) "p2" [timeUniform]
-p "s" $ pme (progName AudioData) "p2" [up "tex_audio" (ui <$> pure (AudioTexture, 2))]
+p "s" $ pt $ seqp $ pure <$> ["s1", "s2"]
+p "s1" $ pme (progName Sine) "p2" [timeUniform]
+p "s2" $ pme (progName AudioData) "p2" [up "tex_audio" (ui <$> pure (AudioTexture, 2))]
+p "p2" $ pm (effectName Repeat) [up "times" $ uf $ pure 3]
+
+p "p2" $ pt $ seqp $ (pure ) <$> ["p3", "p4"]
 
 
 p  "s" $ seqp [pme (progName AudioData) "p2" [up "tex_audio" (ui <$> pure (AudioTexture, 2))], pme (progName Sine) "p2" [timeUniform]]
 
 p "p2" $ pm (effectName Scale) [up "scale" (uf . (* (-0.005)) . (+ 1) .sin . (* (3.1415 * 4)) <$> timePattern)]
 
-p "p2" $ pt $ seqp $ (pure ) <$> ["p3", "p4"]
 
 p "p3" $ pm (effectName Scale) [up "scale" $ uf <$> seqp [pure 0, timePattern]]
 
