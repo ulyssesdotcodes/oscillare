@@ -24,6 +24,7 @@ library
                , hosc >= 0.15
                , lens >= 4.13
                , mtl
+               , network >= 2.6
                , parsec
                , resourcet
                , text >= 1.2

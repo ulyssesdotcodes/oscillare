@@ -1,10 +1,15 @@
-p "s" $ pme (progName Dots) "p1" [up "eqs" (ui <$> pure (EqTexture, 10))]
-p "s" $ pme (progName Sine) "p1" []
+p "s1" $ pme (progName Dots) "p1" [up "eqs" ((zipui EqTexture) . (* 8) . sin . (* 3.1415) <$> timePattern)]
+p "s" $ pme (progName AudioData) "bl" [up "tex_audio" $ ui <$> pure (AudioTexture, 1)]
 
+p "s" $ pt $ seqp ["s1", "s2"]
 
-p "p1" $ pme (effectName Add) "p2" []
+p "p2" $ pme (effectName Scale) "p3" [up "scale" (uf . (* (-0.02)) .sin . (* (3.1415)) <$> timePattern)]
 
-p "p2" $ pme (progName AudioData) "bl" [up "tex_audio" (ui <$> pure (AudioTexture, 2))]
+p "p1" $ pme (effectName Fade) "p2" [up "fade" $ uf <$> pure 0.8]
+
+p "p3" $ pme (effectName Repeat) "bl" [up "times" $ uf <$> (seqp $ pure <$> [0, 1, 2, 1])]
+
+t 2
 
 -------------------------------------------
 

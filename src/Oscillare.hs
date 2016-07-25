@@ -4,6 +4,7 @@
 module Oscillare where
 
 import Control.Concurrent
+import Control.Exception
 import Control.Lens
 import Control.Monad.Reader
 import Control.Monad.Trans.State
@@ -12,6 +13,7 @@ import Data.Map.Strict
 import Data.Text (Text, pack)
 import Data.Text.Encoding
 import Data.Time.Clock
+import Network.Socket
 import Sound.OSC
 import qualified Sound.OSC.Transport.FD as T
 
@@ -204,6 +206,9 @@ addName n p = appendDatum (ostr n) <$> p
 appendDatum :: Datum -> Message -> Message
 appendDatum d (Message a ds) = Message a (d:ds)
 
+oscConnected :: UDP -> IO Bool
+oscConnected (UDP sock) = isBound sock
+
 updateCycle :: MonadIO io => DiffTime -> StateT TempoState io ()
 updateCycle now = do
   tState <- get
@@ -217,8 +222,10 @@ sendMessages :: MonadIO io => StateT TempoState io ()
 sendMessages = do
   tState <- get
   -- liftIO $ print tState
-  liftIO $ T.sendOSC (view conn tState) $ Bundle 0 $ arc (addName `foldMapWithKey` (view pattern tState)) (view prev tState) (view current tState)
+  liftIO $ T.sendOSC (conn' tState) $ Bundle 0 $ arc (addName `foldMapWithKey` (view pattern tState)) (view prev tState) (view current tState)
   -- liftIO $ print $ arc (addName `foldMapWithKey` pattern tState) (current tState)
+  where
+    conn' ts = view conn ts
 
 frame :: MonadIO io => StateT TempoState io ()
 frame = do
