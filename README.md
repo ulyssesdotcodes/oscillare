@@ -32,7 +32,7 @@ First, make sure it's installed correctly:
 3. Run `oscillare-start-haskell`
 4. Double check that you see `Prelude Oscillare>` when you run `oscillare-see-output`
 
-Now it's time to get started! Check out `scratch.osc` for some example programs.
+Now it's time to get started! Check out `scratch.osc` for some example programs. So long as everything is set up correctly and you have a .osc file open you can run individual lines by pressing `Ctrl-c Ctrl-c`. You can see the haskell buffer by pressing `Ctrl-c Ctrl-s`.
 
 For example, to display a simple sine wave:
 
@@ -105,5 +105,15 @@ Next comes the program or effect. Right now programs are `Sine`, `AudioData`, an
 Finally there are uniform patterns. These are evaluated every frame and sent to oschader-cinder. You can make a pattern only happen once using `att` along with a time from 0-1. The program messages use this so it's only sent once every cycle. You can make a bunch of patterns happen one after another using `seqp` which will switch between patterns throughout the cycle.
 
 The tempo is set using `t`. The default is 1 second, but any number of seconds will do.
+
+### Tips and Tricks
+
+- Alpha transparent emacs can be found at https://www.emacswiki.org/emacs/TransparentEmacs
+
+### Known Issues
+
+- On OSX you have to start oschader-cinder first. If you quit oschader-cinder you have to restart oscillare.
+
+
 
     Copyright (C) 2016  Ulysses Popple
