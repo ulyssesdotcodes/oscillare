@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module Main where
+module Oscillare where
 
 import Control.Concurrent
 import Control.Lens

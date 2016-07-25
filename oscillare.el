@@ -15,7 +15,7 @@
   "Start oscillare"
   (interactive)
   (call-interactively 'inferior-haskell-start-process)
-  (oscillare-send-string ":module Main")
+  (oscillare-send-string ":module Oscillare")
   (oscillare-send-string "(p, t, thread) <- run")
   )
 
