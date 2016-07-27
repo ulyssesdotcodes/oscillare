@@ -21,8 +21,6 @@ data TempoState = TempoState { _conn :: UDP, _pattern :: Map Text (Pattern Messa
 
 makeLenses ''TempoState
 
-main = print "Nope"
-
 instance Show TempoState where
    show (TempoState _ p _ _ pr cu) = "{ messages " ++ show (arc (addName `foldMapWithKey` p) pr cu) ++ " pr " ++ (show pr) ++ " cu " ++ (show cu) ++ " }"
 
@@ -138,6 +136,7 @@ data Program
   | Line
   | Sine
   | Dots
+  | Particles
 
 data Effect
   = Scale
@@ -150,6 +149,7 @@ programText Sine = "sine"
 programText Line = "line_down"
 programText AudioData = "audio_data"
 programText Dots = "dots"
+programText Particles = "particles"
 
 effectText :: Effect -> Text
 effectText Scale = "scale"

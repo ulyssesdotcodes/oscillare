@@ -1,5 +1,9 @@
 p "s" $ pme (progName Dots) "p1" [up "eqs" (ui <$> pure (EqTexture, 10))]
-p "s" $ pme (progName Sine) "p1" []
+p "s" $ pme (progName Sine) "p1" [timeUniform]
+
+p "s" $ pme (progName Particles) "p1" []
+
+p "p1" $ pme (effectName Fade) "bl" [up "fade" $ uf <$> (seqp $ pure <$> [0.8, 0.9, 0.99, 0.9])]
 
 
 p "p1" $ pme (effectName Add) "p2" []
