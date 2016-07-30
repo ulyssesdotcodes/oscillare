@@ -139,6 +139,7 @@ data Program =
   | Mult
   | Scale
   | Sine
+  | StringTheory
   | Repeat
 
 programText :: Program -> Text
@@ -151,6 +152,7 @@ programText Line = "line_down"
 programText Mult = "mult"
 programText Scale = "scale"
 programText Sine = "sine"
+programText StringTheory = "string_theory"
 programText Repeat = "repeat"
 
 programMessage :: Program -> Maybe (Text) -> [Pattern (Uniform UniformType)] -> Pattern Message

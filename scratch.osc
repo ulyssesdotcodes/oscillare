@@ -1,28 +1,36 @@
-p "s1" $ pme (progName Dots) "p1" [up "eqs" ((zipui EqTexture) . (* 8) . sin . (* 3.1415) <$> timePattern)]
-p "s" $ pme AudioData "p1" [up "tex_audio" $ ui <$> pure (AudioTexture, -0.7)]
+p "s" $ pme Dots "p1" [up "eqs" ((zipui EqTexture) . (+ 1). (* 8) <$> timePattern)]
+p "s" $ pme Sine "p10" [up "time" $ (zipui Volume) <$> (pure (+) <*> ( (* 2) <$> timePattern) <*> pure 0), up "scale" $ uf . (* 4) . sin . (* 3.1415) <$> timePattern]
 
-p "p1" $ pme Brightness "p3" [up "brightness"$ uf <$> (seqp $ pure <$> [0, 1, 0, 0, 0])]
+p "s" $ pme StringTheory "p1" [timeUniform, up "angle_delta" $ (zipui Volume) <$> pure 2]
+p "p1" $ pme Fade "p2" [up "fade" $ (zipui Volume) . (* 0.6)  . (+ 1) . sin . (* 3.1415) <$> timePattern]
 
-p "p3" $ pme Add "s2" []
-p "p7" $ pme Add "s3" []
+p "p2" $ pt $ seqp $ pure <$> ["p5", "p4"]
+p "p4" $ pme Mult "s2" []
+p "p5" $ pme Add "s2" []
 
-p "s3" $ pme Sine "p8" []
+p "s2" $ pme AudioData "p3" [up "tex_audio" $ ui <$> pure (AudioTexture, -0.8)]
+p "p3" $ pme Fade "bl" [up "fade" $ uf <$> pure 0.5]
 
-p "p8" $ offset 0.5 $ pt "p4"
+p "s" $ pme AudioData "p8" [up "tex_audio" $ ui <$> pure (EqTexture, 20)]
+p "p8" $ pme Repeat "p3" [up "times" $ uf <$> pure 4]
 
-p "s2" $ pme Dots "p4" [up "eqs" $ ui <$> pure (EqTexture, 6)]
-p "p4" $ pme Brightness "p5" [up "brightness" $ uf . (+1) . sin . (*3.1415) <$> timePattern]
+p "p9" $ pme Repeat "p1" [up "times" $ ui <$> pure (Volume, 2)]
+p "p10" $ pme Fade "p9" [up "fade"$ uf <$> pure 0.8]
 
-p "s" $ pt $ seqp ["s1", "s2"]
+p "p1" $ pt $ seqp $ pure <$> ["p4", "p5"]
 
-p "p2" $ pme (effectName Scale) "p3" [up "scale" (uf . (* (-0.02)) .sin . (* (3.1415)) <$> timePattern)]
+p "p5" $ pme Add "s2" []
 
-p "p2" $ pme Fade "bl" [up "fade" $ uf <$> pure 0.8]
+p "p4" $ pme Mult "s2" []
 
-P "p5" $ pme Repeat "p6" [up "times" $ uf <$> (seqp $ pure <$> [4, 8])]
-p "p6" $ pme Fade "bl" [up "fade" $ uf <$> pure 0.8]
 
-t 2
+let flash = mappend (att 0 $ pure 1) (att 0.05 $ pure 0)
+
+p "p3" $ pme Brightness "p7" [up "brightness" $ ui <$> pure (Volume, 0.04)]
+
+p "p7" $ pme Fade "bl" [up "fade" $ uf <$> pure 0.92]
+
+t 2.5
 
 -------------------------------------------
 
