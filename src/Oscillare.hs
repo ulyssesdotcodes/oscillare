@@ -53,12 +53,6 @@ runProg mts t p = modifyMVar_ mts $ return <$> setProg (pack t) p
 changeTempo :: MVar TempoState -> Float -> IO ()
 changeTempo mts t = modifyMVar_ mts $ return <$> set cycleLength (fromRational $ toRational t)
 
-sineProg :: Pattern Message
-sineProg = programMessage (progName Sine) (Just "p1") [timeUniform]
-
-scaleEffect :: Pattern Message
-scaleEffect = programMessage (effectName Scale) Nothing [uniformPattern "scale" (uf . (* 0.5) . sin . (* (3.1415 * 2)) <$> timePattern)]
-
 instance Functor Pattern where
   fmap f (Pattern a) = Pattern (\p t -> f <$> a p t)
 
@@ -136,46 +130,40 @@ uniformPattern n = fmap (Uniform n)
 up :: String -> Pattern UniformType -> Pattern (Uniform UniformType)
 up s = uniformPattern (pack s)
 
-data Program
-  = AudioData
-  | Line
-  | Sine
+data Program =
+  Add
+  | AudioData
+  | Brightness
   | Dots
-  | Particles
-
-data Effect
-  = Scale
   | Fade
+  | Line
+  | Mult
+  | Particles
   | Repeat
-  | Add
+  | Scale
+  | Sine
+  | StringTheory
 
 programText :: Program -> Text
-programText Sine = "sine"
-programText Line = "line_down"
+programText Add = "add"
 programText AudioData = "audio_data"
+programText Brightness = "brightness"
 programText Dots = "dots"
 programText Particles = "particles"
+programText Fade = "fade"
+programText Line = "line_down"
+programText Mult = "mult"
+programText Scale = "scale"
+programText Sine = "sine"
+programText StringTheory = "string_theory"
+programText Repeat = "repeat"
 
-effectText :: Effect -> Text
-effectText Scale = "scale"
-effectText Fade = "fade"
-effectText Repeat = "repeat"
-effectText Add = "add"
-
-data ProgramName a = ProgramName { prog :: a, nameF :: (a -> Text) }
-
-progName :: Program -> ProgramName Program
-progName t = ProgramName t programText
-
-effectName :: Effect -> ProgramName Effect
-effectName t = ProgramName t effectText
-
-programMessage :: ProgramName a -> Maybe (Text) -> [Pattern (Uniform UniformType)] -> Pattern Message
+programMessage :: Program -> Maybe (Text) -> [Pattern (Uniform UniformType)] -> Pattern Message
 programMessage p me us = mconcat $ (progMsg:maybe [clearMsg] ((:[]) . effectMsg) me) ++ uMsgs
   where
     effectMsg e = once <$> pure $ Message "/progs/effect" [ostr e]
     clearMsg = once <$> pure $ Message "/progs/effect/clear" []
-    progMsg = once <$> pure $ Message "/progs" [ostr $ nameF p (prog p)]
+    progMsg = once <$> pure $ Message "/progs" [ostr $ programText p]
     uMsgs = (uniformMessage <$>) <$> us
 
 passthrough :: Pattern Text -> Pattern Message
@@ -188,10 +176,10 @@ pt :: Pattern String -> Pattern Message
 pt = passthrough . fmap pack
 
 
-pme :: ProgramName a -> String -> [Pattern (Uniform UniformType)] -> Pattern Message
+pme :: Program -> String -> [Pattern (Uniform UniformType)] -> Pattern Message
 pme p t = programMessage p (Just $ pack t)
 
-pm :: ProgramName a -> [Pattern (Uniform UniformType)] -> Pattern Message
+pm :: Program -> [Pattern (Uniform UniformType)] -> Pattern Message
 pm p = programMessage p Nothing
 
 uniformMessage :: Uniform UniformType -> Message
