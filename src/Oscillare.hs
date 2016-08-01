@@ -125,6 +125,9 @@ data Uniform a =  Uniform { name :: Text, value :: a }
 timeUniform :: Pattern (Uniform UniformType)
 timeUniform = uniformPattern "time" (UniformFloat <$> timePattern)
 
+deltaUniform :: Pattern (Uniform UniformType)
+deltaUniform = uniformPattern "delta" $ UniformFloat <$> Pattern (\p t -> [(t - p) `mod'` 1])
+
 uniformPattern :: Text -> Pattern UniformType -> Pattern (Uniform UniformType)
 uniformPattern n = fmap (Uniform n)
 
