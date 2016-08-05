@@ -103,6 +103,12 @@ seqpN _ _ [] = mempty
 timePattern :: Pattern Float
 timePattern = Pattern (\_ t -> [t])
 
+deltaPattern :: Pattern Float
+deltaPattern = Pattern (\p t -> [(t - p) `mod'` 1])
+
+sinTimePattern :: Pattern Float
+sinTimePattern = sin . (* 3.1415) <$> timePattern
+
 data UniformType = UniformFloat Float | UniformInput (InputType, Float)
 
 data InputType = AudioTexture | Volume | EqTexture
@@ -122,7 +128,7 @@ timeUniform :: Pattern (Uniform UniformType)
 timeUniform = uniformPattern "time" (UniformFloat <$> timePattern)
 
 deltaUniform :: Pattern (Uniform UniformType)
-deltaUniform = uniformPattern "delta" $ UniformFloat <$> Pattern (\p t -> [(t - p) `mod'` 1])
+deltaUniform = uniformPattern "delta" $ UniformFloat <$> deltaPattern
 
 uniformPattern :: Text -> Pattern UniformType -> Pattern (Uniform UniformType)
 uniformPattern n = fmap (Uniform n)
@@ -138,7 +144,7 @@ data Program =
   | Fade
   | Line
   | Mult
-  | Particles
+  | Flocking
   | Repeat
   | Scale
   | Sine
@@ -149,8 +155,8 @@ programText Add = "add"
 programText AudioData = "audio_data"
 programText Brightness = "brightness"
 programText Dots = "dots"
-programText Particles = "particles"
 programText Fade = "fade"
+programText Flocking = "flocking"
 programText Line = "line_down"
 programText Mult = "mult"
 programText Scale = "scale"
@@ -176,11 +182,8 @@ pt :: Pattern String -> Pattern Message
 pt = passthrough . fmap pack
 
 
-pme :: Program -> String -> [Pattern (Uniform UniformType)] -> Pattern Message
-pme p t = programMessage p (Just $ pack t)
-
-pm :: Program -> [Pattern (Uniform UniformType)] -> Pattern Message
-pm p = programMessage p Nothing
+pme :: Program -> String -> [String] -> [Pattern UniformType] -> Pattern Message
+pme p t uns us = programMessage p (Just $ pack t) (zipWith up uns us)
 
 uniformMessage :: Uniform UniformType -> Message
 uniformMessage (Uniform n (UniformFloat f)) =
