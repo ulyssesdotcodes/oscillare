@@ -134,7 +134,7 @@ uniformPattern :: Text -> Pattern UniformType -> Pattern (Uniform UniformType)
 uniformPattern n = fmap (Uniform n)
 
 up :: String -> Pattern UniformType -> Pattern (Uniform UniformType)
-up s = uniformPattern (pack s)
+up = uniformPattern . pack
 
 data Program =
   Add
@@ -142,9 +142,10 @@ data Program =
   | Brightness
   | Dots
   | Fade
+  | Filter
+  | Flocking
   | Line
   | Mult
-  | Flocking
   | Repeat
   | Scale
   | Sine
@@ -156,6 +157,7 @@ programText AudioData = "audio_data"
 programText Brightness = "brightness"
 programText Dots = "dots"
 programText Fade = "fade"
+programText Filter = "filter"
 programText Flocking = "flocking"
 programText Line = "line_down"
 programText Mult = "mult"
@@ -163,6 +165,26 @@ programText Scale = "scale"
 programText Sine = "sine"
 programText StringTheory = "string_theory"
 programText Repeat = "repeat"
+
+noUProgram :: Program -> String -> Pattern Message
+noUProgram p next = pme p next [] []
+
+singleUProgram :: Program -> String -> Pattern Float -> Pattern Message
+singleUProgram p next uVal = pmeT p (pack next) [programText p] [uf <$> uVal]
+
+
+pAdd = noUProgram Add
+pAudioData next uVolume uInput uVal = pme AudioData next ["tex_audio", "volume"] [(zipui uInput) <$> uVal, uf <$> uVolume]
+pBrightness = singleUProgram Brightness
+pDots next uVolume uInput uVal = pme Dots next ["eqs", "invVolume"] [(zipui uInput) <$> uVal, uf <$> uVolume]
+pFade = singleUProgram Fade
+pFilter = singleUProgram Filter
+-- Have this on the other branch: pFlocking next = pme Flocking 
+pMult = noUProgram Mult
+pScale = singleUProgram Scale
+pSine next uTimeMod uScale uAmplitude = pme Sine next ["time", "scale", "amplitude"] [uf . uTimeMod <$> timePattern, uf <$> uScale, uf <$> uAmplitude]
+pStringTheory next uAngle uAngleDelta uXoff = pme StringTheory next ["angle", "angle_delta", "xoff"] [uAngle, uAngleDelta, uXoff]
+pRepeat = singleUProgram Repeat
 
 programMessage :: Program -> Maybe (Text) -> [Pattern (Uniform UniformType)] -> Pattern Message
 programMessage p me us = mconcat $ (progMsg:maybe [clearMsg] ((:[]) . effectMsg) me) ++ uMsgs
@@ -184,6 +206,9 @@ pt = passthrough . fmap pack
 
 pme :: Program -> String -> [String] -> [Pattern UniformType] -> Pattern Message
 pme p t uns us = programMessage p (Just $ pack t) (zipWith up uns us)
+
+pmeT :: Program -> Text -> [Text] -> [Pattern UniformType] -> Pattern Message
+pmeT p t uns us = programMessage p (Just t) (zipWith uniformPattern uns us)
 
 uniformMessage :: Uniform UniformType -> Message
 uniformMessage (Uniform n (UniformFloat f)) =

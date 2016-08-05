@@ -1,0 +1,6 @@
+p "s" $ pAudioData "p3" (pure 0.3) AudioTexture $ pure 2
+p "p3" $ pMult "s2"
+p "p1" $ pFilter "p2" $ timePattern
+p "p2" $ pFade "bl" $ pure 0.99
+
+p "s2" $ pSine "p1" (sin . (* 3.1415)) (pure 4) (pure 4)

@@ -1,0 +1,8 @@
+p "s" $ pAudioData "p2" (pure 0.4) AudioTexture $ pure 2
+p "p2" $ pFade "p4" $ pure 0.99
+p "p4" $ pScale "p3" $ (* (-0.04)) . (+ (-0.5)) <$> sinTimePattern
+
+p "p3" $ pMult "s2"
+
+p "s2" $ pDots "p1" (pure 8) EqTexture $ pure 16
+p "p1" $ pFilter "bl" $  (* 0.5) . (+ 1) <$> sinTimePattern
