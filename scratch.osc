@@ -1,7 +1,7 @@
 p "s2" $ pSine "p1" (sin . (* 3.1415)) (pure 4) (pure 4)
 p "s2" $ pDots "p1" ((* 1024) . (+ 0.05) . sin . (* 3.1415)) AudioTexture $ (+ 16) . (* 32) <$> sinTimePattern
 p "p1" $ pFilter "p2" $ timePattern
-p "p2" $ pFade "bl" $ pure 0.99
+p "p2" $ pFade "bl" $ pure 0.97
 
 p "s" $ pAudioData "p3" (pure 0.3) AudioTexture $ pure 2
 p "p3" $ pMult "s2"
@@ -10,7 +10,7 @@ t 4
 
 -------------------------------------------
 
-p "s" $ pme Flocking "p1" ["delta", "alignment", "cohesion", "separation", "time"] [deltaPattern, uf . (* 0.1) <$> sinTimePattern, uf . (* 0.2) . sin . (* 3.1415) . (+ 0.5) <$> timePattern, ui <$> pure (Volume, 500), timePattern]
+p "s" $ pme Flocking "p1" ["delta", "alignment", "cohesion", "separation", "time", "speed"] [uf <$> deltaPattern, uf . (* 0.05) <$> sinTimePattern, uf . (* 0.1) . sin . (* 3.1415) . (+ 0.5) <$> timePattern, ui <$> pure (Volume, 1.2), uf <$> timePattern, uf . (* 2) . (+ 1) <$> timePattern]
 p "p1" $ pme Fade "bl" ["fade"] [uf <$> pure 0.98]
 
 p "s" $ pme (progName Dots) "p4" [up "eqs" ((zipui EqTexture) . (+ 1) . (* 8) . sin . (* 3.1415) <$> timePattern), timeUniform]
