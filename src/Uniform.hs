@@ -7,7 +7,7 @@ import Data.Text (Text)
 
 import Pattern
 
-data UniformValue = UniformFloat Double | UniformInput (InputType, Double)
+data UniformValue = UniformFloat Double | UniformInput (InputType, Double) | UniformString String
 
 data InputType = AudioTexture | Volume | EqTexture
 
@@ -18,9 +18,6 @@ inputText :: InputType -> Text
 inputText AudioTexture = "audio_texture"
 inputText Volume = "volume"
 inputText EqTexture = "eq_texture"
-
-uf = UniformFloat
-ui = UniformInput
 
 zipui :: InputType -> Double -> UniformValue
 zipui i f = UniformInput (i, f)
@@ -40,10 +37,10 @@ class FloatUniformPattern a where
   fuPattern :: a -> Pattern UniformValue
 
 instance FloatUniformPattern Double where
-  fuPattern = fmap uf . pure
+  fuPattern = fmap UniformFloat . pure
 
 instance FloatUniformPattern (Pattern Double) where
-  fuPattern = fmap uf
+  fuPattern = fmap UniformFloat
 
 instance FloatPattern a => FloatUniformPattern (FloatInput, a) where
   fuPattern (VolumeInput, f) = zipui Volume <$> floatPattern f

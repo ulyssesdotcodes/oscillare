@@ -64,6 +64,14 @@ programMessage (Program slot (SlottableProgram (BaseProgram prog us effs))) =
   where
     baseSlot = pack $ unpack slot ++ "0"
 programMessage (Program slot (Passthrough sp)) = addSlot slot $ passthrough sp
+programMessage (Program slot (Layer l ss effs)) =
+    (addSlot slot . once . mconcat $ pure <$> [progMsg, effMsg, layerMsg])
+      `mappend` (effectsMessages baseSlot $ reverse effs)
+  where
+    baseSlot = pack $ unpack slot ++ "0"
+    progMsg = Message "/progs" [ostr (progName $ LayerName l)]
+    layerMsg = Message "/progs/connections" $ ostr <$> ss
+    effMsg = Message "/progs/effect" [ostr $ nextSlot baseSlot]
 
 effectsMessages :: Slot -> [Effect] -> Pattern Message
 effectsMessages s ((Effect e us):es) =
@@ -72,7 +80,6 @@ effectsMessages s ((Effect e us):es) =
     s' = nextSlot s
     s'' = nextSlot s'
 effectsMessages s [] = once <$> pure $ Message "/progs/effect/clear" [ostr s]
-
 
 nextSlot :: Slot -> Slot
 nextSlot s = pack $ head s':show (num + 1)
