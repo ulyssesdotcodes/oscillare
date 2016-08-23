@@ -1,10 +1,11 @@
-p "s2" $ pSine "p1" (sin . (* 3.1415)) (pure 4) (pure 4)
-p "s2" $ pDots "p1" ((* 1024) . (+ 0.05) . sin . (* 3.1415)) AudioTexture $ (+ 16) . (* 32) <$> sinTimePattern
-p "p1" $ pFilter "p2" $ timePattern
-p "p2" $ pFade "bl" $ pure 0.97
+p $ pDots "s" ((* 2) . (+ 1) <$> sinTimePattern) (EqTexInput, (+ 3) . (* 10) <$> timePattern)
 
-p "s" $ pAudioData "p3" (pure 0.3) AudioTexture $ pure 2
-p "p3" $ pMult "s2"
+p $ pAudioData "s" 0.5 (AudioTexInput, 50)
+  |+| pScale (-1)
+  |+| pRepeat  (sinTimePattern)
+  |+| pFade 0.9
+
+p $ pSine "s" (* 2) 2 2
 
 t 4
 

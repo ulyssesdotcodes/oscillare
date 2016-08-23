@@ -15,7 +15,7 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Osc, Oscillare
+  exposed-modules:     Oscillare, Uniform, Pattern, Program
   build-depends: aeson >=0.10.0
                , base >= 4.7 && < 5
                , base-prelude

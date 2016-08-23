@@ -40,6 +40,20 @@
                               (line-end-position))))
     (oscillare-send-string s)))
 
+(defun oscillare-run-multiple-lines ()
+  "Send the current region to the interpreter as a single line."
+  (interactive)
+  (save-excursion
+    (mark-paragraph)
+    (let* ((s (buffer-substring-no-properties (region-beginning)
+                                              (region-end))))
+      (oscillare-send-string ":{")
+      (oscillare-send-string s)
+      (oscillare-send-string ":}")
+      (mark-paragraph)
+      (pulse-momentary-highlight-region (mark) (point))
+      )))
+
 (defun chunk-string (n s)
   "Split a string into chunks of n characters"
   (let* ((l (length s))
@@ -62,7 +76,8 @@
 (defun oscillare-mode-keybindings (map)
   "Oscillare keybindings"
   (define-key map [?\C-c ?\C-s] 'oscillare-see-output)
-  (define-key map [?\C-c ?\C-c] 'oscillare-run-line))
+  (define-key map [?\C-c ?\C-c] 'oscillare-run-line)
+  (define-key map (kbd "<C-return>") 'oscillare-run-multiple-lines))
 
 (defvar oscillare-mode-map nil
   "Keymap for oscillare")
