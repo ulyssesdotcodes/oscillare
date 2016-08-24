@@ -57,21 +57,23 @@ changeTempo mts t = modifyMVar_ mts $ return <$> set cycleLength (fromRational $
 
 data SlotMessages = SlotMessages { slot :: Slot, messages :: Pattern Message }
 
+baseSlot slot = pack $ unpack slot ++ "0"
+
 programMessage :: Program -> Pattern Message
 programMessage (Program slot (SlottableProgram (BaseProgram prog us effs))) =
-  slotMessages slot (BaseName prog) (nextSlot baseSlot) us `mappend`
-    (effectsMessages baseSlot $ reverse effs)
+  slotMessages (baseSlot slot) (BaseName prog) (nextSlot (baseSlot slot)) us `mappend`
+    (effectsMessages (baseSlot slot) $ reverse effs)
+programMessage (Program slot (Passthrough sp)) = addSlot (baseSlot slot) $ passthrough $ baseSlot <$> sp
+programMessage (Program slot (Layer l ss es)) =
+  case es of
+    [] -> (addSlot (baseSlot slot) . once . mconcat $ pure <$> [progMsg l, layerMsg ss])
+    e:effs ->
+      (addSlot (baseSlot slot) . once . mconcat $ pure <$> [progMsg l, effMsg, layerMsg ss])
+      `mappend` (effectsMessages (baseSlot slot) $ reverse (e:effs))
   where
-    baseSlot = pack $ unpack slot ++ "0"
-programMessage (Program slot (Passthrough sp)) = addSlot slot $ passthrough sp
-programMessage (Program slot (Layer l ss effs)) =
-    (addSlot slot . once . mconcat $ pure <$> [progMsg, effMsg, layerMsg])
-      `mappend` (effectsMessages baseSlot $ reverse effs)
-  where
-    baseSlot = pack $ unpack slot ++ "0"
-    progMsg = Message "/progs" [ostr (progName $ LayerName l)]
-    layerMsg = Message "/progs/connections" $ ostr <$> ss
-    effMsg = Message "/progs/effect" [ostr $ nextSlot baseSlot]
+    progMsg l = Message "/progs" [ostr (progName $ LayerName l)]
+    layerMsg ss = Message "/progs/connections" $ ostr . baseSlot <$> ss
+    effMsg = Message "/progs/effect" [ostr $ nextSlot (baseSlot slot)]
 
 effectsMessages :: Slot -> [Effect] -> Pattern Message
 effectsMessages s ((Effect e us):es) =
