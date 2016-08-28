@@ -10,8 +10,7 @@ import Control.Monad.Reader
 import Control.Monad.Trans.State
 import Data.Char
 import Data.Map.Strict (Map, insert)
-import Data.Text (Text, pack, unpack)
-import Data.Text.Encoding
+import Data.ByteString.Char8 (ByteString, pack, unpack)
 import Data.Time.Clock
 import Network.Socket
 import Sound.OSC
@@ -21,14 +20,14 @@ import Pattern
 import Program
 import Uniform
 
-data TempoState = TempoState { _conn :: UDP, _pattern :: Map Text Program, _start :: DiffTime, _cycleLength :: DiffTime, _prev :: Double, _current :: Double }
+data TempoState = TempoState { _conn :: UDP, _pattern :: Map ByteString Program, _start :: DiffTime, _cycleLength :: DiffTime, _prev :: Double, _current :: Double }
 
 makeLenses ''TempoState
 
 -- instance Show TempoState where
 --    show (TempoState _ p _ _ pr cu) = "{ messages " ++ show (arc (addName `foldMapWithKey` p) pr cu) ++ " pr " ++ (show pr) ++ " cu " ++ (show cu) ++ " }"
 
-ostr = ASCII_String . encodeUtf8
+ostr = ASCII_String
 
 revEngines :: IO (MVar TempoState)
 revEngines = do
@@ -96,22 +95,21 @@ slotMessages s n next us = addSlot s $ mconcat $ [progMsg, effectMsg, uMsgs us]
     progMsg = once <$> pure $ Message "/progs" [ostr (progName n)]
     uMsgs us' = uniformMessage <$> us'
 
-passthrough :: Pattern Text -> Pattern Message
+passthrough :: Pattern ByteString -> Pattern Message
 passthrough ep = mappend progMsg effectMsg
    where
      effectMsg = (\e -> Message "/progs/effect" [ostr e]) <$> ep
      progMsg = once <$> pure $ Message "/progs" [ostr $ pack "passthrough"]
 
-pt :: String -> Pattern String -> Program
-pt s sp = Program (pack s) (Passthrough $ pack <$> sp)
-
 uniformMessage :: Uniform -> Message
-uniformMessage (Uniform n (UniformFloat f)) =
+uniformMessage (Uniform n (UniformFloatValue (FloatDoubleValue f))) =
   Message "/progs/uniform" [ostr n, float f]
-uniformMessage (Uniform n (UniformInput (i, m))) =
-  Message "/progs/uniform" [ostr n, ostr $ inputText i, float m]
+uniformMessage (Uniform n (UniformFloatValue (FloatInputValue f m))) =
+  Message "/progs/uniform" [ostr n, ostr $ floatInputText f, float m]
+uniformMessage (Uniform n (UniformTexValue (TexInputValue i m))) =
+  Message "/progs/uniform" [ostr n, ostr $ texInputText i, float m]
 
-addSlot :: Text -> Pattern Message -> Pattern Message
+addSlot :: ByteString -> Pattern Message -> Pattern Message
 addSlot n p = appendDatum (ostr n) <$> p
 
 appendDatum :: Datum -> Message -> Message

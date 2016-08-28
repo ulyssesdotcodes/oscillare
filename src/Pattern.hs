@@ -60,13 +60,3 @@ deltaPattern = Pattern (\p t -> [(t - p) `mod'` 1])
 
 sinTimePattern :: Pattern Double
 sinTimePattern = sin . (* 3.1415) <$> timePattern
-
-
-class FloatPattern a where
-  floatPattern :: a -> Pattern Double
-
-instance FloatPattern Double where
-  floatPattern = pure
-
-instance FloatPattern (Pattern Double) where
-  floatPattern = id

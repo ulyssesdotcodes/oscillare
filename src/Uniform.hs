@@ -1,54 +1,90 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FunctionalDependencies #-}
 
 module Uniform where
 
-import Data.Text (Text)
+import Data.ByteString.Char8 (ByteString, pack)
 
 import Pattern
 
-data UniformValue = UniformFloat Double | UniformInput (InputType, Double) | UniformString String
-
-data InputType = AudioTexture | Volume | EqTexture
-
+data FloatValue
+  = FloatInputValue FloatInput Double
+  | FloatDoubleValue Double
 data FloatInput = VolumeInput
+
+floatInputText :: FloatInput -> ByteString
+floatInputText VolumeInput = "volume"
+
+data TexValue
+  = TexInputValue TexInput Double
 data TexInput = AudioTexInput | EqTexInput
 
-inputText :: InputType -> Text
-inputText AudioTexture = "audio_texture"
-inputText Volume = "volume"
-inputText EqTexture = "eq_texture"
+texInputText :: TexInput -> ByteString
+texInputText AudioTexInput = "audio_texture"
+texInputText EqTexInput = "eq_texture"
 
-zipui :: InputType -> Double -> UniformValue
-zipui i f = UniformInput (i, f)
+type StringValue = ByteString
 
-data Uniform =  Uniform { name :: Text, value :: UniformValue }
+data UniformValue
+  = UniformFloatValue FloatValue
+  | UniformTexValue TexValue
+  | UniformStringValue StringValue
+
+data Uniform =  Uniform { name :: ByteString, value :: UniformValue }
 
 timeUniform :: Pattern Uniform
-timeUniform = uniformPattern "time" (UniformFloat <$> timePattern)
+timeUniform = uniformPattern "time" (UniformFloatValue . FloatDoubleValue <$> timePattern)
 
 deltaUniform :: Pattern Uniform
-deltaUniform = uniformPattern "delta" $ UniformFloat <$> deltaPattern
+deltaUniform = uniformPattern "delta" $ UniformFloatValue . FloatDoubleValue <$> deltaPattern
 
-uniformPattern :: Text -> Pattern UniformValue -> Pattern Uniform
+uniformPattern :: ByteString -> Pattern UniformValue -> Pattern Uniform
 uniformPattern n = fmap (Uniform n)
 
 class FloatUniformPattern a where
-  fuPattern :: a -> Pattern UniformValue
+  fPattern :: a -> Pattern FloatValue
 
-instance FloatUniformPattern Double where
-  fuPattern = fmap UniformFloat . pure
+instance FloatUniformPattern Double  where
+  fPattern = pure . FloatDoubleValue
 
-instance FloatUniformPattern (Pattern Double) where
-  fuPattern = fmap UniformFloat
+instance FloatUniformPattern (Pattern Double)  where
+  fPattern = fmap FloatDoubleValue
 
-instance FloatPattern a => FloatUniformPattern (FloatInput, a) where
-  fuPattern (VolumeInput, f) = zipui Volume <$> floatPattern f
+instance RealFloat a => FloatUniformPattern [a]  where
+  fPattern = seqp . fmap (pure . FloatDoubleValue . realToFrac)
+
+instance RealFloat a => FloatUniformPattern (a -> a)  where
+  fPattern f = FloatDoubleValue . realToFrac . f . realToFrac <$> timePattern
+
+class FloatPattern a where
+  floatPattern :: a -> Pattern Double
+
+instance FloatPattern Double where
+  floatPattern = pure
+
+instance FloatPattern (Pattern Double) where
+  floatPattern = id
+
+instance RealFloat a => FloatPattern [a] where
+  floatPattern = seqp . fmap (pure . realToFrac)
+
+instance FloatPattern a => FloatUniformPattern (FloatInput, a)  where
+  fPattern (i, m) = FloatInputValue i <$> floatPattern m
+
+class StringUniformPattern a where
+  sPattern :: a -> Pattern StringValue
+
+instance StringUniformPattern String where
+  sPattern = pure . pack
+
+instance StringUniformPattern [String] where
+  sPattern = seqp . fmap (pure . pack)
 
 class TexUniformPattern a where
-  tuPattern :: a -> Pattern UniformValue
+  tPattern :: a -> Pattern TexValue
 
-instance FloatPattern a => TexUniformPattern (TexInput, a) where
-  tuPattern (AudioTexInput, f) = zipui AudioTexture <$> floatPattern f
-  tuPattern (EqTexInput, f) = zipui EqTexture <$> floatPattern f
-
+instance RealFloat a => TexUniformPattern (TexInput, a) where
+  tPattern (i, m) = pure $ TexInputValue i (realToFrac m)

@@ -1,9 +1,9 @@
 p $ pDots "e" ((* 2) . (+ 1) <$> sinTimePattern) (EqTexInput, (+ 3) . (* 10) <$> timePattern)
 
 p $ pAudioData "a" 0.5 (AudioTexInput, 50)
-  |+| pRepeat  4
-  |+| pFade (VolumeInput, 1.8)
-  |+| pScale (-0.1)
+  |+| pRepeat  (* 2)
+  |+| pFade (VolumeInput, [1, 2, 3])
+  |+| pScale [-0.1, 1, 2]
   |+| pFilter ((* 2) <$> timePattern)
 
 p $ pDots "e" 10 (EqTexInput, offset 0.3 $ (+ 3) . (* 6) <$> sinTimePattern)
@@ -20,7 +20,7 @@ p $ pt "s" $ seqp $ [pure "f", pure "e"]
 p $ pMult "d" ["a", "b", "e"]
   |+| pBrightness ((* 0.5) <$> sinTimePattern )
 
-p $ pAdd "s" ["c", "d"]
+p $ pAdd "s" ["a", "b"]
 
 t 3.1
 
