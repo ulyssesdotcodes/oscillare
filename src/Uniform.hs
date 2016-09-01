@@ -68,6 +68,9 @@ instance FloatPattern Double where
 instance FloatPattern (Pattern Double) where
   floatPattern = id
 
+instance FloatPattern (Double -> Double) where
+  floatPattern f = f <$> timePattern
+
 instance RealFloat a => FloatPattern [a] where
   floatPattern = seqp . fmap (pure . realToFrac)
 
@@ -86,5 +89,5 @@ instance StringUniformPattern [String] where
 class TexUniformPattern a where
   tPattern :: a -> Pattern TexValue
 
-instance RealFloat a => TexUniformPattern (TexInput, a) where
-  tPattern (i, m) = pure $ TexInputValue i (realToFrac m)
+instance FloatPattern a => TexUniformPattern (TexInput, a) where
+  tPattern (i, m) = TexInputValue i <$> floatPattern m

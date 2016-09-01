@@ -17,6 +17,7 @@ data EffectType =
   | Filter
   | Repeat
   | Scale
+  | Translate
 
 data LayerType =
   Add
@@ -26,6 +27,8 @@ data BaseType =
   AudioData
   | Dots
   | Flocking
+  | Lines
+  | Shapes
   | Sine
   | StringTheory
 
@@ -51,8 +54,9 @@ effectName :: EffectType -> ByteString
 effectName Brightness = "brightness"
 effectName Fade = "fade"
 effectName Filter = "filter"
-effectName Scale = "scale"
 effectName Repeat = "repeat"
+effectName Scale = "scale"
+effectName Translate = "translate"
 
 layerName :: LayerType -> ByteString
 layerName Add = "add"
@@ -62,7 +66,9 @@ baseName :: BaseType -> ByteString
 baseName AudioData = "audio_data"
 baseName Dots = "dots"
 baseName Flocking = "flocking"
+baseName Lines = "lines"
 baseName Sine = "sine"
+baseName Shapes = "shapes"
 baseName StringTheory = "string_theory"
 
 progName :: Name -> ByteString
@@ -91,16 +97,20 @@ singleUEffect :: FloatUniformPattern f => EffectType -> f -> Effect
 singleUEffect e f = Effect e $ upf (effectName e) f
 
 pAudioData slot uVolume uData = baseProg slot AudioData $ (upf "volume" uVolume) `mappend` (upt "tex_audio" uData)
-pDots slot uVolume uData = baseProg slot Dots $ (upf "invVolume" uVolume) `mappend` (upt "eqs" uData)
+pDots slot uVolume uData = baseProg slot Dots $ (upf "volume" uVolume) `mappend` (upt "eqs" uData)
 pFlocking slot uAlignment uCohesion uSeparation = baseProg slot Flocking $ mconcat [upf "delta" deltaPattern, upf "alignment" uAlignment, upf "cohesion" uCohesion, upf "separation" uSeparation, upf "time" timePattern]
+pLines slot uWidth uSpacing = baseProg slot Lines $ (upf "width" uWidth) `mappend` (upf "spacing" uSpacing)
+pShapes slot uSides uWidth uSize = baseProg slot Shapes $ mconcat [upf "sides" uSides, upf "width" uWidth, upf "size" uSize]
 pStringTheory slot uTimeMod uAngle uAngleDelta uXoff = baseProg slot StringTheory $ mconcat [upf "angle" uAngle, upf "angle_delta" uAngleDelta, upf "xoff" uXoff]
-pSine slot uTimeMod uScale uAmplitude = baseProg slot Sine $ mconcat [upf "time" $ (uTimeMod :: (Double -> Double)) <$> timePattern, upf "scale" uScale, upf "amplitude" uAmplitude]
+pSine slot uXPos uScale uAmplitude = baseProg slot Sine $ mconcat [upf "time" $ uXPos, upf "scale" uScale, upf "amplitude" uAmplitude]
 
 pBrightness u = singleUEffect Brightness u
 pFade u = singleUEffect Fade u
 pFilter u = singleUEffect Filter u
-pScale u = singleUEffect Scale u
 pRepeat u = singleUEffect Repeat u
+pScale uX uY = Effect Scale $ mconcat [upf "scale_x" uX, upf "scale_y" uY]
+pScale' uXY = pScale uXY uXY
+pTranslate uX uY = Effect Translate $ mconcat [upf "translate_x" uX, upf "translate_y" uY]
 
 pAdd = layer Add
 pMult = layer Mult

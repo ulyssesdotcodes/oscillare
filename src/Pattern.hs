@@ -59,4 +59,7 @@ deltaPattern :: Pattern Double
 deltaPattern = Pattern (\p t -> [(t - p) `mod'` 1])
 
 sinTimePattern :: Pattern Double
-sinTimePattern = sin . (* 3.1415) <$> timePattern
+sinTimePattern = sin . (* (2 * pi)) <$> timePattern
+
+sinMod :: Double -> Double
+sinMod = (+ 0.5) . (* 0.5) . sin . (* (2 * pi))
