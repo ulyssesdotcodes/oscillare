@@ -1,28 +1,28 @@
-p $ pDots "e" ((* 2) . (+ 1) <$> sinTimePattern) (EqTexInput, (+ 3) . (* 10) <$> timePattern)
+p $ pDots "s" 1 (EqTexInput, 4)
+  |+| pFade 0.96
+  |+| pScale 1.01 1.01
 
 p $ pAudioData "s" 0.5 (AudioTexInput, 50)
   |+| pTranslate 0.5 0
 
-p $ pDots "s" 1 (EqTexInput, (+ 4) . (* 6) . sinMod)
-  |+| pTranslate (* 2) 0
+p $ pMult "s" ["a", "b"]
+
+p $ pLines "b" (0.01) (VolumeInput, 0.1)
+
+p $ pShapes "s" 3 0.1 0.1
+  |+| pTranslate 0.1 0.1
 
 p $ pMult "f" ["a", "b"]
 
-p $ pShapes "a" [3, 5, 7, 9] 0.05 (* 0.1)
-  |+| pScale ((* 2) . sinMod) (* 2)
-  |+| pFilter 0.33
+p $ pShapes "s" 4 0.01 0.1
+  |+|
 
-p $ pLines "b" (0.01) ((+ 0.01) . (* 0.01) .  (sinMod))
-  |+| pFilter 0.66
-
-p $ pMult "d" ["a", "b", "e"]
-  |+| pBrightness ((* 0.5) <$> sinTimePattern )
 
 p $ pAdd "s" ["a", "b"]
   |+| pFilter timePattern
   |+| pTranslate 0.2 0
 
-t 3.1
+t 4
 
 -------------------------------------------
 

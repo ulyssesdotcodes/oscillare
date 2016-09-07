@@ -62,4 +62,9 @@ sinTimePattern :: Pattern Double
 sinTimePattern = sin . (* (2 * pi)) <$> timePattern
 
 sinMod :: Double -> Double
-sinMod = (+ 0.5) . (* 0.5) . sin . (* (2 * pi))
+sinMod = sin . (* (2 * pi))
+sinMod' = (+ 0.5) . (* 0.5) . sinMod
+
+cosMod :: Double -> Double
+cosMod = cos . (* (2 * pi))
+cosMod' = (+ 0.5) . (* 0.5) . cosMod

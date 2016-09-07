@@ -1,0 +1,9 @@
+p $ pMult "s" ["a", "b"]
+
+p $ pLines "b" (0.01) (VolumeInput, 0.1)
+
+p $ pAudioData "a" 1 (AudioTexInput, (+ 4) . (* 6) . sinMod')
+  |+| pTranslate 0 (-0.3)
+  |+| pFilter sinMod'
+  |+| pFade 0.96
+  |+| pTranslate (-0.005) 0.01

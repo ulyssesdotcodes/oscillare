@@ -15,7 +15,10 @@ data EffectType =
   Brightness
   | Fade
   | Filter
+  | Mirror
   | Repeat
+  | Reverse
+  | Rotate
   | Scale
   | Translate
 
@@ -54,7 +57,10 @@ effectName :: EffectType -> ByteString
 effectName Brightness = "brightness"
 effectName Fade = "fade"
 effectName Filter = "filter"
+effectName Mirror = "mirror"
 effectName Repeat = "repeat"
+effectName Reverse = "reverse"
+effectName Rotate = "rotate"
 effectName Scale = "scale"
 effectName Translate = "translate"
 
@@ -107,7 +113,10 @@ pSine slot uXPos uScale uAmplitude = baseProg slot Sine $ mconcat [upf "time" $ 
 pBrightness u = singleUEffect Brightness u
 pFade u = singleUEffect Fade u
 pFilter u = singleUEffect Filter u
+pMirror = Effect Mirror mempty
 pRepeat u = singleUEffect Repeat u
+pReverse u = Effect Reverse mempty
+pRotate u = singleUEffect Rotate u
 pScale uX uY = Effect Scale $ mconcat [upf "scale_x" uX, upf "scale_y" uY]
 pScale' uXY = pScale uXY uXY
 pTranslate uX uY = Effect Translate $ mconcat [upf "translate_x" uX, upf "translate_y" uY]

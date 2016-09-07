@@ -1,0 +1,6 @@
+p $ pDots "s" 1 (EqTexInput, 4)
+  |+| pRotate (* 6.2832)
+  |+| pFade 0.98
+  |+| pScale' 0.8
+  |+| pMirror
+  |+| pRotate 0.2
