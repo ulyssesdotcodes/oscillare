@@ -9,6 +9,10 @@ p $ pMult "s" ["a", "b"]
 
 p $ pLines "b" (0.01) (VolumeInput, 0.1)
 
+p $ pFlocking "s" ((* 2) . sinMod') 1 1
+  |+| pFilter (* 1)
+  |+| pFade 0.98
+
 p $ pShapes "s" 3 0.1 0.1
   |+| pTranslate 0.1 0.1
 
@@ -22,33 +26,4 @@ p $ pAdd "s" ["a", "b"]
   |+| pFilter timePattern
   |+| pTranslate 0.2 0
 
-t 4
-
--------------------------------------------
-
-p "s" $ pme Flocking "p1" ["delta", "alignment", "cohesion", "separation", "time", "speed"] [uf <$> deltaPattern, uf . (* 0.05) <$> sinTimePattern, uf . (* 0.1) . sin . (* 3.1415) . (+ 0.5) <$> timePattern, ui <$> pure (Volume, 1.2), uf <$> timePattern, uf . (* 2) . (+ 1) <$> timePattern]
-p "p1" $ pme Fade "bl" ["fade"] [uf <$> pure 0.98]
-
-p "s" $ pme (progName Dots) "p4" [up "eqs" ((zipui EqTexture) . (+ 1) . (* 8) . sin . (* 3.1415) <$> timePattern), timeUniform]
-p "s" $ pme (progName AudioData) "p4" [up "tex_audio" (ui <$> pure (AudioTexture, 2))]
-p "p2" $ pme (effectName Repeat) "p3" [up "times" $ uf . (* 3) . sin . (* 3.1415) <$> timePattern]
-
-p "p2" $ pt $ seqp $ (pure ) <$> ["p3", "p4"]
-
-
-p  "s" $ seqp [pme (progName AudioData) "p2" [up "tex_audio" (ui <$> pure (AudioTexture, 2))], pme (progName Sine) "p2" [timeUniform]]
-
-p "p2" $ pm (effectName Scale) [up "scale" (uf . (* (-0.05)) .sin . (* (3.1415 * 1.2)) <$> timePattern)]
-
-p "p4" $ pme (effectName Repeat) "p3" [up "times" $ uf <$> (seqp $ pure <$> [0, 1, 2, 3, 2, 1])]
-
-
-p "p3" $ pme (effectName Scale) "p4" [up "scale" $ uf <$> (seqp [pure 0, timePattern])]
-
-t 2.2
-
-p "p2" $ pme (effectName Fade) "p3" [up "fade" $ uf <$> offset 0.5 $ mconcat [att 0 $ pure 0, att 0.5 $ pure 0.9]]
-p "p3" $ pme (effectName Fade) "bl" [up "fade" $ uf <$> pure 0.9]
-p "p4" $ pme (effectName Fade) "p0" [up "fade" $ uf <$> pure 0.97]
-
- scaleEffect = programMessage (effectName Scale) Nothing [uniformPattern "scale" ((* 0.5) . sin . (* (3.1415 * 2)) <$> timePattern)]
+t 2

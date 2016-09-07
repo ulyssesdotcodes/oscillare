@@ -104,7 +104,7 @@ singleUEffect e f = Effect e $ upf (effectName e) f
 
 pAudioData slot uVolume uData = baseProg slot AudioData $ (upf "volume" uVolume) `mappend` (upt "tex_audio" uData)
 pDots slot uVolume uData = baseProg slot Dots $ (upf "volume" uVolume) `mappend` (upt "eqs" uData)
-pFlocking slot uAlignment uCohesion uSeparation = baseProg slot Flocking $ mconcat [upf "delta" deltaPattern, upf "alignment" uAlignment, upf "cohesion" uCohesion, upf "separation" uSeparation, upf "time" timePattern]
+pFlocking slot uSeparation uMult uSpeed = baseProg slot Flocking $ mconcat [upf "alignment" ((0.2 :: Double) * uMult), upf "cohesion" ((0.2 :: Double) * uMult), upf "separation" uSeparation, upf "time" timePattern, upf "delta" $ (* uSpeed) <$> deltaPattern]
 pLines slot uWidth uSpacing = baseProg slot Lines $ (upf "width" uWidth) `mappend` (upf "spacing" uSpacing)
 pShapes slot uSides uWidth uSize = baseProg slot Shapes $ mconcat [upf "sides" uSides, upf "width" uWidth, upf "size" uSize]
 pStringTheory slot uTimeMod uAngle uAngleDelta uXoff = baseProg slot StringTheory $ mconcat [upf "angle" uAngle, upf "angle_delta" uAngleDelta, upf "xoff" uXoff]

@@ -1,0 +1,3 @@
+p $ pFlocking "s" ((* 2) . sinMod') 1 1
+  |+| pFilter (* 1)
+  |+| pFade 0.98
