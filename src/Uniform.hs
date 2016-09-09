@@ -2,7 +2,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE FunctionalDependencies #-}
 
 module Uniform where
 
@@ -64,6 +63,9 @@ class FloatPattern a where
 
 instance FloatPattern Double where
   floatPattern = pure
+
+instance FloatPattern Integer where
+  floatPattern = pure . fromInteger
 
 instance FloatPattern (Pattern Double) where
   floatPattern = id

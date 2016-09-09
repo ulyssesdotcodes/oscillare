@@ -4,7 +4,8 @@
 
 module Program where
 
-import Data.ByteString.Char8 (ByteString, pack)
+import Data.ByteString.Char8 (ByteString, pack, append)
+import Data.ByteString.Char8 as BSC
 
 import Pattern
 import Uniform
@@ -31,9 +32,11 @@ data BaseType =
   | Dots
   | Flocking
   | Lines
+  | Passthrough
   | Shapes
   | Sine
   | StringTheory
+  | TriggeredPassthrough
 
 data Name =
   BaseName BaseType
@@ -46,7 +49,6 @@ data BaseProgram =
   BaseProgram BaseType (Pattern Uniform) [Effect]
 data Slottable =
   SlottableProgram BaseProgram
-  | Passthrough (Pattern StringValue)
   | Layer LayerType [Slot] [Effect]
 data Program = Program Slot Slottable
 
@@ -77,6 +79,9 @@ baseName Sine = "sine"
 baseName Shapes = "shapes"
 baseName StringTheory = "string_theory"
 
+baseName Passthrough = "pt"
+baseName TriggeredPassthrough = "ptTriggered"
+
 progName :: Name -> ByteString
 progName (BaseName b) = baseName b
 progName (EffName e) = effectName e
@@ -85,7 +90,6 @@ progName (LayerName l) = layerName l
 (|+|) :: Program -> Effect -> Program
 (|+|) (Program s (SlottableProgram (BaseProgram b us es))) e = Program s $ SlottableProgram $ BaseProgram b us (e:es)
 (|+|) (Program s (Layer l ss es)) e = Program s $ Layer l ss (e:es)
-(|+|) (Program s (Passthrough ps)) _ = Program s (Passthrough ps)
 
 baseProg :: String -> BaseType -> Pattern Uniform -> Program
 baseProg s b us = Program (pack s) (SlottableProgram (BaseProgram b us []))
@@ -96,19 +100,28 @@ layer l s ss = Program (pack s) (Layer l (pack <$> ss) [])
 upf :: FloatUniformPattern f => ByteString -> f -> Pattern Uniform
 upf t pu = uniformPattern t $ UniformFloatValue <$> fPattern pu
 
+ups :: StringUniformPattern f => ByteString -> f -> Pattern Uniform
+ups t pu = uniformPattern t $ UniformStringValue <$> sPattern pu
+
+upsWithBase :: StringUniformPattern f => ByteString -> f -> Pattern Uniform
+upsWithBase t pu = uniformPattern t $ UniformStringValue . BSC.concat . (Prelude.map (`append` "0 ")) . (BSC.split ' ') <$> sPattern pu
+
 upt :: TexUniformPattern t => ByteString -> t -> Pattern Uniform
-upt t pt = uniformPattern t $ UniformTexValue <$> tPattern pt
+upt t pu = uniformPattern t $ UniformTexValue <$> tPattern pu
 
 singleUEffect :: FloatUniformPattern f => EffectType -> f -> Effect
 singleUEffect e f = Effect e $ upf (effectName e) f
 
 pAudioData slot uVolume uData = baseProg slot AudioData $ (upf "volume" uVolume) `mappend` (upt "tex_audio" uData)
 pDots slot uVolume uData = baseProg slot Dots $ (upf "volume" uVolume) `mappend` (upt "eqs" uData)
-pFlocking slot uSeparation uMult uSpeed = baseProg slot Flocking $ mconcat [upf "alignment" ((0.2 :: Double) * uMult), upf "cohesion" ((0.2 :: Double) * uMult), upf "separation" uSeparation, upf "time" timePattern, upf "delta" $ (* uSpeed) <$> deltaPattern]
+pFlocking slot uSeparation uMult uSpeed = baseProg slot Flocking $ mconcat [upf "alignment" uMult, upf "cohesion" uMult, upf "separation" uSeparation, upf "time" timePattern, upf "delta" $ deltaPattern, upf "speed" uSpeed]
 pLines slot uWidth uSpacing = baseProg slot Lines $ (upf "width" uWidth) `mappend` (upf "spacing" uSpacing)
 pShapes slot uSides uWidth uSize = baseProg slot Shapes $ mconcat [upf "sides" uSides, upf "width" uWidth, upf "size" uSize]
 pStringTheory slot uTimeMod uAngle uAngleDelta uXoff = baseProg slot StringTheory $ mconcat [upf "angle" uAngle, upf "angle_delta" uAngleDelta, upf "xoff" uXoff]
 pSine slot uXPos uScale uAmplitude = baseProg slot Sine $ mconcat [upf "time" $ uXPos, upf "scale" uScale, upf "amplitude" uAmplitude]
+
+pt s sp = baseProg s Passthrough (upsWithBase "program" sp)
+ptTriggered s sp uTrig = baseProg s TriggeredPassthrough $ upsWithBase "program" sp `mappend` upf "trigger" uTrig
 
 pBrightness u = singleUEffect Brightness u
 pFade u = singleUEffect Fade u
@@ -124,5 +137,4 @@ pTranslate uX uY = Effect Translate $ mconcat [upf "translate_x" uX, upf "transl
 pAdd = layer Add
 pMult = layer Mult
 
-pt :: StringUniformPattern a => String -> a -> Program
-pt s sp = Program (pack s) (Passthrough $ sPattern sp)
+

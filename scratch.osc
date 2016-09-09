@@ -1,25 +1,27 @@
 p $ pDots "s" 1 (EqTexInput, 4)
-  |+| pFade 0.96
   |+| pScale 1.01 1.01
 
-p $ pAudioData "s" 0.5 (AudioTexInput, 50)
-  |+| pTranslate 0.5 0
+p $ pAudioData "b" 2 (AudioTexInput, 100)
+  |+| pFilter 0.2
 
 p $ pMult "s" ["a", "b"]
 
-p $ pLines "b" (0.01) (VolumeInput, 0.1)
+p $ pLines "b" (0.01) (VolumeInput, 10)
+  |+| pFade 0.96
 
-p $ pFlocking "s" ((* 2) . sinMod') 1 1
-  |+| pFilter (* 1)
-  |+| pFade 0.98
+p $ pFlocking "a" (VolumeInput, 100) 2 16
+  |+| pFade 0.99
 
 p $ pShapes "s" 3 0.1 0.1
   |+| pTranslate 0.1 0.1
 
 p $ pMult "f" ["a", "b"]
 
-p $ pShapes "s" 4 0.01 0.1
-  |+|
+p $ ptTriggered "s" "a b" (VolumeInput, 4)
+
+p $ pt "s" ["a", "b"]
+
+p $ pShapes "s" 3 0.01 0.1
 
 
 p $ pAdd "s" ["a", "b"]

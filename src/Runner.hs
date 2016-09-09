@@ -9,7 +9,7 @@ import Control.Lens
 import Control.Monad.Reader
 import Control.Monad.Trans.State
 import Data.Char
-import Data.Map.Strict (Map, insert)
+import Data.Map.Strict (Map, insert, foldMapWithKey)
 import Data.ByteString.Char8 (ByteString, pack, unpack)
 import Data.Time.Clock
 import Network.Socket
@@ -20,12 +20,19 @@ import Pattern
 import Program
 import Uniform
 
-data TempoState = TempoState { _conn :: UDP, _pattern :: Map ByteString Program, _start :: DiffTime, _cycleLength :: DiffTime, _prev :: Double, _current :: Double }
+data TempoState = TempoState { _conn :: UDP, _patt :: Map ByteString Program, _start :: DiffTime, _cycleLength :: DiffTime, _prev :: Double, _current :: Double }
 
 makeLenses ''TempoState
 
--- instance Show TempoState where
---    show (TempoState _ p _ _ pr cu) = "{ messages " ++ show (arc (addName `foldMapWithKey` p) pr cu) ++ " pr " ++ (show pr) ++ " cu " ++ (show cu) ++ " }"
+instance Show TempoState where
+   show (TempoState _ p _ _ pr cu) =
+     let
+       addName n p = (unpack n) ++ ": " ++ show (arc (programMessage p) pr cu)
+       msgs = addName `foldMapWithKey` p
+     in
+      case msgs of
+        [] -> ""
+        e -> "{ messages " ++ e ++ " pr " ++ (show pr) ++ " cu " ++ (show cu) ++ " }"
 
 ostr = ASCII_String
 
@@ -33,10 +40,9 @@ revEngines :: IO (MVar TempoState)
 revEngines = do
   now <- getCurrentTime
   conn' <- openUDP "127.0.0.1" 9001
-  mVarT <- newMVar $ TempoState conn' mempty (utctDayTime now) (secondsToDiffTime 1) 0 0
-  return mVarT
+  newMVar $ TempoState conn' mempty (utctDayTime now) (secondsToDiffTime 1) 0 0
 
-gunEngines :: MVar TempoState -> IO (ThreadId)
+gunEngines :: MVar TempoState -> IO ThreadId
 gunEngines = forkIO . sync
 
 run :: IO ((Program -> IO ()), (Double -> IO ()), ThreadId)
@@ -46,7 +52,7 @@ run = do
   return (runProg mts, changeTempo mts, ti)
 
 setProg :: Program -> TempoState -> TempoState
-setProg p = over pattern (insert (programSlot p) p)
+setProg p = over patt (insert (programSlot p) p)
 
 runProg :: MVar TempoState -> Program -> IO ()
 runProg mts p = modifyMVar_ mts $ return <$> setProg p
@@ -62,7 +68,6 @@ programMessage :: Program -> Pattern Message
 programMessage (Program slot (SlottableProgram (BaseProgram prog us effs))) =
   slotMessages (baseSlot slot) (BaseName prog) (nextSlot (baseSlot slot)) us `mappend`
     (effectsMessages (baseSlot slot) $ reverse effs)
-programMessage (Program slot (Passthrough sp)) = addSlot (baseSlot slot) $ passthrough $ baseSlot <$> sp
 programMessage (Program slot (Layer l ss es)) =
   case es of
     [] -> (addSlot (baseSlot slot) . once . mconcat $ pure <$> [progMsg l, layerMsg ss])
@@ -95,12 +100,6 @@ slotMessages s n next us = addSlot s $ mconcat $ [progMsg, effectMsg, uMsgs us]
     progMsg = once <$> pure $ Message "/progs" [ostr (progName n)]
     uMsgs us' = uniformMessage <$> us'
 
-passthrough :: Pattern ByteString -> Pattern Message
-passthrough ep = mappend progMsg effectMsg
-   where
-     effectMsg = (\e -> Message "/progs/effect" [ostr e]) <$> ep
-     progMsg = once <$> pure $ Message "/progs" [ostr $ pack "passthrough"]
-
 uniformMessage :: Uniform -> Message
 uniformMessage (Uniform n (UniformFloatValue (FloatDoubleValue f))) =
   Message "/progs/uniform" [ostr n, float f]
@@ -108,6 +107,8 @@ uniformMessage (Uniform n (UniformFloatValue (FloatInputValue f m))) =
   Message "/progs/uniform" [ostr n, ostr $ floatInputText f, float m]
 uniformMessage (Uniform n (UniformTexValue (TexInputValue i m))) =
   Message "/progs/uniform" [ostr n, ostr $ texInputText i, float m]
+uniformMessage (Uniform n (UniformStringValue s)) =
+  Message "/progs/uniform" [ostr n, ostr s]
 
 addSlot :: ByteString -> Pattern Message -> Pattern Message
 addSlot n p = appendDatum (ostr n) <$> p
@@ -130,11 +131,10 @@ updateCycle now = do
 sendMessages :: MonadIO io => StateT TempoState io ()
 sendMessages = do
   tState <- get
-  -- liftIO $ print tState
-  liftIO $ T.sendOSC (conn' tState) $ Bundle 0 $ arc (foldr (mappend . programMessage) mempty (view pattern tState)) (view prev tState) (view current tState)
-  -- liftIO $ print $ arc (addName `foldMapWithKey` pattern tState) (current tState)
+  -- liftIO $ if (show tState == "") then return () else print tState
+  liftIO $ T.sendOSC (conn' tState) $ Bundle 0 $ arc (foldr (mappend . programMessage) mempty (view patt tState)) (view prev tState) (view current tState)
   where
-    conn' ts = view conn ts
+    conn' = view conn
 
 frame :: MonadIO io => StateT TempoState io ()
 frame = do
