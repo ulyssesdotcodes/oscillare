@@ -10,20 +10,24 @@ import Data.ByteString.Char8 (ByteString, pack)
 import Pattern
 
 data FloatValue
-  = FloatInputValue FloatInput Double
+  = FloatInputValue FloatInput [Double]
   | FloatDoubleValue Double
-data FloatInput = VolumeInput
+data FloatInput =
+  VolumeInput
+  | KickInput
 
 floatInputText :: FloatInput -> ByteString
 floatInputText VolumeInput = "volume"
+floatInputText KickInput = "kick"
 
 data TexValue
   = TexInputValue TexInput Double
-data TexInput = AudioTexInput | EqTexInput
+data TexInput = AudioTexInput | EqTexInput | CameraTexInput
 
 texInputText :: TexInput -> ByteString
 texInputText AudioTexInput = "audio_texture"
 texInputText EqTexInput = "eq_texture"
+texInputText CameraTexInput = "camera_texture"
 
 type StringValue = ByteString
 
@@ -77,7 +81,7 @@ instance RealFloat a => FloatPattern [a] where
   floatPattern = seqp . fmap (pure . realToFrac)
 
 instance FloatPattern a => FloatUniformPattern (FloatInput, a)  where
-  fPattern (i, m) = FloatInputValue i <$> floatPattern m
+  fPattern (i, m) = FloatInputValue i . (:[]) <$> floatPattern m
 
 class StringUniformPattern a where
   sPattern :: a -> Pattern StringValue

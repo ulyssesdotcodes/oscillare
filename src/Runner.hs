@@ -104,7 +104,7 @@ uniformMessage :: Uniform -> Message
 uniformMessage (Uniform n (UniformFloatValue (FloatDoubleValue f))) =
   Message "/progs/uniform" [ostr n, float f]
 uniformMessage (Uniform n (UniformFloatValue (FloatInputValue f m))) =
-  Message "/progs/uniform" [ostr n, ostr $ floatInputText f, float m]
+  Message "/progs/uniform" $ [ostr n, ostr $ floatInputText f] ++ (float <$> m)
 uniformMessage (Uniform n (UniformTexValue (TexInputValue i m))) =
   Message "/progs/uniform" [ostr n, ostr $ texInputText i, float m]
 uniformMessage (Uniform n (UniformStringValue s)) =

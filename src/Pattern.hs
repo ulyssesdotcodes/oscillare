@@ -32,6 +32,9 @@ flatten ps = Pattern (\pr t -> concat (arc ps pr t))
 once :: Pattern a -> Pattern a
 once = att 0
 
+rev :: Double -> Double
+rev x = 1 - x
+
 flash :: Double -> Pattern a -> Pattern a -> Pattern a
 flash t a b = Pattern (\pr cu -> if (match pr cu) then arc a pr cu else arc b pr cu)
   where
@@ -67,6 +70,10 @@ sinTimePattern = sin . (* (2 * pi)) <$> timePattern
 sinMod :: Double -> Double
 sinMod = sin . (* (2 * pi))
 sinMod' = (+ 0.5) . (* 0.5) . sinMod
+
 cosMod :: Double -> Double
 cosMod = cos . (* (2 * pi))
 cosMod' = (+ 0.5) . (* 0.5) . cosMod
+
+pi2Mod :: Double -> Double
+pi2Mod = (* 6.2831)

@@ -17,6 +17,7 @@ data EffectType =
   | Fade
   | Filter
   | Mirror
+  | Overlay
   | Repeat
   | Reverse
   | Rotate
@@ -36,6 +37,7 @@ data BaseType =
   | Shapes
   | Sine
   | StringTheory
+  | InputTexBase
   | TriggeredPassthrough
 
 data Name =
@@ -60,6 +62,7 @@ effectName Brightness = "brightness"
 effectName Fade = "fade"
 effectName Filter = "filter"
 effectName Mirror = "mirror"
+effectName Overlay = "overlay"
 effectName Repeat = "repeat"
 effectName Reverse = "reverse"
 effectName Rotate = "rotate"
@@ -74,6 +77,7 @@ baseName :: BaseType -> ByteString
 baseName AudioData = "audio_data"
 baseName Dots = "dots"
 baseName Flocking = "flocking"
+baseName InputTexBase = "input_texture"
 baseName Lines = "lines"
 baseName Sine = "sine"
 baseName Shapes = "shapes"
@@ -116,6 +120,7 @@ pAudioData slot uVolume uData = baseProg slot AudioData $ (upf "volume" uVolume)
 pDots slot uVolume uData = baseProg slot Dots $ (upf "volume" uVolume) `mappend` (upt "eqs" uData)
 pFlocking slot uSeparation uMult uSpeed = baseProg slot Flocking $ mconcat [upf "alignment" uMult, upf "cohesion" uMult, upf "separation" uSeparation, upf "time" timePattern, upf "delta" $ deltaPattern, upf "speed" uSpeed]
 pLines slot uWidth uSpacing = baseProg slot Lines $ (upf "width" uWidth) `mappend` (upf "spacing" uSpacing)
+pInput slot uInput = baseProg slot InputTexBase $ upt "program" uInput
 pShapes slot uSides uWidth uSize = baseProg slot Shapes $ mconcat [upf "sides" uSides, upf "width" uWidth, upf "size" uSize]
 pStringTheory slot uTimeMod uAngle uAngleDelta uXoff = baseProg slot StringTheory $ mconcat [upf "angle" uAngle, upf "angle_delta" uAngleDelta, upf "xoff" uXoff]
 pSine slot uXPos uScale uAmplitude = baseProg slot Sine $ mconcat [upf "time" $ uXPos, upf "scale" uScale, upf "amplitude" uAmplitude]
@@ -128,7 +133,7 @@ pFade u = singleUEffect Fade u
 pFilter u = singleUEffect Filter u
 pMirror = Effect Mirror mempty
 pRepeat u = singleUEffect Repeat u
-pReverse u = Effect Reverse mempty
+pReverse = Effect Reverse mempty
 pRotate u = singleUEffect Rotate u
 pScale uX uY = Effect Scale $ mconcat [upf "scale_x" uX, upf "scale_y" uY]
 pScale' uXY = pScale uXY uXY
