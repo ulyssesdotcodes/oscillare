@@ -32,12 +32,14 @@ data BaseType =
   AudioData
   | Dots
   | Flocking
+  | Image
+  | InputTexBase
   | Lines
   | Passthrough
   | Shapes
   | Sine
   | StringTheory
-  | InputTexBase
+  | Text
   | TriggeredPassthrough
 
 data Name =
@@ -77,11 +79,13 @@ baseName :: BaseType -> ByteString
 baseName AudioData = "audio_data"
 baseName Dots = "dots"
 baseName Flocking = "flocking"
+baseName Image = "image"
 baseName InputTexBase = "input_texture"
 baseName Lines = "lines"
 baseName Sine = "sine"
 baseName Shapes = "shapes"
 baseName StringTheory = "string_theory"
+baseName Text = "text"
 
 baseName Passthrough = "pt"
 baseName TriggeredPassthrough = "ptTriggered"
@@ -120,10 +124,12 @@ pAudioData slot uVolume uData = baseProg slot AudioData $ (upf "volume" uVolume)
 pDots slot uVolume uData = baseProg slot Dots $ (upf "volume" uVolume) `mappend` (upt "eqs" uData)
 pFlocking slot uSeparation uMult uSpeed = baseProg slot Flocking $ mconcat [upf "alignment" uMult, upf "cohesion" uMult, upf "separation" uSeparation, upf "time" timePattern, upf "delta" $ deltaPattern, upf "speed" uSpeed]
 pLines slot uWidth uSpacing = baseProg slot Lines $ (upf "width" uWidth) `mappend` (upf "spacing" uSpacing)
+pImage slot uImage = baseProg slot Image $ ups "image" uImage
 pInput slot uInput = baseProg slot InputTexBase $ upt "program" uInput
 pShapes slot uSides uWidth uSize = baseProg slot Shapes $ mconcat [upf "sides" uSides, upf "width" uWidth, upf "size" uSize]
 pStringTheory slot uTimeMod uAngle uAngleDelta uXoff = baseProg slot StringTheory $ mconcat [upf "angle" uAngle, upf "angle_delta" uAngleDelta, upf "xoff" uXoff]
 pSine slot uXPos uScale uAmplitude = baseProg slot Sine $ mconcat [upf "time" $ uXPos, upf "scale" uScale, upf "amplitude" uAmplitude]
+pText slot uText = baseProg slot Text $ ups "text" uText
 
 pt s sp = baseProg s Passthrough (upsWithBase "program" sp)
 ptTriggered s sp uTrig = baseProg s TriggeredPassthrough $ upsWithBase "program" sp `mappend` upf "trigger" uTrig
@@ -132,6 +138,7 @@ pBrightness u = singleUEffect Brightness u
 pFade u = singleUEffect Fade u
 pFilter u = singleUEffect Filter u
 pMirror = Effect Mirror mempty
+pOverlay u = singleUEffect Overlay u
 pRepeat u = singleUEffect Repeat u
 pReverse = Effect Reverse mempty
 pRotate u = singleUEffect Rotate u

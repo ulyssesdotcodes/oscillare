@@ -36,59 +36,73 @@ Now it's time to get started! Check out `scratch.osc` for some example programs.
 
 For example, to display a simple sine wave:
 
-`p "s" $ pm (progName Sine) []`
+`p $ pSine "s" 0 1 1`
 
 This creates a Sine program and places it in the "s" slot, which is the main slot you'll see displayed.
 
 
 To get it moving:
 
-`p "s" $ pm (progName Sine) [timeUniform]`
+`p $ pSine "s" (* 1) 1 1`
 
-This will send the time to the "time" uniform every frame.
+Since the first input of `pSine` is the x position, that's the one we want to edit. If there's a function in that position like `(* 1)` then it will take the base time and apply that function to it.
 
 
 Let's make it scale too:
 
-`p "s" $ pm (progName Sine) [up "scale" $ uf <$> timePattern, timeUniform]`
+`p $ pSine "s" (* 1) ((+ 1) . (* 2)) 1`
 
-This will send the time to a "scale" uniform every frame.
+Note that we can combine functions with Haskell's `.` operator.
 
 
-We can make it slightly more smooth by using the `Pattern` functor:
+But it's still jerky! We can make it slightly more smooth by using a handy built in `sinMod'` that oscilates between 0 and 1.
 
-`p "s" $ pm (progName Sine) [up "scale" $ uf . sin . (* 3.1415) <$> timePattern, timeUniform]`
+`p $ pSine "s" (* 1) ((+ 1) . (* 2) . sinMod') 1`
+
+There's also a `sinMod` operator that goes between -1 and 1, and `cos` versions of both.
 
 
 Now let's make it react to some audio!
 
-`p "s" $ pm (progName Sine) [up "scale" $ ui <$> pure (Volume, 1), timeUniform]`
+`p $ pSine "s" (* 1) ((+ 1) . (* 2) . sinMod') (VolumeInput, 1)`
+
+We can use float inputs like `VolumeInput` in place of any float value or function. The form for inputs is always `([Input], [float modifier])`
 
 
-Adding an effect is just chaining to another program:
-
-```
-p "s" $ pme (progName Sine) "p1" [up "scale" $ ui <$> pure (Volume, 1), timeUniform]
-
-p "p1" $ pm (progName Fade) [up "fade" $ uf <$> pure 0.97]
-```
-
-`seqp` sequences a list of patterns to all take place within one cycle
+Adding an effect can be done with the `|+|` operator
 
 ```
-p "s" $ pme (progName Sine) "p1" [up "scale" $ ui <$> pure (Volume, 1), timeUniform]
-
-p "p1" $ pm (progName Fade) [up "fade" $ uf <$> (seqp [pure 0.5, pure 0.97])]
+p $ pSine "s" (* 1) ((+ 1) . (* 2) . sinMod') (VolumeInput, 1)
+  |+| pFade 0.98
 ```
 
-We can also use pattern to switch between programs but keep them in memory:
+If we use an array instead of a plain float value, it goes in sequence over Oscillare's cycle
 
 ```
-p "s" $ pt $ seqp [pure "p3", pure "p4"] 
+p $ pSine "s" (* 1) ((+ 1) . (* 2) . sinMod') (VolumeInput, 1)
+  |+| pFade [0.5, 0.98]
+```
 
-p "s1" $ pme (progName Sine) "p1" [up "scale" $ ui <$> pure (Volume, 1), timeUniform]
+We can also use `pt` to switch between programs but keep them in memory, and apply effects to both programs:
 
-p "s1" $ pme (progName AudioData) "p1" [up "tex_audio" $ ui <$> pure (AudioTexture, 1)]
+```
+p "s" $ pt ["a", "b"']
+  |+| pFade [0.5, 0.98]
+
+p $ pSine "a" (* 1) ((+ 1) . (* 2) . sinMod') (VolumeInput, 1)
+
+p $ pAudioData "b" 1 (AudioTexInput, 1)
+```
+
+If we want to combine them instead of switching between them, that's easy too.
+
+```
+p "s" $ pAdd ["a", "b"']
+  |+| pFade [0.5, 0.98]
+
+p $ pSine "a" (* 1) ((+ 1) . (* 2) . sinMod') (VolumeInput, 1)
+
+p $ pAudioData "b" 1 (AudioTexInput, 1)
 ```
 
 Finally let's slow everything down a bit:
@@ -97,14 +111,72 @@ Finally let's slow everything down a bit:
 t 2.3
 ```
 
+### Inputs
 
-Let's take this apart a bit. `p` puts the following program or effect into a slot. `pm` gives you a program or effect with no effects chained. `pme` chains an effect. 
+There are three input types: strings, floats, and textures. Each one can be a single value, a list, a pattern, or a backend input with modifier. 
 
-Next comes the program or effect. Right now programs are `Sine`, `AudioData`, and `Dots`. Effects are `Fade`, `Scale`, and `Repeat`.
+Single values are sent every frame, lists are split evenly over a single cycle, and patterns are evaluated and sent. 
 
-Finally there are uniform patterns. These are evaluated every frame and sent to oschader-cinder. You can make a pattern only happen once using `att` along with a time from 0-1. The program messages use this so it's only sent once every cycle. You can make a bunch of patterns happen one after another using `seqp` which will switch between patterns throughout the cycle.
+Backend inputs have to be selected from valid input types:
 
-The tempo is set using `t`. The default is 1 second, but any number of seconds will do.
+Float inputs are `VolumeInput`, and `KickInput`. The modifier for both multiplies the value.
+
+Texture inputs are `(CameraTexInput, [not used])`, `(EqTexInput, [number of bands])`, and `(AudioTexInput, [not used])`.
+
+There are no string inputs right now.
+
+### Base Programs
+
+Base programs draw directly to an FBO.
+
+```
+pAudioData Volume(float) Data(texture)
+pDots  Volume(float) Data(texture)
+pFlocking  Separation(float) Mult(float) Speed(float) 
+pLines  Width(float) Spacing(float)
+pImage Image(Image)
+pInput  Input(texture)
+pShapes  Sides(float) Width(float) Size(float) 
+pStringTheory  TimeMod(float) Angle(float) AngleDelta(float) Xoff(float) 
+pSine  XPos(float) Scale(float) Amplitude(float) 
+pText  Text(string)
+```
+
+### Effects
+
+Effects take a base fbo and perfor some operation on it.
+
+```
+pBrightness Brightness(float)
+pFade Fade(float)
+pFilter Filter(float)
+pMirror
+pOverlay Fade(float)
+pRepeat Times(float)
+pReverse
+pRotate Rotation(float)
+pScale XScale(float) YScale(float)
+pScale' XYScale(float)
+pTranslate XScale(float) YScale(float)
+```
+
+### Passthroughs
+
+Passthroughs take a slot name (or list, or pattern) and apply their own effects on top.
+
+```
+pt Slot(string)
+ptTriggered Slots(string) // Note that since triggers can span multiple cycles, the Slots input here is a space-separated list of slots e.g. "a b c"
+```
+
+### Layers
+
+Layers combine multiple slots into one and add effects
+
+```
+pAdd Slot(string)
+pMult Slot(string)
+```
 
 ### Tips and Tricks
 
@@ -113,7 +185,8 @@ The tempo is set using `t`. The default is 1 second, but any number of seconds w
 ### Known Issues
 
 - On OSX you have to start oschader-cinder first. If you quit oschader-cinder you have to restart oscillare.
-
-
+- Effects on programs using passthrough don't work.
+- EqTexInput is buggy
+- Stack overflows are still possible - be wary!
 
     Copyright (C) 2016  Ulysses Popple

@@ -3,21 +3,30 @@ p $ pDots "a" 0.2 (EqTexInput, (+ 2) . (* 8) . sinMod' )
   |+| pTranslate ((* 2) . sinMod') 0
   |+| pRepeat (VolumeInput, 100)
 
-p $ pAudioData "b" 0.8 (AudioTexInput, 2)
+p $ pAudioData "a" 0.8 (AudioTexInput, 2)
   |+| pFilter (* 1)
-  |+| pBrightness 8
+  |+| pBrightness 0.7
+  |+| pFade 0.98
 
 p $ pLines "b" ((* 0.01) . sinMod') (VolumeInput, 2)
 
 p $ pMult "b" ["a", "c"]
 
-p $ pFlockin
-  |+| pFilter (* 1)
+p $ pFlocking "c" (KickInput, 100) 1 32
   |+| pFade 0.96
 
-p $ pInput "
-  |+| pFilter (* 1)
-  |+| pFade (KickInput, 0.8)
+p $ pText "s" "OK, fine"
+
+p $ pText "s" "Test 1 2  3 4 5"
+  |+| pReverse
+
+p $ pAdd "s" ["a", "b"]
+
+
+p $ pInput "s" (CameraTexInput, 1)
+  |+| pBrightness 1.7
+  |+| pTranslate (-0.3) 0
+  |+| pScale' 1.5
 
 p $ pShapes "s" ((+ 3) . (* 2) . sinMod') 0.2 0.1
   |+| pRepeat 3
@@ -25,9 +34,9 @@ p $ pShapes "s" ((+ 3) . (* 2) . sinMod') 0.2 0.1
   |+| pScale' 1.05
   |+| pScale' (KickInput, 1.5)
 
-p $ ptTriggered "s" "a b" (KickInput, 0.9)
+p $ ptTriggered "s" "a c" (KickInput, 1.1)
   |+| pFilter (VolumeInput, 3)
-  |+| pFade 0.96
+  |+| pFade 0.97
 
 p $ pMult "s" ["a","b"]
   |+| pFade 0.96
@@ -41,4 +50,4 @@ p $ pShapes "s" 3 0.01 0.1
 p $ pAdd "s" ["a", "b", "c"]
   |+| pFilter timePattern
 
-t 1.5
+t 7
