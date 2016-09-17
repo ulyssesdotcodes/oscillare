@@ -2,6 +2,7 @@
 module Pattern where
 
 import Data.Fixed
+import System.Random
 
 data Pattern a = Pattern { arc :: Double -> Double -> [a] }
 
@@ -66,6 +67,9 @@ deltaPattern = Pattern (\p t -> [(t - p) `mod'` 1])
 
 sinTimePattern :: Pattern Double
 sinTimePattern = sin . (* (2 * pi)) <$> timePattern
+
+rand :: Pattern Double
+rand = Pattern (\t t' -> [(fst . random . mkStdGen . round) (t * t' * (2 ^ 16))])
 
 sinMod :: Double -> Double
 sinMod = sin . (* (2 * pi))

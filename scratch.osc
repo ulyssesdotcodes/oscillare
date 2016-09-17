@@ -10,10 +10,15 @@ p $ pAudioData "a" 0.8 (AudioTexInput, 2)
 
 p $ pLines "b" ((* 0.01) . sinMod') (VolumeInput, 2)
 
+p $ pImage "s" TestCard
+
 p $ pMult "b" ["a", "c"]
 
-p $ pFlocking "c" (KickInput, 100) 1 32
+p $ pFlocking "s" (KickInput, 100) 1 32
   |+| pFade 0.96
+
+p $ pSideEmitter "s" (KickInput, 0.5) (VolumeInput, 6) 0.1 0
+  |+| pFade 0.97
 
 p $ pText "s" "OK, fine"
 
@@ -50,4 +55,4 @@ p $ pShapes "s" 3 0.01 0.1
 p $ pAdd "s" ["a", "b", "c"]
   |+| pFilter timePattern
 
-t 7
+t 3

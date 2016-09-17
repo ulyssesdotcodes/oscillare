@@ -37,6 +37,7 @@ data BaseType =
   | Lines
   | Passthrough
   | Shapes
+  | SideEmitter
   | Sine
   | StringTheory
   | Text
@@ -78,6 +79,7 @@ layerName Mult = "mult"
 baseName :: BaseType -> ByteString
 baseName AudioData = "audio_data"
 baseName Dots = "dots"
+baseName SideEmitter = "emitter"
 baseName Flocking = "flocking"
 baseName Image = "image"
 baseName InputTexBase = "input_texture"
@@ -122,6 +124,16 @@ singleUEffect e f = Effect e $ upf (effectName e) f
 
 pAudioData slot uVolume uData = baseProg slot AudioData $ (upf "volume" uVolume) `mappend` (upt "tex_audio" uData)
 pDots slot uVolume uData = baseProg slot Dots $ (upf "volume" uVolume) `mappend` (upt "eqs" uData)
+pSideEmitter slot uAmount uLifespan uSpread uYPos = baseProg slot SideEmitter $
+  mconcat [ upf "emitterY" uYPos
+          , upf "emitterX" $ ((-10) :: Double)
+          , upf "emitVelX" uAmount
+          , upf "emitVelY" $ pure (*) <*> floatPattern uSpread <*> ((+ (-0.5)) <$> rand)
+          , upf "delta" deltaPattern
+          , upf "time" timePattern
+          , upf "speed" deltaPattern
+          , upf "lifespan" uLifespan
+          ]
 pFlocking slot uSeparation uMult uSpeed = baseProg slot Flocking $ mconcat [upf "alignment" uMult, upf "cohesion" uMult, upf "separation" uSeparation, upf "time" timePattern, upf "delta" $ deltaPattern, upf "speed" uSpeed]
 pLines slot uWidth uSpacing = baseProg slot Lines $ (upf "width" uWidth) `mappend` (upf "spacing" uSpacing)
 pImage slot uImage = baseProg slot Image $ ups "image" uImage
