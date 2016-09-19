@@ -54,8 +54,13 @@ run = do
 setProg :: Program -> TempoState -> TempoState
 setProg p = over patt (insert (programSlot p) p)
 
+printPrograms :: TempoState -> IO TempoState
+printPrograms ts = do
+  putStrLn . foldr ((++) . (\n -> "\n" ++ n) . show) [] $ view patt ts
+  return ts
+
 runProg :: MVar TempoState -> Program -> IO ()
-runProg mts p = modifyMVar_ mts $ return <$> setProg p
+runProg mts p = modifyMVar_ mts $ printPrograms <$> setProg p
 
 changeTempo :: MVar TempoState -> Double -> IO ()
 changeTempo mts t = modifyMVar_ mts $ return <$> set cycleLength (fromRational $ toRational t)

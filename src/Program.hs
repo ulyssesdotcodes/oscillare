@@ -49,14 +49,25 @@ data Name =
   | EffName EffectType
   | LayerName LayerType
 
+instance Show LayerType where
+  show = unpack . layerName
+
 data Effect =
   Effect EffectType (Pattern Uniform)
+
+instance Show Effect where
+  show (Effect et _) = unpack $ effectName et
+
 data BaseProgram =
   BaseProgram BaseType (Pattern Uniform) [Effect]
+
+instance Show BaseProgram where
+  show (BaseProgram bt _ es) = unpack (baseName bt) ++ " Effects:" ++ Prelude.concatMap ((++ ", ") . show) es
+
 data Slottable =
   SlottableProgram BaseProgram
-  | Layer LayerType [Slot] [Effect]
-data Program = Program Slot Slottable
+  | Layer LayerType [Slot] [Effect] deriving Show
+data Program = Program Slot Slottable deriving Show
 
 programSlot :: Program -> Slot
 programSlot (Program s _) = s

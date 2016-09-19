@@ -11,17 +11,17 @@ p $ pSine "c" sinMod' 1 1
   |+| pFade 0.98
   |+| pScale' 1.01
 
-p $ ptTriggered "s" ["c d"] (KickInput, 0.7)
+p $ ptTriggered "s" ["a b"] (KickInput, 0.7)
   |+| pScale' 0.1
 
 
-p $ pLines "d" (VolumeInput, 0.08) (VolumeInput, 0.7)
+p $ pLines "b" (VolumeInput, 0.08) (VolumeInput, 0.7)
   |+| pFade 0.8
   |+| pRotate 0.1
 
 p $ pSideEmitter "b" ()
 
-p $ pImage "b" "frb_girl.jpg" 1
+p $ pImage "a" "frb_girl.jpg" 1
   |+| pScale' (VolumeInput, 6)
   |+| pReverse
 
