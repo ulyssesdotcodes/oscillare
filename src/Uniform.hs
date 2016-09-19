@@ -47,12 +47,6 @@ deltaUniform = uniformPattern "delta" $ UniformFloatValue . FloatDoubleValue <$>
 uniformPattern :: ByteString -> Pattern UniformValue -> Pattern Uniform
 uniformPattern n = fmap (Uniform n)
 
-data ImageFile =
-  TestCard
-
-imageName :: ImageFile -> ByteString
-imageName TestCard = "Testcard.jpg"
-
 class FloatUniformPattern a where
   fPattern :: a -> Pattern FloatValue
 
@@ -97,12 +91,6 @@ instance StringUniformPattern String where
 
 instance StringUniformPattern [String] where
   sPattern = seqp . fmap (pure . pack)
-
-instance StringUniformPattern ImageFile where
-  sPattern = pure . imageName
-
-instance StringUniformPattern [ImageFile] where
-  sPattern = seqp . fmap (pure . imageName)
 
 class TexUniformPattern a where
   tPattern :: a -> Pattern TexValue

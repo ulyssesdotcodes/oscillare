@@ -1,47 +1,53 @@
-p $ pDots "a" 0.2 (EqTexInput, (+ 2) . (* 8) . sinMod' )
+p $ pDots "b" 0.5 (EqTexInput, (+ 3) . (* 5) . sinMod')
+  |+| pTranslate 0 (* 1)
   |+| pMirror
-  |+| pTranslate ((* 2) . sinMod') 0
-  |+| pRepeat (VolumeInput, 100)
+  |+| pFade 0.4
 
-p $ pAudioData "a" 0.8 (AudioTexInput, 2)
-  |+| pFilter (* 1)
-  |+| pBrightness 0.7
+p $ pAudioData "b" 0.4 (AudioTexInput, 1)
+  |+| pFade 0.9
+
+p $ pSine "c" sinMod' 1 1
+  |+| pRepeat 16
   |+| pFade 0.98
+  |+| pScale' 1.01
 
-p $ pLines "b" ((* 0.01) . sinMod') (VolumeInput, 2)
+p $ ptTriggered "s" ["c d"] (KickInput, 0.7)
+  |+| pScale' 0.1
 
-p $ pImage "s" TestCard
 
-p $ pMult "b" ["a", "c"]
+p $ pLines "d" (VolumeInput, 0.08) (VolumeInput, 0.7)
+  |+| pFade 0.8
+  |+| pRotate 0.1
 
-p $ pFlocking "s" (KickInput, 100) 1 32
-  |+| pFade 0.96
+p $ pSideEmitter "b" ()
 
-p $ pSideEmitter "s" (KickInput, 0.5) (VolumeInput, 6) 0.1 0
-  |+| pFade 0.97
-
-p $ pText "s" "OK, fine"
-
-p $ pText "s" "Test 1 2  3 4 5"
+p $ pImage "b" "frb_girl.jpg" 1
+  |+| pScale' (VolumeInput, 6)
   |+| pReverse
 
-p $ pAdd "s" ["a", "b"]
+p $ pMult "a" ["x", "y"]
 
+p $ pMult "s" ["a", "b"]
+  |+| pTranslate (-0.8) 0
+  |+| pFade (KickInput, 1.2)
 
-p $ pInput "s" (CameraTexInput, 1)
-  |+| pBrightness 1.7
-  |+| pTranslate (-0.3) 0
-  |+| pScale' 1.5
+p $ pVideo "b" "driving.mov" (VolumeInput, 3)
+  |+| pScale' 2
 
-p $ pShapes "s" ((+ 3) . (* 2) . sinMod') 0.2 0.1
-  |+| pRepeat 3
-  |+| pFade 0.92
-  |+| pScale' 1.05
-  |+| pScale' (KickInput, 1.5)
+p $ pInput "y" (CameraTexInput, 1)
+  |+| pTranslate 0 (0.2)
+  |+| pFade 0.7
+
+p $ pShapes "x" 3 0.3 0.2
+
+p $ pShapes "y" 4 0.3 0.2
+
+p $ pShapes "z" 5 0.3 0.2
+
+p $ ptTriggered "s" "x y" (KickInput, 0.9)
+  |+| pFade 0.7
 
 p $ ptTriggered "s" "a c" (KickInput, 1.1)
-  |+| pFilter (VolumeInput, 3)
-  |+| pFade 0.97
 
 p $ pMult "s" ["a","b"]
   |+| pFade 0.96
@@ -55,4 +61,4 @@ p $ pShapes "s" 3 0.01 0.1
 p $ pAdd "s" ["a", "b", "c"]
   |+| pFilter timePattern
 
-t 3
+t 2.3

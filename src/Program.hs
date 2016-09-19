@@ -42,6 +42,7 @@ data BaseType =
   | StringTheory
   | Text
   | TriggeredPassthrough
+  | Video
 
 data Name =
   BaseName BaseType
@@ -88,6 +89,7 @@ baseName Sine = "sine"
 baseName Shapes = "shapes"
 baseName StringTheory = "string_theory"
 baseName Text = "text"
+baseName Video = "video"
 
 baseName Passthrough = "pt"
 baseName TriggeredPassthrough = "ptTriggered"
@@ -126,7 +128,6 @@ pAudioData slot uVolume uData = baseProg slot AudioData $ (upf "volume" uVolume)
 pDots slot uVolume uData = baseProg slot Dots $ (upf "volume" uVolume) `mappend` (upt "eqs" uData)
 pSideEmitter slot uAmount uLifespan uSpread uYPos = baseProg slot SideEmitter $
   mconcat [ upf "emitterY" uYPos
-          , upf "emitterX" $ ((-10) :: Double)
           , upf "emitVelX" uAmount
           , upf "emitVelY" $ pure (*) <*> floatPattern uSpread <*> ((+ (-0.5)) <$> rand)
           , upf "delta" deltaPattern
@@ -136,12 +137,13 @@ pSideEmitter slot uAmount uLifespan uSpread uYPos = baseProg slot SideEmitter $
           ]
 pFlocking slot uSeparation uMult uSpeed = baseProg slot Flocking $ mconcat [upf "alignment" uMult, upf "cohesion" uMult, upf "separation" uSeparation, upf "time" timePattern, upf "delta" $ deltaPattern, upf "speed" uSpeed]
 pLines slot uWidth uSpacing = baseProg slot Lines $ (upf "width" uWidth) `mappend` (upf "spacing" uSpacing)
-pImage slot uImage = baseProg slot Image $ ups "image" uImage
+pImage slot uImage uClear = baseProg slot Image $ mconcat [ups "image" uImage, upf "clear_shade" uClear]
 pInput slot uInput = baseProg slot InputTexBase $ upt "program" uInput
 pShapes slot uSides uWidth uSize = baseProg slot Shapes $ mconcat [upf "sides" uSides, upf "width" uWidth, upf "size" uSize]
 pStringTheory slot uTimeMod uAngle uAngleDelta uXoff = baseProg slot StringTheory $ mconcat [upf "angle" uAngle, upf "angle_delta" uAngleDelta, upf "xoff" uXoff]
 pSine slot uXPos uScale uAmplitude = baseProg slot Sine $ mconcat [upf "time" $ uXPos, upf "scale" uScale, upf "amplitude" uAmplitude]
 pText slot uText = baseProg slot Text $ ups "text" uText
+pVideo slot uPath uSpeed = baseProg slot Video $ mconcat [ups "video" uPath, upf "speed" uSpeed]
 
 pt s sp = baseProg s Passthrough (upsWithBase "program" sp)
 ptTriggered s sp uTrig = baseProg s TriggeredPassthrough $ upsWithBase "program" sp `mappend` upf "trigger" uTrig
