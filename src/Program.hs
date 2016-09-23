@@ -14,6 +14,7 @@ type Slot = ByteString
 
 data EffectType =
   Brightness
+  | Edges
   | Fade
   | Filter
   | Mirror
@@ -74,6 +75,7 @@ programSlot (Program s _) = s
 
 effectName :: EffectType -> ByteString
 effectName Brightness = "brightness"
+effectName Edges = "edge_detection"
 effectName Fade = "fade"
 effectName Filter = "filter"
 effectName Mirror = "mirror"
@@ -160,6 +162,7 @@ pt s sp = baseProg s Passthrough (upsWithBase "program" sp)
 ptTriggered s sp uTrig = baseProg s TriggeredPassthrough $ upsWithBase "program" sp `mappend` upf "trigger" uTrig
 
 pBrightness u = singleUEffect Brightness u
+pEdges = Effect Edges mempty
 pFade u = singleUEffect Fade u
 pFilter u = singleUEffect Filter u
 pMirror = Effect Mirror mempty

@@ -1,9 +1,11 @@
-p $ pDots "b" 0.5 (EqTexInput, (+ 3) . (* 5) . sinMod')
-  |+| pTranslate 0 (* 1)
-  |+| pMirror
-  |+| pFade 0.4
+p $ pt "s" "a"
 
-p $ pAudioData "b" 0.4 (AudioTexInput, 1)
+
+p $ pDots "s" 0.1 (EqTexInput, 4)
+  |+| pEdges
+
+
+p $ pAudioData "a" 0.4 (AudioTexInput, 1)
   |+| pFade 0.9
 
 p $ pSine "c" sinMod' 1 1
@@ -21,9 +23,8 @@ p $ pLines "b" (VolumeInput, 0.08) (VolumeInput, 0.7)
 
 p $ pSideEmitter "b" ()
 
-p $ pImage "a" "frb_girl.jpg" 1
-  |+| pScale' (VolumeInput, 6)
-  |+| pReverse
+p $ pImage "s" "frb_girl.jpg" 1
+  |+| pEdges
 
 p $ pMult "a" ["x", "y"]
 
@@ -34,9 +35,18 @@ p $ pMult "s" ["a", "b"]
 p $ pVideo "b" "driving.mov" (VolumeInput, 3)
   |+| pScale' 2
 
-p $ pInput "y" (CameraTexInput, 1)
-  |+| pTranslate 0 (0.2)
-  |+| pFade 0.7
+p $ pAdd "a" ["b", "c"]
+
+p $ pInput "d" (CameraTexInput, 1)
+
+p $ pt "b" "d"
+  |+| pBrightness sinMod'
+
+p $ pt "c" "d"
+  |+| pBrightness 1.5
+  |+| pEdges
+  |+| pBrightness (VolumeInput, 2)
+  |+| pScale' (KickInput, 0.1)
 
 p $ pShapes "x" 3 0.3 0.2
 
