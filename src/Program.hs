@@ -31,6 +31,7 @@ data LayerType =
 
 data BaseType =
   AudioData
+  | CircleEmitter
   | Dots
   | Flocking
   | Image
@@ -92,12 +93,13 @@ layerName Mult = "mult"
 
 baseName :: BaseType -> ByteString
 baseName AudioData = "audio_data"
+baseName CircleEmitter = "circle_emitter"
 baseName Dots = "dots"
-baseName SideEmitter = "emitter"
 baseName Flocking = "flocking"
 baseName Image = "image"
 baseName InputTexBase = "input_texture"
 baseName Lines = "lines"
+baseName SideEmitter = "emitter"
 baseName Sine = "sine"
 baseName Shapes = "shapes"
 baseName StringTheory = "string_theory"
@@ -139,8 +141,18 @@ singleUEffect e f = Effect e $ upf (effectName e) f
 
 pAudioData slot uVolume uData = baseProg slot AudioData $ (upf "volume" uVolume) `mappend` (upt "tex_audio" uData)
 pDots slot uVolume uData = baseProg slot Dots $ (upf "volume" uVolume) `mappend` (upt "eqs" uData)
-pSideEmitter slot uAmount uLifespan uSpread uYPos = baseProg slot SideEmitter $
+pCircleEmitter slot uLifespan uVel uRotation uPullback uTex = baseProg slot CircleEmitter $
+  mconcat [ upf "delta" deltaPattern
+          , upf "time" timePattern
+          , upf "emitVel" uVel
+          , upf "lifespan" uLifespan
+          , upf "pullback" uPullback
+          , upf "rotation" uRotation
+          , upt "tex_audio" uTex
+          ]
+pSideEmitter slot uAmount uLifespan uSpread uYPos uXPos = baseProg slot SideEmitter $
   mconcat [ upf "emitterY" uYPos
+          , upf "emitterX" uXPos
           , upf "emitVelX" uAmount
           , upf "emitVelY" $ pure (*) <*> floatPattern uSpread <*> ((+ (-0.5)) <$> rand)
           , upf "delta" deltaPattern
