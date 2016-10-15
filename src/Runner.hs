@@ -4,11 +4,9 @@
 module Runner where
 
 import Control.Concurrent
-import Control.Exception
 import Control.Lens
 import Control.Monad.Reader
 import Control.Monad.Trans.State
-import Data.Char
 import Data.Map.Strict (Map, insert, foldMapWithKey)
 import Data.ByteString.Char8 (ByteString, pack, unpack)
 import Data.Time.Clock
@@ -18,6 +16,7 @@ import qualified Sound.OSC.Transport.FD as T
 
 import Pattern
 import Program
+import Server
 import Uniform
 
 data TempoState = TempoState { _conn :: UDP, _patt :: Map ByteString Program, _start :: DiffTime, _cycleLength :: DiffTime, _prev :: Double, _current :: Double }
@@ -40,6 +39,9 @@ revEngines :: IO (MVar TempoState)
 revEngines = do
   now <- getCurrentTime
   conn' <- openUDP "127.0.0.1" 9001
+  _ <- forkIO $ do
+    udpsrv <- udpServer "0.0.0.0" 9000
+    runReaderT server udpsrv
   newMVar $ TempoState conn' mempty (utctDayTime now) (secondsToDiffTime 1) 0 0
 
 gunEngines :: MVar TempoState -> IO ThreadId

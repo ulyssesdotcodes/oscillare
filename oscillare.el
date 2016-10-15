@@ -22,8 +22,7 @@
 (defun oscillare-quit-haskell ()
   "Quit haskell."
   (interactive)
-  (kill-buffer inferior-haskell-buffer)
-  (delete-other-windows))
+  (kill-buffer inferior-haskell-buffer))
 
 (defun oscillare-send-string (s)
   (if (comint-check-proc inferior-haskell-buffer)
