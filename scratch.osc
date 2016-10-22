@@ -1,13 +1,34 @@
+p $ ptTriggered "s" "a b c" (KickInput, 0.8)
+  |+| pFade 0.92
+  |+| pScale' (-0.1)
+
+
+p $ pVideo "a" "sky.mov" (VolumeInput, 3)
+  |+| pEdges
+  |+| pScale 1
+
+p $ pInput "b" (CameraTexInput, 1)
+  |+| pEdges
+  |+| pFilter (* 1)
+
+p $ pStringTheory "b" (* 2) (* 2) 1 1
+  |+| pLittlePlanet
+  |+| pRotate (VolumeInput, 1)
+
+p $ pAudioData "c" 2 (AudioTexInput, 3)
+  |+| pLittlePlanet
+  |+| pFilter (* 1)
+  |+| pRepeat ((+ 2) . (* 8))
+
+
 p $ pt "s" "a"
 
-p $ pCircleEmitter "a" 4 (KickInput, 1) pi2Mod 1 (AudioTexInput, 256)
-  |+| pFade 0.98
-
-p $ pSideEmitter "a" (VolumeInput, 1.5) (KickInput, 3) 0.4 ((* 10) . sinMod) (-30)
+p $ pSideEmitter "a" (VolumeInput, 0.1) (KickInput, 10) 0.1 0 (-30)
 
 p $ ptTriggered "a" "e d" (KickInput, 1.2)
 
-p $ pAudioData "a" 0.7 (EqTexInput, 5)
+p $ pAudioData "a" 0.7 (AudioTexInput, 5)
+  |+| pLittlePlanet
   |+| pFade 0.9
 
 p $ pMult "e" ["b", "c"]
@@ -34,7 +55,7 @@ p $ ptTriggered "a" "e" (KickInput, 0.7)
   |+| pBrightness (VolumeInput, 0.5)
   |+| pOverlay 1
 
-p $ pVideo "d" "sky.mov" (KickInput, 2)
+p $ pVideo "d" "sky.mov" (KickInput, 4)
   |+| pEdges
   |+| pScale' 1
   |+| pFade (KickInput, 1.2)
@@ -52,9 +73,9 @@ p $ pStringTheory "b" (* 3) (* 1) 1 1
 p $ pMult "a" ["b"]
 
 
-p $ pInput "b" (CameraTexInput, 1)
-  |+| pBrightness 1.3
+p $ pInput "a" (CameraTexInput, 1)
   |+| pEdges
+  |+| pLittlePlanet
 
 p $ pAdd "a" ["d", "e"]
   |+| pScale' ((* (-0.7)) . sinMod')

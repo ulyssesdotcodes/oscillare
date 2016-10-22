@@ -17,6 +17,7 @@ data EffectType =
   | Edges
   | Fade
   | Filter
+  | LittlePlanet
   | Mirror
   | Overlay
   | Repeat
@@ -42,7 +43,7 @@ data BaseType =
   | SideEmitter
   | Sine
   | StringTheory
-  | Text
+  | TextType
   | TriggeredPassthrough
   | Video
 
@@ -79,6 +80,7 @@ effectName Brightness = "brightness"
 effectName Edges = "edge_detection"
 effectName Fade = "fade"
 effectName Filter = "filter"
+effectName LittlePlanet = "little_planet"
 effectName Mirror = "mirror"
 effectName Overlay = "overlay"
 effectName Repeat = "repeat"
@@ -103,7 +105,7 @@ baseName SideEmitter = "emitter"
 baseName Sine = "sine"
 baseName Shapes = "shapes"
 baseName StringTheory = "string_theory"
-baseName Text = "text"
+baseName TextType = "text"
 baseName Video = "video"
 
 baseName Passthrough = "pt"
@@ -167,7 +169,7 @@ pInput slot uInput = baseProg slot InputTexBase $ upt "program" uInput
 pShapes slot uSides uWidth uSize = baseProg slot Shapes $ mconcat [upf "sides" uSides, upf "width" uWidth, upf "size" uSize]
 pStringTheory slot uTimeMod uAngle uAngleDelta uXoff = baseProg slot StringTheory $ mconcat [upf "angle" uAngle, upf "angle_delta" uAngleDelta, upf "xoff" uXoff]
 pSine slot uXPos uScale uAmplitude = baseProg slot Sine $ mconcat [upf "time" $ uXPos, upf "scale" uScale, upf "amplitude" uAmplitude]
-pText slot uText = baseProg slot Text $ ups "text" uText
+pText slot uText = baseProg slot TextType $ ups "text" uText
 pVideo slot uPath uSpeed = baseProg slot Video $ mconcat [ups "video" uPath, upf "speed" uSpeed]
 
 pt s sp = baseProg s Passthrough (upsWithBase "program" sp)
@@ -177,6 +179,7 @@ pBrightness u = singleUEffect Brightness u
 pEdges = Effect Edges mempty
 pFade u = singleUEffect Fade u
 pFilter u = singleUEffect Filter u
+pLittlePlanet = Effect LittlePlanet mempty
 pMirror = Effect Mirror mempty
 pOverlay u = singleUEffect Overlay u
 pRepeat u = singleUEffect Repeat u

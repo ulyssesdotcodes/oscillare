@@ -1,5 +1,4 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell #-}
 
 module Runner where
 
@@ -17,11 +16,10 @@ import qualified Sound.OSC.Transport.FD as T
 import Pattern
 import Program
 import Server
+import State
 import Uniform
 
-data TempoState = TempoState { _conn :: UDP, _patt :: Map ByteString Program, _start :: DiffTime, _cycleLength :: DiffTime, _prev :: Double, _current :: Double }
-
-makeLenses ''TempoState
+ostr = ASCII_String
 
 instance Show TempoState where
    show (TempoState _ p _ _ pr cu) =
@@ -33,15 +31,10 @@ instance Show TempoState where
         [] -> ""
         e -> "{ messages " ++ e ++ " pr " ++ (show pr) ++ " cu " ++ (show cu) ++ " }"
 
-ostr = ASCII_String
-
 revEngines :: IO (MVar TempoState)
 revEngines = do
   now <- getCurrentTime
   conn' <- openUDP "127.0.0.1" 9001
-  _ <- forkIO $ do
-    udpsrv <- udpServer "0.0.0.0" 9000
-    runReaderT server udpsrv
   newMVar $ TempoState conn' mempty (utctDayTime now) (secondsToDiffTime 1) 0 0
 
 gunEngines :: MVar TempoState -> IO ThreadId
@@ -51,18 +44,16 @@ run :: IO ((Program -> IO ()), (Double -> IO ()), ThreadId)
 run = do
   mts <- revEngines
   ti <- gunEngines mts
+  _ <- forkIO $ do
+    udpsrv <- udpServer "0.0.0.0" 9000
+    runReaderT (serve mts) udpsrv
   return (runProg mts, changeTempo mts, ti)
 
-setProg :: Program -> TempoState -> TempoState
-setProg p = over patt (insert (programSlot p) p)
-
-printPrograms :: TempoState -> IO TempoState
-printPrograms ts = do
-  putStrLn . foldr ((++) . (\n -> "\n" ++ n) . show) [] $ view patt ts
-  return ts
-
 runProg :: MVar TempoState -> Program -> IO ()
-runProg mts p = modifyMVar_ mts $ printPrograms <$> setProg p
+runProg mts p = modifyMVar_ mts $ \ts -> do
+  (pLog, ts') <- runStateT (setProg' p) ts
+  putStrLn pLog
+  return ts'
 
 changeTempo :: MVar TempoState -> Double -> IO ()
 changeTempo mts t = modifyMVar_ mts $ return <$> set cycleLength (fromRational $ toRational t)

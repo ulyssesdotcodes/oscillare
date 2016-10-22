@@ -8,11 +8,13 @@ import           BasePrelude hiding (readMaybe)
 import           Data.Aeson
 import           Data.Aeson.Types
 import           Sound.OSC.Type
+import Sound.OSC.Transport.FD.UDP
 
 import           Data.Vector ((!?))
 import qualified Data.ByteString.Lazy as BSL
 import qualified Data.ByteString.Char8 as BSC
 import qualified Data.Vector as Vector
+import qualified Network.Socket as N {- network -}
 
 foo :: BSL.ByteString
 foo = "[\"#bundle\",{\"timestamp\":0.0},[\"/c_set\",3,4.5],[\"/n_free\",0]]"
@@ -81,6 +83,18 @@ instance ToJSON Bundle where
     toJSON (b : t' : m')
     where
       encodeMessage (Message a d) =
+        let a' = toJSON a
+            d' = map toJSON d
+        in toJSON (a' : d')
+
+instance FromJSON Message where
+  parseJSON (Object v) = do
+    addr <- v .: "address"
+    args <- v .: "args"
+    Message <$> parseJSON addr <*> traverse parseJSON args
+
+instance ToJSON Message where
+  toJSON (Message a d) =
         let a' = toJSON a
             d' = map toJSON d
         in toJSON (a' : d')

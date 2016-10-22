@@ -17,12 +17,24 @@
   (call-interactively 'inferior-haskell-start-process)
   (oscillare-send-string ":module Oscillare")
   (oscillare-send-string "(p, t, thread) <- run")
+  (split-window-below-and-focus)
+  (switch-to-buffer inferior-haskell-buffer)
   )
 
 (defun oscillare-quit-haskell ()
-  "Quit haskell."
+  "Quit osicllare."
   (interactive)
-  (kill-buffer inferior-haskell-buffer))
+  (switch-to-buffer inferior-haskell-buffer)
+  (kill-buffer-and-window))
+
+(defun oscillare-restart-haskell()
+  "Restart oscillare"
+  (interactive)
+  (oscillare-quit-haskell)
+  (oscillare-start-haskell)
+  )
+
+
 
 (defun oscillare-send-string (s)
   (if (comint-check-proc inferior-haskell-buffer)
