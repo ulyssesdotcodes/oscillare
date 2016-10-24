@@ -75,11 +75,13 @@ parseMessage (OSC.Message addr args) =
 
 data Address =
   Mood
+  | Time
   | Prog ByteString ByteString
   | None ByteString
 
 strToAddress :: [ByteString] -> Address
 strToAddress ["mood"] = Mood
+strToAddress ["time"] = Time
 strToAddress bs = None $ concat bs
 
 applyMessage :: MVar ServerState -> (Address, [OSC.Datum]) -> IO ()
@@ -96,6 +98,10 @@ applyMessage mss (Mood, [mood]) = do
     (log, ts'') <- runStateT (doMood mood) ts'
     print log
     return ts''
+
+applyMessage mss (Time, [OSC.datum_floating -> Just time]) = do
+  ss <- readMVar mss
+  modifyMVar_ (ss ^. ts) $ runReaderT (changeTempo time)
 
 applyMessage _ (None bs, dat) =
   print ("Invalid Message Args : " ++ show bs ++ ", " ++ show dat)
