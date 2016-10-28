@@ -1,29 +1,145 @@
-p $ ptTriggered "s" "a b c" (KickInput, 0.8)
+p $ pt "s" "a"
+
+p $ pAdd "a" ["c", "d"]
+  |+| pRepeat 3
+  |+| pOverlay 0.98
+
+p $ pLines "d" (KickInput, 0.1) 0.2
+  |+| pTranslate (VolumeInput, 0.5) 0
+  |+| pMirror
+
+p $ pFlocking "c" (VolumeInput, 120) 2 64
+  |+| pFilter (* 1)
+
+p $ pAudioData "c" 0.5 (AudioTexInput, 5)
+  |+| pRotate (0.5 * 3.1415)
+
+p $ pCircleEmitter "c" (VolumeInput, 8) (VolumeInput, 6) pi2Mod 1 (EqTexInput, 128)
+  |+| pMirror
+  |+| pTranslate 0.25 0.2
+  |+| pBrightness 4
+
+
+p $ pFlocking "b" (KickInput, 80) 1 64
+  |+| pFade 0.9
+
+p $ pVideo "o" "driving.mov" (VolumeInput, 5)
+  |+| pScale' 0.7
+  |+| pTranslate 0 0.1
+  |+| pEdges
+  |+| pFade 0.9
+
+p $ pInput "c" (CameraTexInput, 1)
+  |+| pEdges
+  |+| pTranslate 0.2 0.3
+  |+| pScale' 0.4
+
+p $ pAudioData "p" 1 (AudioTexInput, 5)
+  |+| pOverlay 0.98
+  |+| pScale' (-0.01)
+
+p $ pAdd "o" ["p", "q"]
+
+p $ pLines "c" (KickInput, 0.1) 0.16
+  |+| pTranslate (* 2) 0
+  |+| pMirror
+
+p $ pAudioData "q" 1 (AudioTexInput, 5)
+  |+| pFilter 0
+  |+| pLittlePlanet
+  |+| pScale' (-0.4)
+
+p $ pDots "b" 1 (EqTexInput, 6)
+  |+| pRepeat 30
+  |+| pMirror
+
+p $ pLines "d" (VolumeInput, 0.4) 0.2
+  |+| pRotate 0.3
+  |+| pLittlePlanet
+  |+| pRotate (KickInput, 2)
+
+p $ pAudioData "b" 1 (AudioTexInput, 5)
+  |+| pLittlePlanet
+  |+| pRotate ((* (-1)) . pi2Mod)
+  |+| pRepeat 3
+
+p $ pShapes "b" ((+ 3) . (* 6) . sinMod') 0.4 0.2
+  |+| pRepeat [33, 27, 21, 21, 25, 27, 33]
+
+p $ pAdd "b" ["e"]
+  |+| pRepeat 1
+
+p $ pStringTheory "b" (* 3) sinMod' 1 1
+  |+| pRepeat 3
+  |+| pFilter (* 1)
+  |+| pLittlePlanet
+  |+| pEdges
+
+p $ pStringTheory "c" (* 3) sinMod' 1 1
+  |+| pRepeat 3
+  |+| pLittlePlanet
+  |+| pEdges
+
+p $ pSine "b" (* 1) 1 (KickInput, 2)
+  |+| pRotate ((* (-1)) . pi2Mod)
+  |+| pScale' (-0.2)
+  |+| pRepeat 3
+  |+| pRotate (KickInput, pi2Mod)
+
+
+t 80
+
+p $ pAudioData "b" 1 (EqTexInput, 64)
+  |+| pTranslate 0 (0.3)
+  |+| pLittlePlanet
+  |+| pMirror
   |+| pFade 0.92
-  |+| pScale' (-0.1)
-
-
-p $ pVideo "a" "sky.mov" (VolumeInput, 3)
-  |+| pEdges
-  |+| pScale 1
-
-p $ pInput "b" (CameraTexInput, 1)
-  |+| pEdges
   |+| pFilter (* 1)
 
-p $ pStringTheory "b" (* 2) (* 2) 1 1
-  |+| pLittlePlanet
-  |+| pRotate (VolumeInput, 1)
+p $ pAdd "c" ["d"]
+  |+| pBrightness (VolumeInput, 2)
+  |+| pOverlay (KickInput, 1.2)
+  |+| pTranslate 0 (-0.02)
 
-p $ pAudioData "c" 2 (AudioTexInput, 3)
-  |+| pLittlePlanet
+p $ ptTriggered "c" "d" (KickInput, 0.7)
+  |+| pBrightness (VolumeInput, 2)
+  |+| pOverlay (KickInput, 1.2)
+  |+| pTranslate 0 (-0.02)
+
+p $ pStringTheory "d" (* 1) sinMod' 1 1
+  |+| pRepeat 2
+  |+| pEdges
+  |+| pFade 0.9
+
+
+p $ ptTriggered "c" "b d" (KickInput, 1)
+  |+| pOverlay 0.92
+  |+| pScale' (KickInput, 0.02)
+
+p $ pShapes "d" (KickInput, 8) 0.2 0.2
+  |+| pMirror
+  |+| pRepeat [2, 4, 6, 8]
+  |+| pScale' (KickInput, 0.7)
+  |+| pFade 0.98
   |+| pFilter (* 1)
-  |+| pRepeat ((+ 2) . (* 8))
+
+p $ pMult "c" ["a", "b"]
+  |+| pBrightness 2
+  |+| pOverlay (KickInput, 1.7)
+
+p $ pCircleEmitter "d" (KickInput, 4) 5 (KickInput, 3.1415) 2 (EqTexInput, 128)
+  |+| pFilter ((+ 0.8) . (* 0.2) . sinMod')
+  |+| pMirror
+
+p $ pSideEmitter "c" (VolumeInput, 3) (KickInput, 7) 0.1 ((* 20) . sinMod') (-30)
+  |+| pMirror
+
+p $ pSine "a" (VolumeInput, 1) 1 1
+  |+| pFade 0.97
 
 
 p $ pt "s" "a"
 
-p $ pSideEmitter "a" (VolumeInput, 0.1) (KickInput, 10) 0.1 0 (-30)
 
 p $ ptTriggered "a" "e d" (KickInput, 1.2)
 
@@ -34,8 +150,6 @@ p $ pAudioData "a" 0.7 (AudioTexInput, 5)
 p $ pMult "e" ["b", "c"]
   |+| pBrightness 1.4
 
-p $ pSine "a" (VolumeInput, 1) 1 1
-  |+| pFade 0.97
 
 p $ pMult "a" ["c", "d"]
   |+| pRotate sinMod
@@ -62,20 +176,11 @@ p $ pVideo "d" "sky.mov" (KickInput, 4)
   |+| pTranslate 0 ((* (-0.01)) . sinMod)
   |+| pFilter (* 1)
 
-p $ pDots "a" 1 (EqTexInput, 4)
 
 p $ pAudioData "d" 0.3 (AudioTexInput, 1)
 
-p $ pStringTheory "b" (* 3) (* 1) 1 1
-  |+| pFilter (* 1)
-  |+| pFade (KickInput, 1)
-
 p $ pMult "a" ["b"]
 
-
-p $ pInput "a" (CameraTexInput, 1)
-  |+| pEdges
-  |+| pLittlePlanet
 
 p $ pAdd "a" ["d", "e"]
   |+| pScale' ((* (-0.7)) . sinMod')
@@ -85,27 +190,13 @@ p $ pAdd "a" ["d", "e"]
   |+| pFade 0.96
   |+| pRotate [0.01, -0.01]
 
-p $ pFlocking "e" (KickInput, 100) 1 32
-  |+| pFilter (* 1)
-
 p $ ptTriggered "e" "f g" (KickInput, 0.7)
 
 p $ pLines "b" 0.01 (VolumeInput, 1)
 
-p $ pLines "g" 0.01 (VolumeInput, 0.1)
-  |+| pRotate 0.5
-  |+| pBrightness sinMod'
-  |+| pFilter ((+ 0.33) . (* 1))
-  |+| pFade 0.8
-
-p $ pShapes "e" [3, 4, 5, 6] 0.3 0.01
-
 p $ pImage "b" "frb_girl.jpg" 1
   |+| pEdges
   |+| pFade (KickInput, 1)
-
-p $ pText "c" "DJ HiPro in the back"
-  |+| pScale' (VolumeInput, 0.4)
 
 p $ pMult "a" ["x", "y"]
 
@@ -136,5 +227,35 @@ p $ pShapes "s" 3 0.01 0.1
 
 p $ pAdd "s" ["a", "b", "c"]
   |+| pFilter timePattern
+
+t 2
+
+---------------------
+
+
+p $ pt "s" "c"
+
+p $ pAudioData "b" 1 (EqTexInput, 64)
+  |+| pTranslate 0 (0.3)
+  |+| pLittlePlanet
+  |+| pMirror
+  |+| pFade 0.99
+  |+| pFilter (* 1)
+
+p $ ptTriggered "c" "d" (KickInput, 0.8)
+  |+| pOverlay 0.99
+  |+| pScale' (-0.03)
+  |+| pScale' (KickInput, 0.06)
+
+p $ pShapes "d" (KickInput, 6) 0.2 0.2
+  |+| pMirror
+  |+| pRepeat 2
+  |+| pFade 0.98
+  |+| pFilter (* 1)
+
+p $ pFlocking "d" (KickInput, 30) 1 64
+  |+| pMirror
+  |+| pFilter (* 2)
+  |+| pFade 0.8
 
 t 2

@@ -1,5 +1,14 @@
-#dial {
+.nx {
   position: relative;
-  left: 100px;
-  top: 100px;
+  display: block;
+  margin: 16px;
+}
+
+#tempo {
+  width: 200px;
+  height: 80px;
+}
+
+#progs {
+  height: 35px;
 }

@@ -38,5 +38,5 @@ setProgs :: Monad m => [Program] -> StateT TempoState m String
 setProgs ps = mapStateT (fmap (first last)) $ mapM setProg' ps
 
 changeTempo :: Monad m => Double -> ReaderT TempoState m TempoState
-changeTempo t = reader $ set cycleLength (fromRational $ toRational t)
+changeTempo t = reader $ set cycleLength (fromRational $ toRational (240 / t))
 

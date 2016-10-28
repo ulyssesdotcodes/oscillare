@@ -5,3 +5,9 @@ nx.sendsTo(function(data, something, somethingElse){
   console.log(this.oscPath);
   ws.send(JSON.stringify({address : this.oscPath, args: Object.keys(data).map(key => data[key])}));
 });
+
+nx.onload = function() {
+  progs.row = 1;
+  progs.col = 10;
+  progs.init();
+}

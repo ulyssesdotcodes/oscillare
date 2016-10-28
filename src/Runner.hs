@@ -47,7 +47,7 @@ run = do
   _ <- forkIO $ do
     udpsrv <- udpServer "0.0.0.0" 9000
     runReaderT (serve mts) udpsrv
-  return (runProg mts, \t -> modifyMVar_ mts >>= runReaderT (changeTempo t), ti)
+  return (runProg mts, \t -> modifyMVar_ mts (runReaderT (changeTempo t)), ti)
 
 runProg :: MVar TempoState -> Program -> IO ()
 runProg mts p = modifyMVar_ mts $ \ts -> do
@@ -55,7 +55,7 @@ runProg mts p = modifyMVar_ mts $ \ts -> do
   putStrLn pLog
   return ts'
 
-data SlotMessages = SlotMessages { slot :: Slot, messages :: Pattern Message }
+data SlotMessages = SlotMessages { dest :: Slot, messages :: Pattern Message }
 
 baseSlot slot = pack $ unpack slot ++ "0"
 

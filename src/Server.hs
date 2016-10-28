@@ -1,20 +1,25 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE ExtendedDefaultRules #-}
 
 module Server where
 
-import Prelude hiding (concat)
+import Prelude hiding (concat, lookup)
 
 import Control.Concurrent
 import Control.Lens
+import Control.Lens.TH
 import Control.Monad.Trans.Reader
 import Control.Monad.Trans.State
+import Control.Monad.Trans.Writer
 import Control.Monad.IO.Class
 import Data.Aeson (decode)
 import Data.ByteString.Char8 (ByteString, concat, pack, readInt, split)
-import Data.Text.Lazy.Encoding (encodeUtf8)
+import Data.Char
+import Data.Map (Map, fromList, (!), lookup)
 import Data.Maybe
+import Data.Text.Lazy.Encoding (encodeUtf8)
 import Network.Wai
 import Network.Wai.Application.Static (StaticSettings(..), staticApp, defaultWebAppSettings)
 import Network.Wai.Handler.Warp (run)
@@ -76,21 +81,22 @@ parseMessage (OSC.Message addr args) =
 data Address =
   Mood
   | Time
-  | Prog ByteString ByteString
+  | Prog
   | None ByteString
 
 strToAddress :: [ByteString] -> Address
 strToAddress ["mood"] = Mood
-strToAddress ["time"] = Time
+strToAddress ["tempo"] = Time
+strToAddress ["progs"] = Prog
 strToAddress bs = None $ concat bs
 
 applyMessage :: MVar ServerState -> (Address, [OSC.Datum]) -> IO ()
-applyMessage mss ((Prog x y), [toggled]) = do
-  print $ concat [x, ", ", y, ", ", pack $ show toggled]
-  let modifier t = if OSC.datum_floating toggled == Just 1.0 then ((:) t) else filter (/= t)
-  maybe (return ()) (\t -> modifyMVar_ mss (return . over toggles (modifier t)))
-    $ maybeTuple (readInt x, readInt y)
-  readMVar mss >>= print . view toggles
+applyMessage mss (Prog, [OSC.datum_floating -> Just y, OSC.datum_floating -> Just x, OSC.datum_floating -> Just on]) = do
+  ss <- readMVar mss
+  modifyMVar_ (ss ^. ts) $ \ts' -> do
+    (log, ts'') <- runStateT (doProg (truncate x) (truncate y) on) ts'
+    print log
+    return ts''
 
 applyMessage mss (Mood, [mood]) = do
   ss <- readMVar mss
@@ -105,6 +111,9 @@ applyMessage mss (Time, [OSC.datum_floating -> Just time]) = do
 
 applyMessage _ (None bs, dat) =
   print ("Invalid Message Args : " ++ show bs ++ ", " ++ show dat)
+
+applyMessage _ (_, dat) =
+  print ("Invalid Args : " ++ show dat)
 
 maybeTuple :: (Maybe (a, a'), Maybe (b, b')) -> Maybe (a, b)
 maybeTuple (a, b) = do
@@ -126,3 +135,28 @@ doMood (OSC.ASCII_String "chill") =
            ]
 
 doMood _ = return "Invalid Mood"
+
+progMap :: Map Int Program
+progMap = fromList [(0, pSine "b" (* 1) 1 1)
+                   ]
+
+doProg :: Monad m => Int -> Int -> Float -> StateT TempoState m String
+doProg x 0 1 = fromMaybe (return "") (setProg' . set slot (pack $ chr (x + 97):"") <$> lookup x progMap)
+doProg x 0 0 = fromMaybe (return "") (setProg' . set slot (pack $ chr (x + 97):"") <$> lookup x progMap)
+doProg _ _ _ = return ""
+
+-- setTriggered :: Monad m => ByteString -> StateT TempoState m String
+-- setTriggered ps = do
+--   ts <- get
+--   patt.ix "s" %= _
+--   ts' <- get
+--   return $ mconcat $ execWriterT (logProg ts')
+--   -- let
+--   --   set' ps =
+--   --     maybe ps (lookup "s" -> (Program slot (SlottableProgram (BaseProgram TriggeredPassthrough pus es))))
+--   --     Program slot (SlottableProgram (BaseProgram TriggeredPassthrough pus es))
+--   -- ts <- get
+
+-- setTriggered' :: Program -> Program
+-- setTriggered' (Program s (SlottableProgram (BaseProgram TriggeredPassthrough (UniformStringValue ))))
+

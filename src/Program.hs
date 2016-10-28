@@ -1,9 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE FlexibleContexts #-}
 
 
 module Program where
 
+import Control.Lens
 import Data.ByteString.Char8 (ByteString, pack, append)
 import Data.ByteString.Char8 as BSC
 
@@ -52,29 +54,6 @@ data Name =
   | EffName EffectType
   | LayerName LayerType
 
-instance Show LayerType where
-  show = unpack . layerName
-
-data Effect =
-  Effect EffectType (Pattern Uniform)
-
-instance Show Effect where
-  show (Effect et _) = unpack $ effectName et
-
-data BaseProgram =
-  BaseProgram BaseType (Pattern Uniform) [Effect]
-
-instance Show BaseProgram where
-  show (BaseProgram bt _ es) = unpack (baseName bt) ++ " Effects:" ++ Prelude.concatMap ((++ ", ") . show) es
-
-data Slottable =
-  SlottableProgram BaseProgram
-  | Layer LayerType [Slot] [Effect] deriving Show
-data Program = Program Slot Slottable deriving Show
-
-programSlot :: Program -> Slot
-programSlot (Program s _) = s
-
 effectName :: EffectType -> ByteString
 effectName Brightness = "brightness"
 effectName Edges = "edge_detection"
@@ -115,6 +94,31 @@ progName :: Name -> ByteString
 progName (BaseName b) = baseName b
 progName (EffName e) = effectName e
 progName (LayerName l) = layerName l
+
+instance Show LayerType where
+  show = unpack . layerName
+
+data Effect =
+  Effect EffectType (Pattern Uniform)
+
+instance Show Effect where
+  show (Effect et _) = unpack $ effectName et
+
+data BaseProgram =
+  BaseProgram BaseType (Pattern Uniform) [Effect]
+
+instance Show BaseProgram where
+  show (BaseProgram bt _ es) = unpack (baseName bt) ++ " Effects:" ++ Prelude.concatMap ((++ ", ") . show) es
+
+data Slottable =
+  SlottableProgram BaseProgram
+  | Layer LayerType [Slot] [Effect] deriving Show
+data Program = Program {_slot :: Slot, _program :: Slottable } deriving Show
+
+makeLenses ''Program
+
+programSlot :: Program -> Slot
+programSlot (Program s _) = s
 
 (|+|) :: Program -> Effect -> Program
 (|+|) (Program s (SlottableProgram (BaseProgram b us es))) e = Program s $ SlottableProgram $ BaseProgram b us (e:es)
