@@ -2,12 +2,14 @@
 
 module Runner where
 
+import Prelude hiding (unwords)
+
 import Control.Concurrent
 import Control.Lens
 import Control.Monad.Reader
 import Control.Monad.Trans.State
 import Data.Map.Strict (Map, insert, foldMapWithKey)
-import Data.ByteString.Char8 (ByteString, pack, unpack)
+import Data.ByteString.Char8 (ByteString, pack, unpack, unwords)
 import Data.Time.Clock
 import Network.Socket
 import Sound.OSC
@@ -22,32 +24,32 @@ import Uniform
 ostr = ASCII_String
 
 instance Show TempoState where
-   show (TempoState _ p _ _ pr cu) =
+   show (TempoState _ p _ _ pr cu exec) =
      let
        addName n p = (unpack n) ++ ": " ++ show (arc (programMessage p) pr cu)
        msgs = addName `foldMapWithKey` p
      in
       case msgs of
         [] -> ""
-        e -> "{ messages " ++ e ++ " pr " ++ (show pr) ++ " cu " ++ (show cu) ++ " }"
+        e -> "{ messages " ++ e ++ " pr " ++ (show pr) ++ " cu " ++ (show cu) ++ " exec " ++ (show exec) ++ " }"
 
 revEngines :: IO (MVar TempoState)
 revEngines = do
   now <- getCurrentTime
   conn' <- openUDP "127.0.0.1" 9001
-  newMVar $ TempoState conn' mempty (utctDayTime now) (secondsToDiffTime 1) 0 0
+  newMVar $ TempoState conn' mempty (utctDayTime now) (secondsToDiffTime 1) 0 0 (Exec ["a"] 0.9 [])
 
 gunEngines :: MVar TempoState -> IO ThreadId
 gunEngines = forkIO . sync
 
-run :: IO ((Program -> IO ()), (Double -> IO ()), ThreadId)
+run :: IO ((Program -> IO ()), (Double -> IO ()), (Exec -> Exec) -> IO (), ThreadId)
 run = do
   mts <- revEngines
   ti <- gunEngines mts
   _ <- forkIO $ do
     udpsrv <- udpServer "0.0.0.0" 9000
     runReaderT (serve mts) udpsrv
-  return (runProg mts, \t -> modifyMVar_ mts (runReaderT (changeTempo t)), ti)
+  return (runProg mts, \t -> modifyMVar_ mts (runReaderT (changeTempo t)), \f -> modifyMVar_ mts (return . (exec %~ f)), ti)
 
 runProg :: MVar TempoState -> Program -> IO ()
 runProg mts p = modifyMVar_ mts $ \ts -> do
@@ -58,6 +60,12 @@ runProg mts p = modifyMVar_ mts $ \ts -> do
 data SlotMessages = SlotMessages { dest :: Slot, messages :: Pattern Message }
 
 baseSlot slot = pack $ unpack slot ++ "0"
+
+execMessage :: Exec -> Pattern Message
+execMessage (Exec ps k es) =
+  programMessage (Program "s" (SlottableProgram (BaseProgram TriggeredPassthrough us es)))
+  where
+    us = uniformPattern "program" (pure . UniformStringValue $ unwords ps) `mappend` upf "trigger" (KickInput, k)
 
 programMessage :: Program -> Pattern Message
 programMessage (Program slot (SlottableProgram (BaseProgram prog us effs))) =
@@ -127,7 +135,7 @@ sendMessages :: MonadIO io => StateT TempoState io ()
 sendMessages = do
   tState <- get
   -- liftIO $ if (show tState == "") then return () else print tState
-  liftIO $ T.sendOSC (conn' tState) $ Bundle 0 $ arc (foldr (mappend . programMessage) mempty (view patt tState)) (view prev tState) (view current tState)
+  liftIO $ T.sendOSC (conn' tState) $ Bundle 0 $ arc (execMessage (view exec tState) `mappend` foldr (mappend . programMessage) mempty (view patt tState)) (view prev tState) (view current tState)
   where
     conn' = view conn
 

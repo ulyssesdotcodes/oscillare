@@ -16,7 +16,7 @@
   (interactive)
   (call-interactively 'inferior-haskell-start-process)
   (oscillare-send-string ":module Oscillare")
-  (oscillare-send-string "(p, t, thread) <- run")
+  (oscillare-send-string "(p, t, base, thread) <- run")
   (split-window-below-and-focus)
   (switch-to-buffer inferior-haskell-buffer)
   )

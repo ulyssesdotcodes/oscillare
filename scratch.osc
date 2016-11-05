@@ -1,23 +1,42 @@
-p $ pt "s" "a"
+p $ pt "s" "a"progs
+
+base $ (+++) "a"
+
+base $ sps ["a", "b"]
+
+base $ kk 1.2
+
+base $ (|+| pFade 0.98) . (|-|)
 
 p $ pAdd "a" ["c", "d"]
   |+| pRepeat 3
   |+| pOverlay 0.98
 
-p $ pLines "d" (KickInput, 0.1) 0.2
+p $ pAudioData "b" 1 (AudioTexInput, 5)
+  |+| pLittlePlanet
+  |+| pRotate ((* (-1)) . pi2Mod)
+  |+| pRepeat 3
+
+p $ pInput "a" (CameraTexInput, 1)
+  |+| pEdges
+  |+| pBrightness 2
+
+p $ pLines "a" (KickInput, 0.1) 0.2
   |+| pTranslate (VolumeInput, 0.5) 0
   |+| pMirror
 
 p $ pFlocking "c" (VolumeInput, 120) 2 64
   |+| pFilter (* 1)
 
-p $ pAudioData "c" 0.5 (AudioTexInput, 5)
+p $ pAudioData "a" 0.5 (AudioTexInput, 5)
   |+| pRotate (0.5 * 3.1415)
 
-p $ pCircleEmitter "c" (VolumeInput, 8) (VolumeInput, 6) pi2Mod 1 (EqTexInput, 128)
+p $ pCircleEmitter "b" (VolumeInput, 8) (VolumeInput, 6) pi2Mod 1 (EqTexInput, 128)
   |+| pMirror
   |+| pTranslate 0.25 0.2
   |+| pBrightness 4
+
+p $ pt "a" ["b"]
 
 
 p $ pFlocking "b" (KickInput, 80) 1 64
@@ -28,11 +47,6 @@ p $ pVideo "o" "driving.mov" (VolumeInput, 5)
   |+| pTranslate 0 0.1
   |+| pEdges
   |+| pFade 0.9
-
-p $ pInput "c" (CameraTexInput, 1)
-  |+| pEdges
-  |+| pTranslate 0.2 0.3
-  |+| pScale' 0.4
 
 p $ pAudioData "p" 1 (AudioTexInput, 5)
   |+| pOverlay 0.98
@@ -57,11 +71,6 @@ p $ pLines "d" (VolumeInput, 0.4) 0.2
   |+| pRotate 0.3
   |+| pLittlePlanet
   |+| pRotate (KickInput, 2)
-
-p $ pAudioData "b" 1 (AudioTexInput, 5)
-  |+| pLittlePlanet
-  |+| pRotate ((* (-1)) . pi2Mod)
-  |+| pRepeat 3
 
 p $ pShapes "b" ((+ 3) . (* 6) . sinMod') 0.4 0.2
   |+| pRepeat [33, 27, 21, 21, 25, 27, 33]

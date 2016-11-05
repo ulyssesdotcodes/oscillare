@@ -113,16 +113,30 @@ instance Show BaseProgram where
 data Slottable =
   SlottableProgram BaseProgram
   | Layer LayerType [Slot] [Effect] deriving Show
-data Program = Program {_slot :: Slot, _program :: Slottable } deriving Show
+
+data Program = Program {_slot :: Slot, _program :: Slottable }
+  deriving Show
+
+data Exec = Exec { _progs :: [ByteString]
+                  , _kick :: Double
+                  , _effects :: [Effect]
+                  } deriving Show
 
 makeLenses ''Program
+makeLenses ''Exec
+
+class Effectable a where
+  (|+|) :: a -> Effect -> a
+
+instance Effectable Program where
+  (Program s (SlottableProgram (BaseProgram b us es))) |+| e = Program s $ SlottableProgram $ BaseProgram b us (e:es)
+  (Program s (Layer l ss es)) |+| e = Program s $ Layer l ss (e:es)
+
+instance Effectable Exec where
+  (Exec ps k es) |+| e = Exec ps k (e:es)
 
 programSlot :: Program -> Slot
 programSlot (Program s _) = s
-
-(|+|) :: Program -> Effect -> Program
-(|+|) (Program s (SlottableProgram (BaseProgram b us es))) e = Program s $ SlottableProgram $ BaseProgram b us (e:es)
-(|+|) (Program s (Layer l ss es)) e = Program s $ Layer l ss (e:es)
 
 baseProg :: String -> BaseType -> Pattern Uniform -> Program
 baseProg s b us = Program (pack s) (SlottableProgram (BaseProgram b us []))
