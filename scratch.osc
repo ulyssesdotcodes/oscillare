@@ -1,27 +1,29 @@
 p $ pt "s" "a"progs
 
-base $ (+++) "a"
+base $ (+++) "b"
 
-base $ sps ["a", "b"]
+ease $ sps ["b", "a"]
 
 base $ kk 1.2
 
 base $ (|+| pFade 0.98) . (|-|)
 
+t 100
+
 p $ pAdd "a" ["c", "d"]
   |+| pRepeat 3
   |+| pOverlay 0.98
 
-p $ pAudioData "b" 1 (AudioTexInput, 5)
+p $ pAudioData "a" 1 (AudioTexInput, 5)
   |+| pLittlePlanet
   |+| pRotate ((* (-1)) . pi2Mod)
   |+| pRepeat 3
 
-p $ pInput "a" (CameraTexInput, 1)
+p $ pInput "b" (CameraTexInput, 1)
   |+| pEdges
   |+| pBrightness 2
 
-p $ pLines "a" (KickInput, 0.1) 0.2
+p $ pLines "c" (KickInput, 0.1) 0.2
   |+| pTranslate (VolumeInput, 0.5) 0
   |+| pMirror
 

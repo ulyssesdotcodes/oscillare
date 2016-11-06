@@ -54,7 +54,7 @@ serve mts = do
 
 staticPage :: Application
 staticPage =
-  staticApp $ defaultWebAppSettings "C:\\Users\\Ulysses\\Development\\oscillare\\src\\static"
+  staticApp $ defaultWebAppSettings "C:\\Users\\ulyss\\Development\\oscillare\\src\\static"
 
 wsApp :: MVar ServerState -> ServerApp
 wsApp ss pc = do
@@ -137,12 +137,21 @@ doMood (OSC.ASCII_String "chill") =
 doMood _ = return "Invalid Mood"
 
 progMap :: Map Int Program
-progMap = fromList [(0, pSine "b" (* 1) 1 1)
+progMap = fromList [ (0, pSine "a" (* 1) 1 1)
+                   , (1, pInput "b" (CameraTexInput, 1) |+| pEdges |+| pBrightness 2)
                    ]
 
 doProg :: Monad m => Int -> Int -> Float -> StateT TempoState m String
-doProg x 0 1 = fromMaybe (return "") (setProg' . set slot (pack $ chr (x + 97):"") <$> lookup x progMap)
-doProg x 0 0 = fromMaybe (return "") (setProg' . set slot (pack $ chr (x + 97):"") <$> lookup x progMap)
+doProg x 0 1 = do
+  let prog = lookup x progMap
+  case prog of
+    Just p -> setAddProg p
+    Nothing -> return ""
+doProg x 0 0 = do
+  let prog = lookup x progMap
+  case prog of
+    Just p -> exec %%= (execStateT $ remProg (programSlot p))
+    Nothing -> return ""
 doProg _ _ _ = return ""
 
 -- setTriggered :: Monad m => ByteString -> StateT TempoState m String

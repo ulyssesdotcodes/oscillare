@@ -37,7 +37,7 @@ revEngines :: IO (MVar TempoState)
 revEngines = do
   now <- getCurrentTime
   conn' <- openUDP "127.0.0.1" 9001
-  newMVar $ TempoState conn' mempty (utctDayTime now) (secondsToDiffTime 1) 0 0 (Exec ["a"] 0.9 [])
+  newMVar $ TempoState conn' mempty (utctDayTime now) (secondsToDiffTime 1) 0 0 (Exec ["a0"] 0.9 [])
 
 gunEngines :: MVar TempoState -> IO ThreadId
 gunEngines = forkIO . sync
