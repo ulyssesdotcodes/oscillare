@@ -10,6 +10,7 @@ import Prelude hiding (concat, lookup)
 import Control.Concurrent
 import Control.Lens
 import Control.Lens.TH
+import Control.Lens.Zoom
 import Control.Monad.Trans.Reader
 import Control.Monad.Trans.State
 import Control.Monad.Trans.Writer
@@ -137,8 +138,13 @@ doMood (OSC.ASCII_String "chill") =
 doMood _ = return "Invalid Mood"
 
 progMap :: Map Int Program
-progMap = fromList [ (0, pSine "a" (* 1) 1 1)
-                   , (1, pInput "b" (CameraTexInput, 1) |+| pEdges |+| pBrightness 2)
+progMap = fromList [ (0, pAudioData "a" 1 (AudioTexInput, 5) |+| pFade 0.97)
+                   , (1, pInput "b" (CameraTexInput, 1) |+| pEdges |+| pBrightness 2 |+| pFade (VolumeInput, 0.98))
+                   , (2, pLines "c" (KickInput, 0.1) 0.2 |+| pMirror)
+                   , (3, pFlocking "d" (KickInput, 80) 1 64 |+| pFade 0.98)
+                   , (4, pDots "e" 1 (EqTexInput, 6) |+| pMirror)
+                   , (5, pShapes "f" ((+ 3) . (* 6) . sinMod') 0.2 0.2 |+| pRepeat 9)
+                   , (6, pStringTheory "g" (* 3) sinMod' 1 1 |+| pRepeat 3 |+| pFilter (* 1))
                    ]
 
 doProg :: Monad m => Int -> Int -> Float -> StateT TempoState m String
@@ -150,7 +156,10 @@ doProg x 0 1 = do
 doProg x 0 0 = do
   let prog = lookup x progMap
   case prog of
-    Just p -> exec %%= (execStateT $ remProg (programSlot p))
+    Just p -> do
+      a <- zoom exec $ remProg (programSlot p)
+      a' <- setProg' (Program (programSlot p) Blank)
+      return (a ++ a')
     Nothing -> return ""
 doProg _ _ _ = return ""
 

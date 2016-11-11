@@ -81,6 +81,7 @@ programMessage (Program slot (Layer l ss es)) =
     progMsg l = Message "/progs" [ostr (progName $ LayerName l)]
     layerMsg ss = Message "/progs/connections" $ ostr . baseSlot <$> ss
     effMsg = Message "/progs/effect" [ostr $ nextSlot (baseSlot slot)]
+programMessage (Program slot Blank) = once <$> pure $ Message "/progs/clear" [ostr slot]
 
 effectsMessages :: Slot -> [Effect] -> Pattern Message
 effectsMessages s ((Effect e us):es) =

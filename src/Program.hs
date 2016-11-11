@@ -112,7 +112,8 @@ instance Show BaseProgram where
 
 data Slottable =
   SlottableProgram BaseProgram
-  | Layer LayerType [Slot] [Effect] deriving Show
+  | Layer LayerType [Slot] [Effect]
+  | Blank deriving Show
 
 data Program = Program {_slot :: Slot, _program :: Slottable }
   deriving Show
