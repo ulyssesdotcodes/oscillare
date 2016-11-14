@@ -9,7 +9,8 @@ import Control.Lens
 import Control.Monad.Reader
 import Control.Monad.Trans.State
 import Data.Map.Strict (Map, insert, foldMapWithKey)
-import Data.ByteString.Char8 (ByteString, pack, unpack, unwords)
+import Data.ByteString.Char8 (ByteString, pack, unpack, unwords, append)
+import Data.Maybe
 import Data.Time.Clock
 import Network.Socket
 import Sound.OSC
@@ -37,7 +38,7 @@ revEngines :: IO (MVar TempoState)
 revEngines = do
   now <- getCurrentTime
   conn' <- openUDP "127.0.0.1" 9001
-  newMVar $ TempoState conn' mempty (utctDayTime now) (secondsToDiffTime 1) 0 0 (Exec ["a0"] 0.9 [])
+  newMVar $ TempoState conn' mempty (utctDayTime now) (secondsToDiffTime 1) 0 0 (Exec [] 0.9 [])
 
 gunEngines :: MVar TempoState -> IO ThreadId
 gunEngines = forkIO . sync
@@ -59,18 +60,19 @@ runProg mts p = modifyMVar_ mts $ \ts -> do
 
 data SlotMessages = SlotMessages { dest :: Slot, messages :: Pattern Message }
 
-baseSlot slot = pack $ unpack slot ++ "0"
+baseSlot :: ByteString -> ByteString
+baseSlot s = append s (pack "0")
 
 execMessage :: Exec -> Pattern Message
 execMessage (Exec ps k es) =
-  programMessage (Program "s" (SlottableProgram (BaseProgram TriggeredPassthrough us es)))
+  programMessage (Program (pack "s") (SlottableProgram (BaseProgram TriggeredPassthrough us es)))
   where
     us = uniformPattern "program" (pure . UniformStringValue $ unwords ps) `mappend` upf "trigger" (KickInput, k)
 
 programMessage :: Program -> Pattern Message
-programMessage (Program slot (SlottableProgram (BaseProgram prog us effs))) =
-  slotMessages (baseSlot slot) (BaseName prog) (nextSlot (baseSlot slot)) us `mappend`
-    (effectsMessages (baseSlot slot) $ reverse effs)
+programMessage (Program s (SlottableProgram (BaseProgram prog us effs))) =
+  slotMessages (baseSlot s) (BaseName prog) (nextSlot (baseSlot s)) us `mappend`
+    (effectsMessages (baseSlot s) $ reverse effs)
 programMessage (Program slot (Layer l ss es)) =
   case es of
     [] -> (addSlot (baseSlot slot) . once . mconcat $ pure <$> [progMsg l, layerMsg ss])
@@ -92,10 +94,14 @@ effectsMessages s ((Effect e us):es) =
 effectsMessages s [] = once <$> pure $ Message "/progs/effect/clear" [ostr s]
 
 nextSlot :: Slot -> Slot
-nextSlot s = pack $ head s':show (num + 1)
+nextSlot s = pack $ fromMaybe ("no: " ++ (unpack s)) $ init' s' >>= \i -> num >>= \n -> Just (i ++ show (n + 1))
   where
     s' = unpack s
-    num = read $ tail s'
+    num = tail' s' >>= readMaybe
+    tail' [] = Nothing
+    tail' xs = Just [(last xs)]
+    init' [] = Nothing
+    init' xs = Just (init xs)
 
 slotMessages :: Slot -> Name -> Slot -> Pattern Uniform -> Pattern Message
 slotMessages s n next us = addSlot s $ mconcat $ [progMsg, effectMsg, uMsgs us]

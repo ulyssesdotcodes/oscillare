@@ -1,27 +1,33 @@
 p $ pt "s" "a"progs
 
-base $ (+++) "b"
+base $ (++-) "a"
 
 ease $ sps ["b", "a"]
 
-base $ kk 1.2
+base $ kk 8
 
 base $ (|+| pFade 0.98) . (|-|)
 
 t 100
 
+p $ pLines "c" (KickInput, 0.1) 0.2 |+| pMirror |+| pBrightness 1 |+| pBrightness 1
+
+p $ pAudioData "a" 1 (AudioTexInput, 32)
+
+p $ pDots "a" 1 (EqTexInput, 8)
+
 p $ pAdd "a" ["c", "d"]
   |+| pRepeat 3
   |+| pOverlay 0.98
 
-p $ pAudioData "a" 1 (AudioTexInput, 5)
+p $ pAudioData "aa" 3 (EqTexInput, 50)
   |+| pLittlePlanet
-  |+| pRotate ((* (-1)) . pi2Mod)
   |+| pRepeat 3
 
-p $ pInput "b" (CameraTexInput, 1)
+p $ pInput "a" (CameraTexInput, 1)
   |+| pEdges
   |+| pBrightness 2
+
 
 p $ pLines "c" (KickInput, 0.1) 0.2
   |+| pTranslate (VolumeInput, 0.5) 0
@@ -74,8 +80,8 @@ p $ pLines "d" (VolumeInput, 0.4) 0.2
   |+| pLittlePlanet
   |+| pRotate (KickInput, 2)
 
-p $ pShapes "b" ((+ 3) . (* 6) . sinMod') 0.4 0.2
-  |+| pRepeat [33, 27, 21, 21, 25, 27, 33]
+p $ pShapes "a" ((+ 3) . (* 6) . sinMod') 0.4 0.2
+  |+| pLittlePlanet
 
 p $ pAdd "b" ["e"]
   |+| pRepeat 1
@@ -117,7 +123,7 @@ p $ ptTriggered "c" "d" (KickInput, 0.7)
   |+| pOverlay (KickInput, 1.2)
   |+| pTranslate 0 (-0.02)
 
-p $ pStringTheory "d" (* 1) sinMod' 1 1
+p $ pStringTheory "a" (* 1) sinMod' 1 1
   |+| pRepeat 2
   |+| pEdges
   |+| pFade 0.9
@@ -158,7 +164,8 @@ p $ pAudioData "a" 0.7 (AudioTexInput, 5)
   |+| pLittlePlanet
   |+| pFade 0.9
 
-p $ pMult "e" ["b", "c"]
+p $ pMult "e" ["b00 (EqTexInput, 32)
+", "c"]
   |+| pBrightness 1.4
 
 
@@ -169,6 +176,8 @@ p $ pMult "a" ["c", "d"]
   |+| pFade (KickInput, 1.1)
   |+| pScale' (KickInput, 0.08)
   |+| pScale' (-0.04)
+
+
 
 p $ p
 

@@ -124,27 +124,26 @@ maybeTuple (a, b) = do
 
 doMood :: Monad m => OSC.Datum -> StateT TempoState m String
 doMood (OSC.ASCII_String "energetic") =
-  setProgs [ ptTriggered "s" ("a b" :: String) (KickInput, (0.9 :: Double)) |+| pFade (0.98 :: Double)
-           , pSideEmitter "a" (VolumeInput, (2 :: Double)) (KickInput, (10 :: Double)) (0.2 :: Double) ((* 10) . sinMod) ((-30) :: Double)
+  setProgs [ pSideEmitter "a" (VolumeInput, (2 :: Double)) (KickInput, (10 :: Double)) (0.2 :: Double) ((* 10) . sinMod) ((-30) :: Double)
            , (pSine "b" (* 1) (1 :: Double) (1 :: Double))
            ]
 
 doMood (OSC.ASCII_String "chill") =
-  setProgs [ ptTriggered "s" ("a b" :: String) (KickInput, (0.9 :: Double)) |+| pFade (0.98 :: Double)
-           , pText "a" ("Chillaxed" :: String)
-           , pSine "b" (* 1) (1 :: Double) (1 :: Double)
+  setProgs [ pText "ba" ("Chillaxed" :: String)
+           , pSine "bb" (* 1) (1 :: Double) (1 :: Double)
            ]
 
 doMood _ = return "Invalid Mood"
 
 progMap :: Map Int Program
-progMap = fromList [ (0, pAudioData "a" 1 (AudioTexInput, 5) |+| pFade 0.97)
-                   , (1, pInput "b" (CameraTexInput, 1) |+| pEdges |+| pBrightness 2 |+| pFade (VolumeInput, 0.98))
-                   , (2, pLines "c" (KickInput, 0.1) 0.2 |+| pMirror)
-                   , (3, pFlocking "d" (KickInput, 80) 1 64 |+| pFade 0.98)
-                   , (4, pDots "e" 1 (EqTexInput, 6) |+| pMirror)
-                   , (5, pShapes "f" ((+ 3) . (* 6) . sinMod') 0.2 0.2 |+| pRepeat 9)
-                   , (6, pStringTheory "g" (* 3) sinMod' 1 1 |+| pRepeat 3 |+| pFilter (* 1))
+progMap = fromList [ (0, pAudioData "aa" 1 (AudioTexInput, 5) |+| pFade 0.97)
+                   , (1, pInput "ab" (CameraTexInput, 1) |+| pEdges |+| pBrightness 2 |+| pFade (VolumeInput, 0.98))
+                   , (2, pLines "ac" (KickInput, 0.1) 0.2 |+| pMirror)
+                   , (3, pFlocking "ad" (KickInput, 80) 1 64 |+| pFade 0.98)
+                   , (4, pDots "ae" 1 (EqTexInput, 6) |+| pMirror)
+                   , (5, pShapes "af" ((+ 3) . (* 6) . sinMod') 0.2 0.2 |+| pRepeat 9)
+                   , (6, pStringTheory "ag" (* 3) sinMod' 1 1 |+| pRepeat 3 |+| pFilter (* 1))
+                   , (7, pShapes "ah" ((+ 3) . (* 6) . sinMod') 0.4 0.2 |+| pLittlePlanet)
                    ]
 
 doProg :: Monad m => Int -> Int -> Float -> StateT TempoState m String
