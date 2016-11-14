@@ -18,6 +18,7 @@ import Control.Monad.IO.Class
 import Data.Aeson (decode)
 import Data.ByteString.Char8 (ByteString, concat, pack, readInt, split)
 import Data.Char
+import Data.List (union, (\\))
 import Data.Map (Map, fromList, (!), lookup)
 import Data.Maybe
 import Data.Text.Lazy.Encoding (encodeUtf8)
@@ -136,15 +137,23 @@ doMood (OSC.ASCII_String "chill") =
 doMood _ = return "Invalid Mood"
 
 progMap :: Map Int Program
-progMap = fromList [ (0, pAudioData "aa" 1 (AudioTexInput, 5) |+| pFade 0.97)
-                   , (1, pInput "ab" (CameraTexInput, 1) |+| pEdges |+| pBrightness 2 |+| pFade (VolumeInput, 0.98))
+progMap = fromList [ (0, pAudioData "aa" 1 (AudioTexInput, 5))
+                   , (1, pInput "ab" (CameraTexInput, 1) |+| pEdges |+| pBrightness 2)
                    , (2, pLines "ac" (KickInput, 0.1) 0.2 |+| pMirror)
-                   , (3, pFlocking "ad" (KickInput, 80) 1 64 |+| pFade 0.98)
+                   , (3, pFlocking "ad" (KickInput, 80) 1 64 |+| pFade 0.4)
                    , (4, pDots "ae" 1 (EqTexInput, 6) |+| pMirror)
                    , (5, pShapes "af" ((+ 3) . (* 6) . sinMod') 0.2 0.2 |+| pRepeat 9)
                    , (6, pStringTheory "ag" (* 3) sinMod' 1 1 |+| pRepeat 3 |+| pFilter (* 1))
                    , (7, pShapes "ah" ((+ 3) . (* 6) . sinMod') 0.4 0.2 |+| pLittlePlanet)
                    ]
+
+effMap :: Map Int [Effect]
+effMap = fromList [ (0, [pFade 0.94])
+                 , (1, [pFade 0.7, pFade (VolumeInput, 1)])
+                 , (2, [ pLittlePlanet ])
+                 , (3, [ pFilter (* 1) ])
+                 , (4, [ pFilter (VolumeInput, 2) ])
+                 ]
 
 doProg :: Monad m => Int -> Int -> Float -> StateT TempoState m String
 doProg x 0 1 = do
@@ -160,6 +169,24 @@ doProg x 0 0 = do
       a' <- setProg' (Program (programSlot p) Blank)
       return (a ++ a')
     Nothing -> return ""
+
+doProg x 1 1 = do
+  let effs = lookup x effMap
+  case effs of
+    Just effs' -> do
+      exec . effects %= union effs'
+      st <- get
+      return $ show $ view (exec . effects) st
+    Nothing -> return ""
+doProg x 1 0 = do
+  let effs = lookup x effMap
+  case effs of
+    Just eff' -> do
+      exec . effects %= (\\ eff')
+      st <- get
+      return $ show $ view (exec . effects) st
+    Nothing -> return ""
+
 doProg _ _ _ = return ""
 
 -- setTriggered :: Monad m => ByteString -> StateT TempoState m String

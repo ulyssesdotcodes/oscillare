@@ -27,6 +27,7 @@ data EffectType =
   | Rotate
   | Scale
   | Translate
+  deriving Eq
 
 data LayerType =
   Add
@@ -100,6 +101,9 @@ instance Show LayerType where
 
 data Effect =
   Effect EffectType (Pattern Uniform)
+
+instance Eq Effect where
+  (==) (Effect et pu) (Effect et' pu') = (et == et') && (pu == pu')
 
 instance Show Effect where
   show (Effect et _) = unpack $ effectName et

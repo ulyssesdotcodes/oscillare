@@ -7,7 +7,7 @@ nx.sendsTo(function(data, something, somethingElse){
 });
 
 nx.onload = function() {
-  progs.row = 1;
+  progs.row = 2;
   progs.col = 10;
   progs.init();
 }

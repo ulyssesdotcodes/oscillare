@@ -9,20 +9,25 @@ import Data.ByteString.Char8 (ByteString, pack)
 
 import Pattern
 
+instance Eq (Pattern Uniform) where
+  (==) pu pu' = ((arc pu 0 0.1) == (arc pu' 0 0.1)) && ((arc pu 0.5 0.6) == (arc pu' 0.5 0.6))
+
 data FloatValue
   = FloatInputValue FloatInput [Double]
   | FloatDoubleValue Double
+  deriving Eq
 data FloatInput =
   VolumeInput
   | KickInput
+  deriving Eq
 
 floatInputText :: FloatInput -> ByteString
 floatInputText VolumeInput = "volume"
 floatInputText KickInput = "kick"
 
 data TexValue
-  = TexInputValue TexInput Double
-data TexInput = AudioTexInput | EqTexInput | CameraTexInput
+  = TexInputValue TexInput Double deriving Eq
+data TexInput = AudioTexInput | EqTexInput | CameraTexInput deriving Eq
 
 texInputText :: TexInput -> ByteString
 texInputText AudioTexInput = "audio_texture"
@@ -35,8 +40,9 @@ data UniformValue
   = UniformFloatValue FloatValue
   | UniformTexValue TexValue
   | UniformStringValue StringValue
+  deriving Eq
 
-data Uniform =  Uniform { name :: ByteString, value :: UniformValue }
+data Uniform =  Uniform { name :: ByteString, value :: UniformValue } deriving Eq
 
 timeUniform :: Pattern Uniform
 timeUniform = uniformPattern "time" (UniformFloatValue . FloatDoubleValue <$> timePattern)
