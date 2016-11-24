@@ -1,6 +1,6 @@
 p $ pt "s" "a"progs
 
-base $ (++-) "a"
+base $ (+++) "a"
 
 ease $ sps ["b", "a"]
 
@@ -20,7 +20,7 @@ p $ pAdd "a" ["c", "d"]
   |+| pRepeat 3
   |+| pOverlay 0.98
 
-p $ pAudioData "aa" 3 (EqTexInput, 50)
+p $ pAudioData "a" 3 (EqTexInput, 50)
   |+| pLittlePlanet
   |+| pRepeat 3
 
