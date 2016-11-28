@@ -2,17 +2,25 @@ p $ pt "s" "a"progs
 
 base $ (+++) "a"
 
-ease $ sps ["b", "a"]
-
-base $ kk 8
+base $ kk 1.35
 
 base $ (|+| pFade 0.98) . (|-|)
 
 t 100
 
+p $ pSine "b" (VolumeInput, 1) 1 1
+
 p $ pLines "c" (KickInput, 0.1) 0.2 |+| pMirror |+| pBrightness 1 |+| pBrightness 1
 
-p $ pAudioData "a" 1 (AudioTexInput, 32)
+p $ pFlocking "a" (VolumeInput, 120) 2 64
+  |+| pBlur
+  |+| pFilter (VolumeInput, 2)
+  |+| pFade 0.98
+
+p $ pShapes "a" ((+ 3) . (* 6) . sinMod') 0.4 0.2
+  |+| pRepeat 30
+  |+| pDisplace (EqTexInput, 3)
+
 
 p $ pDots "a" 1 (EqTexInput, 8)
 

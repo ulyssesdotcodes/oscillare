@@ -15,10 +15,12 @@ import Uniform
 type Slot = ByteString
 
 data EffectType =
-  Brightness
+  Blur
+  | Brightness
   | Edges
   | Fade
   | Filter
+  | Lumidots
   | LittlePlanet
   | Mirror
   | Overlay
@@ -31,6 +33,7 @@ data EffectType =
 
 data LayerType =
   Add
+  | Displace
   | Mult
 
 data BaseType =
@@ -56,10 +59,12 @@ data Name =
   | LayerName LayerType
 
 effectName :: EffectType -> ByteString
+effectName Blur = "blur"
 effectName Brightness = "brightness"
 effectName Edges = "edge_detection"
 effectName Fade = "fade"
 effectName Filter = "filter"
+effectName Lumidots = "lumidots"
 effectName LittlePlanet = "little_planet"
 effectName Mirror = "mirror"
 effectName Overlay = "overlay"
@@ -71,6 +76,7 @@ effectName Translate = "translate"
 
 layerName :: LayerType -> ByteString
 layerName Add = "add"
+layerName Displace = "displace"
 layerName Mult = "mult"
 
 baseName :: BaseType -> ByteString
@@ -198,11 +204,13 @@ pVideo slot uPath uSpeed = baseProg slot Video $ mconcat [ups "video" uPath, upf
 pt s sp = baseProg s Passthrough (upsWithBase "program" sp)
 ptTriggered s sp uTrig = baseProg s TriggeredPassthrough $ upsWithBase "program" sp `mappend` upf "trigger" uTrig
 
+pBlur = Effect Blur mempty
 pBrightness u = singleUEffect Brightness u
 pEdges = Effect Edges mempty
 pFade u = singleUEffect Fade u
 pFilter u = singleUEffect Filter u
 pLittlePlanet = Effect LittlePlanet mempty
+pLumidots = Effect Lumidots mempty
 pMirror = Effect Mirror mempty
 pOverlay u = singleUEffect Overlay u
 pRepeat u = singleUEffect Repeat u
@@ -213,6 +221,7 @@ pScale' uXY = pScale uXY uXY
 pTranslate uX uY = Effect Translate $ mconcat [upf "translate_x" uX, upf "translate_y" uY]
 
 pAdd = layer Add
+pDisplace = layer Displace
 pMult = layer Mult
 
 
