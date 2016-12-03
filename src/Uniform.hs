@@ -19,11 +19,13 @@ data FloatValue
 data FloatInput =
   VolumeInput
   | KickInput
+  | Slider1Input
   deriving Eq
 
 floatInputText :: FloatInput -> ByteString
 floatInputText VolumeInput = "volume"
 floatInputText KickInput = "kick"
+floatInputText Slider1Input = "slider1"
 
 data TexValue
   = TexInputValue TexInput Double deriving Eq

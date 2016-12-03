@@ -24,6 +24,7 @@ data TempoState = TempoState { _conn :: UDP
                              , _prev :: Double
                              , _current :: Double
                              , _exec :: Exec
+                             , _inputs :: Map ByteString Double
                              }
 
 makeLenses ''TempoState

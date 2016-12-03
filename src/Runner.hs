@@ -2,13 +2,13 @@
 
 module Runner where
 
-import Prelude hiding (unwords)
+import Prelude hiding (unwords, lookup)
 
 import Control.Concurrent
 import Control.Lens
 import Control.Monad.Reader
 import Control.Monad.Trans.State
-import Data.Map.Strict (Map, insert, foldMapWithKey)
+import Data.Map.Strict (Map, insert, foldMapWithKey, member, (!), lookup)
 import Data.ByteString.Char8 (ByteString, pack, unpack, unwords, append)
 import Data.Maybe
 import Data.Time.Clock
@@ -25,9 +25,9 @@ import Uniform
 ostr = ASCII_String
 
 instance Show TempoState where
-   show (TempoState _ p _ _ pr cu exec) =
+   show (TempoState _ p _ _ pr cu exec inputs) =
      let
-       addName n p = (unpack n) ++ ": " ++ show (arc (programMessage p) pr cu)
+       addName n p = (unpack n) ++ ": " ++ show (arc (programMessage inputs p) pr cu)
        msgs = addName `foldMapWithKey` p
      in
       case msgs of
@@ -38,7 +38,7 @@ revEngines :: IO (MVar TempoState)
 revEngines = do
   now <- getCurrentTime
   conn' <- openUDP "127.0.0.1" 9001
-  newMVar $ TempoState conn' mempty (utctDayTime now) (secondsToDiffTime 1) 0 0 (Exec [] 8 [])
+  newMVar $ TempoState conn' mempty (utctDayTime now) (secondsToDiffTime 1) 0 0 (Exec [] 8 []) mempty
 
 gunEngines :: MVar TempoState -> IO ThreadId
 gunEngines = forkIO . sync
@@ -63,35 +63,35 @@ data SlotMessages = SlotMessages { dest :: Slot, messages :: Pattern Message }
 baseSlot :: ByteString -> ByteString
 baseSlot s = append s (pack "0")
 
-execMessage :: Exec -> Pattern Message
-execMessage (Exec ps k es) =
-  programMessage (Program (pack "s") (SlottableProgram (BaseProgram TriggeredPassthrough us es)))
+execMessage :: Map ByteString Double -> Exec -> Pattern Message
+execMessage inputs (Exec ps k es) =
+  programMessage inputs (Program (pack "s") (SlottableProgram (BaseProgram TriggeredPassthrough us es)))
   where
     us = uniformPattern "program" (pure . UniformStringValue $ unwords ps) `mappend` upf "trigger" (KickInput, k)
 
-programMessage :: Program -> Pattern Message
-programMessage (Program s (SlottableProgram (BaseProgram prog us effs))) =
-  slotMessages (baseSlot s) (BaseName prog) (nextSlot (baseSlot s)) us `mappend`
-    (effectsMessages (baseSlot s) $ reverse effs)
-programMessage (Program slot (Layer l ss es)) =
+programMessage :: Map ByteString Double -> Program -> Pattern Message
+programMessage inputs (Program s (SlottableProgram (BaseProgram prog us effs))) =
+  slotMessages (baseSlot s) (BaseName prog) (nextSlot (baseSlot s)) us inputs `mappend`
+    (effectsMessages inputs (baseSlot s) $ reverse effs)
+programMessage inputs (Program slot (Layer l ss es)) =
   case es of
     [] -> (addSlot (baseSlot slot) . once . mconcat $ pure <$> [progMsg l, layerMsg ss])
     e:effs ->
       (addSlot (baseSlot slot) . once . mconcat $ pure <$> [progMsg l, effMsg, layerMsg ss])
-      `mappend` (effectsMessages (baseSlot slot) $ reverse (e:effs))
+      `mappend` (effectsMessages inputs (baseSlot slot) $ reverse (e:effs))
   where
     progMsg l = Message "/progs" [ostr (progName $ LayerName l)]
     layerMsg ss = Message "/progs/connections" $ ostr . baseSlot <$> ss
     effMsg = Message "/progs/effect" [ostr $ nextSlot (baseSlot slot)]
-programMessage (Program slot Blank) = once <$> pure $ Message "/progs/clear" [ostr slot]
+programMessage _ (Program slot Blank) = once <$> pure $ Message "/progs/clear" [ostr slot]
 
-effectsMessages :: Slot -> [Effect] -> Pattern Message
-effectsMessages s ((Effect e us):es) =
-  slotMessages s' (EffName e) s'' us `mappend` effectsMessages s' es
+effectsMessages :: Map ByteString Double -> Slot -> [Effect] -> Pattern Message
+effectsMessages inputs s ((Effect e us):es) =
+  slotMessages s' (EffName e) s'' us inputs `mappend` effectsMessages inputs s' es
   where
     s' = nextSlot s
     s'' = nextSlot s'
-effectsMessages s [] = once <$> pure $ Message "/progs/effect/clear" [ostr s]
+effectsMessages _ s [] = once <$> pure $ Message "/progs/effect/clear" [ostr s]
 
 nextSlot :: Slot -> Slot
 nextSlot s = pack $ fromMaybe ("no: " ++ (unpack s)) $ init' s' >>= \i -> num >>= \n -> Just (i ++ show (n + 1))
@@ -103,21 +103,23 @@ nextSlot s = pack $ fromMaybe ("no: " ++ (unpack s)) $ init' s' >>= \i -> num >>
     init' [] = Nothing
     init' xs = Just (init xs)
 
-slotMessages :: Slot -> Name -> Slot -> Pattern Uniform -> Pattern Message
-slotMessages s n next us = addSlot s $ mconcat $ [progMsg, effectMsg, uMsgs us]
+slotMessages :: Slot -> Name -> Slot -> Pattern Uniform -> Map ByteString Double -> Pattern Message
+slotMessages s n next us inputs = addSlot s $ mconcat $ [progMsg, effectMsg, uMsgs us]
   where
     effectMsg = once <$> pure $ Message "/progs/effect" [ostr next]
     progMsg = once <$> pure $ Message "/progs" [ostr (progName n)]
-    uMsgs us' = uniformMessage <$> us'
+    uMsgs us' = uniformMessage inputs <$> us'
 
-uniformMessage :: Uniform -> Message
-uniformMessage (Uniform n (UniformFloatValue (FloatDoubleValue f))) =
+uniformMessage :: Map ByteString Double -> Uniform -> Message
+uniformMessage _ (Uniform n (UniformFloatValue (FloatDoubleValue f))) =
   Message "/progs/uniform" [ostr n, float f]
-uniformMessage (Uniform n (UniformFloatValue (FloatInputValue f m))) =
-  Message "/progs/uniform" $ [ostr n, ostr "input", ostr $ floatInputText f] ++ (float <$> m)
-uniformMessage (Uniform n (UniformTexValue (TexInputValue i m))) =
+uniformMessage inputMap (Uniform n (UniformFloatValue (FloatInputValue f m))) =
+  case member (floatInputText f) inputMap of
+    True -> Message "/progs/uniform" $ [ostr n, (float . (* (head m))) (fromMaybe 0 (lookup (floatInputText f) inputMap))] ++ (float <$> m)
+    False -> Message "/progs/uniform" $ [ostr n, ostr "input", ostr $ floatInputText f] ++ (float <$> m)
+uniformMessage _ (Uniform n (UniformTexValue (TexInputValue i m))) =
   Message "/progs/uniform" [ostr n, ostr "input", ostr $ texInputText i, float m]
-uniformMessage (Uniform n (UniformStringValue s)) =
+uniformMessage _ (Uniform n (UniformStringValue s)) =
   Message "/progs/uniform" [ostr n, ostr "string", ostr s]
 
 addSlot :: ByteString -> Pattern Message -> Pattern Message
@@ -142,7 +144,7 @@ sendMessages :: MonadIO io => StateT TempoState io ()
 sendMessages = do
   tState <- get
   -- liftIO $ if (show tState == "") then return () else print tState
-  liftIO $ T.sendOSC (conn' tState) $ Bundle 0 $ arc (execMessage (view exec tState) `mappend` foldr (mappend . programMessage) mempty (view patt tState)) (view prev tState) (view current tState)
+  liftIO $ T.sendOSC (conn' tState) $ Bundle 0 $ arc (execMessage (view inputs tState) (view exec tState) `mappend` foldr (mappend . programMessage (view inputs tState)) mempty (view patt tState)) (view prev tState) (view current tState)
   where
     conn' = view conn
 

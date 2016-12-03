@@ -8,7 +8,8 @@ base $ (|+| pFade 0.98) . (|-|)
 
 t 100
 
-p $ pSine "b" (VolumeInput, 1) 1 1
+p $ pSine "a" (Slider1Input, 1) 1 1
+  |+| pFade (Slider1Input, 1)
 
 p $ pLines "c" (KickInput, 0.1) 0.2 |+| pMirror |+| pBrightness 1 |+| pBrightness 1
 

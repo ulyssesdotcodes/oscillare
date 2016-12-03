@@ -16,12 +16,13 @@ import Control.Monad.Trans.State
 import Control.Monad.Trans.Writer
 import Control.Monad.IO.Class
 import Data.Aeson (decode)
-import Data.ByteString.Char8 (ByteString, concat, pack, readInt, split)
+import Data.ByteString.Char8 (ByteString, concat, pack, readInt, split, unpack)
 import Data.Char
 import Data.List (union, (\\))
-import Data.Map (Map, fromList, (!), lookup)
+import Data.Map.Lazy (Map, fromList, (!), lookup, insert)
 import Data.Maybe
 import Data.Text.Lazy.Encoding (encodeUtf8)
+import GHC.Float
 import Network.Wai
 import Network.Wai.Application.Static (StaticSettings(..), staticApp, defaultWebAppSettings)
 import Network.Wai.Handler.Warp (run)
@@ -84,12 +85,14 @@ data Address =
   Mood
   | Time
   | Prog
+  | Input ByteString
   | None ByteString
 
 strToAddress :: [ByteString] -> Address
 strToAddress ["mood"] = Mood
 strToAddress ["tempo"] = Time
 strToAddress ["progs"] = Prog
+strToAddress ["input", i] = Input i
 strToAddress bs = None $ concat bs
 
 applyMessage :: MVar ServerState -> (Address, [OSC.Datum]) -> IO ()
@@ -110,6 +113,13 @@ applyMessage mss (Mood, [mood]) = do
 applyMessage mss (Time, [OSC.datum_floating -> Just time]) = do
   ss <- readMVar mss
   modifyMVar_ (ss ^. ts) $ runReaderT (changeTempo time)
+
+applyMessage mss (Input inputName, xs) = do
+  ss <- readMVar mss
+  modifyMVar_ (ss ^. ts) $ \ts' -> do
+    (log, ts'') <- runStateT (doInput inputName xs) ts'
+    print log
+    return ts''
 
 applyMessage _ (None bs, dat) =
   print ("Invalid Message Args : " ++ show bs ++ ", " ++ show dat)
@@ -135,6 +145,10 @@ doMood (OSC.ASCII_String "chill") =
            ]
 
 doMood _ = return "Invalid Mood"
+
+doInput :: Monad m => ByteString -> [ OSC.Datum ] -> StateT TempoState m String
+doInput inputName [(OSC.Float val)] = (inputs %= insert inputName (float2Double val)) >> return (unpack inputName ++ ": " ++ show val)
+doInput _ _ = return "Invalid value"
 
 progMap :: Map Int Program
 progMap = fromList [ (0, pAudioData "aa" 1 (AudioTexInput, 5))
