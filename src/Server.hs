@@ -16,7 +16,7 @@ import Control.Monad.Trans.State
 import Control.Monad.Trans.Writer
 import Control.Monad.IO.Class
 import Data.Aeson (decode)
-import Data.ByteString.Char8 (ByteString, concat, pack, readInt, split, unpack)
+import Data.ByteString.Char8 (ByteString, concat, pack, readInt, split, unpack, append)
 import Data.Char
 import Data.List (union, (\\))
 import Data.Map.Lazy (Map, fromList, (!), lookup, insert)
@@ -148,6 +148,7 @@ doMood _ = return "Invalid Mood"
 
 doInput :: Monad m => ByteString -> [ OSC.Datum ] -> StateT TempoState m String
 doInput inputName [(OSC.Float val)] = (inputs %= insert inputName (float2Double val)) >> return (unpack inputName ++ ": " ++ show val)
+doInput inputName ((OSC.Float valx):(OSC.Float valy):_) = (inputs %= insert (append inputName (pack "x")) (float2Double valx)) >> (inputs %= insert (append inputName (pack "y")) (float2Double valy)) >> return (unpack inputName ++ ": " ++ show valx ++ ", " ++ show valy)
 doInput _ _ = return "Invalid value"
 
 progMap :: Map Int Program

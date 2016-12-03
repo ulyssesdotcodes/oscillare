@@ -20,12 +20,22 @@ data FloatInput =
   VolumeInput
   | KickInput
   | Slider1Input
+  | Slider2Input
+  | Slider3Input
+  | Slider4Input
+  | Position1InputX
+  | Position1InputY
   deriving Eq
 
 floatInputText :: FloatInput -> ByteString
 floatInputText VolumeInput = "volume"
 floatInputText KickInput = "kick"
 floatInputText Slider1Input = "slider1"
+floatInputText Slider2Input = "slider2"
+floatInputText Slider3Input = "slider3"
+floatInputText Slider4Input = "slider4"
+floatInputText Position1InputX = "pos1x"
+floatInputText Position1InputY = "pos1y"
 
 data TexValue
   = TexInputValue TexInput Double deriving Eq
