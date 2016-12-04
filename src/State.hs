@@ -15,7 +15,9 @@ import Data.Map.Strict (Map, insert, foldMapWithKey)
 import Data.Time.Clock
 import Sound.OSC
 
+import Pattern
 import Program
+import Uniform
 
 data TempoState = TempoState { _conn :: UDP
                              , _patt :: Map ByteString Program
@@ -25,6 +27,7 @@ data TempoState = TempoState { _conn :: UDP
                              , _current :: Double
                              , _exec :: Exec
                              , _inputs :: Map ByteString Double
+                             , _lastMessages :: [Message]
                              }
 
 makeLenses ''TempoState
@@ -57,8 +60,8 @@ changeTempo t = reader $ set cycleLength (fromRational $ toRational (240 / t))
 modProgs :: Monad m => ([ByteString] -> [ByteString]) -> StateT TempoState m ()
 modProgs f = exec.progs %= f
 
-setExecKick :: Monad m => Double -> StateT TempoState m ()
-setExecKick d = exec.kick .= d
+setExecKick :: (Monad m, FloatUniformPattern a) => a  -> StateT TempoState m ()
+setExecKick d = exec.kick .= fPattern d
 
 addProg :: Monad m => ByteString -> StateT Exec m String
 addProg p = do
@@ -70,17 +73,20 @@ remProg p = do
   progs %= filter (/= append p (pack "0"))
   get >>= return . show
 
-(+++) :: String -> Exec -> Exec
-(+++) p = execState $ addProg (pack p)
+(+++) :: String -> TempoState -> TempoState
+(+++) p = execState $ zoom exec (addProg (pack p))
 
-(++-) :: String -> Exec -> Exec
-(++-) p = execState $ remProg (pack p)
+(++-) :: String -> TempoState -> TempoState
+(++-) p = execState $ zoom exec $ remProg (pack p)
 
-kk :: Double -> Exec -> Exec
-kk = (kick .~)
+kk :: FloatUniformPattern a => a -> TempoState -> TempoState
+kk k ts = flip execState ts $ zoom exec $ kick .= fPattern k
 
 sps :: [String] -> Exec -> Exec
 sps = (progs .~) . (fmap (pack . (++ "0")))
 
-(|-|) :: Exec -> Exec
-(|-|) = effects .~ []
+(|-|) :: TempoState -> TempoState
+(|-|) = execState $ zoom exec $ effects .= []
+
+resetCache :: TempoState -> TempoState
+resetCache = lastMessages .~ []

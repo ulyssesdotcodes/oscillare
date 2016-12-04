@@ -24,8 +24,9 @@
 (defun oscillare-quit-haskell ()
   "Quit osicllare."
   (interactive)
-  (switch-to-buffer inferior-haskell-buffer)
-  (kill-buffer-and-window))
+  (if (get-buffer inferior-haskell-buffer)
+    (switch-to-buffer inferior-haskell-buffer)
+    (kill-buffer-and-window)))
 
 (defun oscillare-restart-haskell()
   "Restart oscillare"

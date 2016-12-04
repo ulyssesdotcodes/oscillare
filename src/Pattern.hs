@@ -30,6 +30,9 @@ overlay p q = Pattern (\pr t -> arc p pr t ++ arc q pr t)
 flatten :: Pattern [a] -> Pattern a
 flatten ps = Pattern (\pr t -> concat (arc ps pr t))
 
+ffmap :: ([a] -> [b]) -> Pattern a -> Pattern b
+ffmap f (Pattern as) = Pattern (\p t -> f $ as p t)
+
 once :: Pattern a -> Pattern a
 once = att 0
 

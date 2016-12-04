@@ -1,23 +1,28 @@
 p $ pt "s" "a"progs
 
-base $ (+++) "a"
+base $ (+++) "b"
 
-base $ kk 1.35
+base $ kk (flash (pure 1) (pure 0))
+
+base $ resetCache
 
 base $ (|+| pFade 0.98) . (|-|)
 
 t 100
 
-p $ pSine "a" (* 1) (Position1InputX, 10) (Position1InputY, 10)
-  |+| pScale' (Slider2Input, 1)
-  |+| pScale' (VolumeInput, 1)
+p $ pSine "a" (* 1) (Position1InputX, [10]) (Position1InputY, [10])
+  |+| pFire (Slider2Input, [1])
+  |+| pFade (Slider1Input, [1])
+  |+| pScale' (VolumeInput, [1])
 
 p $ pLines "c" (KickInput, 0.1) 0.2 |+| pMirror |+| pBrightness 1 |+| pBrightness 1
 
-p $ pFlocking "a" (VolumeInput, 120) 2 64
-  |+| pBlur
-  |+| pFilter (VolumeInput, 2)
-  |+| pFade 0.98
+p $ pVoronoi "b" (* 2)
+  |+| pFire 1
+
+p $ pFlocking "a" (Slider1Input, [120]) 2 32
+  |+| pFire 1
+  |+| pFade 0.99
 
 p $ pShapes "a" ((+ 3) . (* 6) . sinMod') 0.4 0.2
   |+| pRepeat 30
@@ -30,9 +35,7 @@ p $ pAdd "a" ["c", "d"]
   |+| pRepeat 3
   |+| pOverlay 0.98
 
-p $ pAudioData "a" 3 (EqTexInput, 50)
-  |+| pLittlePlanet
-  |+| pRepeat 3
+p $ pAudioData "a" 1 (EqTexInput, [40])
 
 p $ pInput "a" (CameraTexInput, 1)
   |+| pEdges

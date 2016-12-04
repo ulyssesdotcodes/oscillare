@@ -38,13 +38,19 @@ floatInputText Position1InputX = "pos1x"
 floatInputText Position1InputY = "pos1y"
 
 data TexValue
-  = TexInputValue TexInput Double deriving Eq
-data TexInput = AudioTexInput | EqTexInput | CameraTexInput deriving Eq
+  = TexInputValue TexInput [Double] deriving Eq
+data TexInput =
+  AudioTexInput
+  | EqTexInput
+  | CameraTexInput
+  | BlankTex
+  deriving Eq
 
 texInputText :: TexInput -> ByteString
 texInputText AudioTexInput = "audio_texture"
 texInputText EqTexInput = "eq_texture"
 texInputText CameraTexInput = "camera_texture"
+texInputText BlankTex = "blank"
 
 type StringValue = ByteString
 
@@ -95,11 +101,8 @@ instance FloatPattern (Pattern Double) where
 instance FloatPattern (Double -> Double) where
   floatPattern f = f <$> timePattern
 
-instance RealFloat a => FloatPattern [a] where
-  floatPattern = seqp . fmap (pure . realToFrac)
-
-instance FloatPattern a => FloatUniformPattern (FloatInput, a)  where
-  fPattern (i, m) = FloatInputValue i . (:[]) <$> floatPattern m
+instance FloatPattern a => FloatUniformPattern (FloatInput, [a])  where
+  fPattern (i, m) = ffmap ((:[]) . FloatInputValue i) $ mconcat $ fmap floatPattern m
 
 class StringUniformPattern a where
   sPattern :: a -> Pattern StringValue
@@ -113,5 +116,10 @@ instance StringUniformPattern [String] where
 class TexUniformPattern a where
   tPattern :: a -> Pattern TexValue
 
-instance FloatPattern a => TexUniformPattern (TexInput, a) where
-  tPattern (i, m) = TexInputValue i <$> floatPattern m
+instance FloatPattern a => TexUniformPattern (TexInput, [a]) where
+  tPattern (EqTexInput, d:[]) = TexInputValue EqTexInput . (:[]) <$> floatPattern d
+  tPattern (_, _) = pure $ TexInputValue BlankTex []
+
+instance TexUniformPattern TexInput where
+  tPattern EqTexInput = pure $ TexInputValue BlankTex []
+  tPattern t = pure $ TexInputValue t []

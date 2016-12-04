@@ -20,6 +20,7 @@ data EffectType =
   | Edges
   | Fade
   | Filter
+  | Fire
   | Lumidots
   | LittlePlanet
   | Mirror
@@ -37,7 +38,8 @@ data LayerType =
   | Mult
 
 data BaseType =
-  AudioData
+  AbstractSpiral
+  | AudioData
   | CircleEmitter
   | Dots
   | Flocking
@@ -52,6 +54,7 @@ data BaseType =
   | TextType
   | TriggeredPassthrough
   | Video
+  | Voronoi
 
 data Name =
   BaseName BaseType
@@ -64,6 +67,7 @@ effectName Brightness = "brightness"
 effectName Edges = "edge_detection"
 effectName Fade = "fade"
 effectName Filter = "filter"
+effectName Fire = "fire"
 effectName Lumidots = "lumidots"
 effectName LittlePlanet = "little_planet"
 effectName Mirror = "mirror"
@@ -80,6 +84,7 @@ layerName Displace = "displace"
 layerName Mult = "mult"
 
 baseName :: BaseType -> ByteString
+baseName AbstractSpiral = "abstract_spiral"
 baseName AudioData = "audio_data"
 baseName CircleEmitter = "circle_emitter"
 baseName Dots = "dots"
@@ -93,6 +98,7 @@ baseName Shapes = "shapes"
 baseName StringTheory = "string_theory"
 baseName TextType = "text"
 baseName Video = "video"
+baseName Voronoi = "voronoi"
 
 baseName Passthrough = "pt"
 baseName TriggeredPassthrough = "ptTriggered"
@@ -129,9 +135,12 @@ data Program = Program {_slot :: Slot, _program :: Slottable }
   deriving Show
 
 data Exec = Exec { _progs :: [ByteString]
-                  , _kick :: Double
+                  , _kick :: Pattern FloatValue
                   , _effects :: [Effect]
-                  } deriving Show
+                  }
+
+instance Show Exec where
+  show (Exec p _ es)= show p ++ show es
 
 makeLenses ''Program
 makeLenses ''Exec
@@ -170,6 +179,7 @@ upt t pu = uniformPattern t $ UniformTexValue <$> tPattern pu
 singleUEffect :: FloatUniformPattern f => EffectType -> f -> Effect
 singleUEffect e f = Effect e $ upf (effectName e) f
 
+pAbstractSpiral slot uTime = baseProg slot AbstractSpiral $ (upf "time" uTime)
 pAudioData slot uVolume uData = baseProg slot AudioData $ (upf "volume" uVolume) `mappend` (upt "tex_audio" uData)
 pDots slot uVolume uData = baseProg slot Dots $ (upf "volume" uVolume) `mappend` (upt "eqs" uData)
 pCircleEmitter slot uLifespan uVel uRotation uPullback uTex = baseProg slot CircleEmitter $
@@ -199,6 +209,7 @@ pShapes slot uSides uWidth uSize = baseProg slot Shapes $ mconcat [upf "sides" u
 pStringTheory slot uTimeMod uAngle uAngleDelta uXoff = baseProg slot StringTheory $ mconcat [upf "angle" uAngle, upf "angle_delta" uAngleDelta, upf "xoff" uXoff]
 pSine slot uXPos uScale uAmplitude = baseProg slot Sine $ mconcat [upf "time" $ uXPos, upf "scale" uScale, upf "amplitude" uAmplitude]
 pText slot uText = baseProg slot TextType $ ups "text" uText
+pVoronoi slot uTime = baseProg slot Voronoi $ upf "time" uTime
 pVideo slot uPath uSpeed = baseProg slot Video $ mconcat [ups "video" uPath, upf "speed" uSpeed]
 
 pt s sp = baseProg s Passthrough (upsWithBase "program" sp)
@@ -209,6 +220,7 @@ pBrightness u = singleUEffect Brightness u
 pEdges = Effect Edges mempty
 pFade u = singleUEffect Fade u
 pFilter u = singleUEffect Filter u
+pFire u = singleUEffect Fire u
 pLittlePlanet = Effect LittlePlanet mempty
 pLumidots = Effect Lumidots mempty
 pMirror = Effect Mirror mempty
