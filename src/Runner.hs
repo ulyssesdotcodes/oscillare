@@ -86,7 +86,7 @@ programMessage inputs (Program slot (Layer l ss es)) =
     progMsg l = Message "/progs" [ostr (progName $ LayerName l)]
     layerMsg ss = Message "/progs/connections" $ ostr . baseSlot <$> ss
     effMsg = Message "/progs/effect" [ostr $ nextSlot (baseSlot slot)]
-programMessage _ (Program slot Blank) = pure $ Message "/progs/clear" [ostr slot]
+programMessage _ (Program slot Blank) = pure $ Message "/progs/clear" [ostr $ baseSlot slot]
 
 effectsMessages :: Map ByteString Double -> Slot -> [Effect] -> Pattern Message
 effectsMessages inputs s ((Effect e us):es) =

@@ -63,7 +63,12 @@ seqpN i n (p:ps) = mappend (offset (seg * (fromIntegral i)) (Pattern timeGuard))
 seqpN _ _ [] = mempty
 
 timePattern :: Pattern Double
-timePattern = Pattern (\_ t -> [t])
+timePattern = Pattern (\_ t -> [mod' t 1])
+
+absTimePattern :: Pattern Double
+absTimePattern = Pattern (\_ t -> [t])
+
+abt = absTimePattern
 
 deltaPattern :: Pattern Double
 deltaPattern = Pattern (\p t -> [(t - p) `mod'` 1])

@@ -181,6 +181,7 @@ singleUEffect e f = Effect e $ upf (effectName e) f
 
 pAbstractSpiral slot uTime = baseProg slot AbstractSpiral $ (upf "time" uTime)
 pAudioData slot uVolume uData = baseProg slot AudioData $ (upf "volume" uVolume) `mappend` (upt "tex_audio" uData)
+pBlank slot = Program (pack slot) Blank
 pDots slot uVolume uData = baseProg slot Dots $ (upf "volume" uVolume) `mappend` (upt "eqs" uData)
 pCircleEmitter slot uLifespan uVel uRotation uPullback uTex = baseProg slot CircleEmitter $
   mconcat [ upf "delta" deltaPattern
