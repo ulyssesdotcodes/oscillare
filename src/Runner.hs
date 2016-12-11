@@ -121,7 +121,7 @@ uniformMessage inputMap (Uniform n (UniformFloatValue (FloatInputValue f m))) =
     True -> Message "/progs/uniform" $ [ostr n, (float . (* (head m))) (fromMaybe 0 (lookup (floatInputText f) inputMap))] ++ (float <$> m)
     False -> Message "/progs/uniform" $ [ostr n, ostr "input", ostr $ floatInputText f] ++ (float <$> m)
 uniformMessage _ (Uniform n (UniformTexValue (TexInputValue i m))) =
-  Message "/progs/uniform" [ostr n, ostr "input", ostr $ texInputText i, float (head m)]
+  Message "/progs/uniform" $ [ostr n, ostr "input", ostr $ texInputText i] ++ (float <$> m)
 uniformMessage _ (Uniform n (UniformStringValue s)) =
   Message "/progs/uniform" [ostr n, ostr "string", ostr s]
 

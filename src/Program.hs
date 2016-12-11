@@ -101,7 +101,7 @@ baseName Video = "video"
 baseName Voronoi = "voronoi"
 
 baseName Passthrough = "pt"
-baseName TriggeredPassthrough = "ptTriggered"
+baseName TriggeredPassthrough = "pt_triggered"
 
 progName :: Name -> ByteString
 progName (BaseName b) = baseName b
@@ -205,7 +205,7 @@ pSideEmitter slot uAmount uLifespan uSpread uYPos uXPos = baseProg slot SideEmit
 pFlocking slot uSeparation uMult uSpeed = baseProg slot Flocking $ mconcat [upf "alignment" uMult, upf "cohesion" uMult, upf "separation" uSeparation, upf "time" timePattern, upf "delta" $ deltaPattern, upf "speed" uSpeed]
 pLines slot uWidth uSpacing = baseProg slot Lines $ (upf "width" uWidth) `mappend` (upf "spacing" uSpacing)
 pImage slot uImage uClear = baseProg slot Image $ mconcat [ups "image" uImage, upf "clear_shade" uClear]
-pInput slot uInput = baseProg slot InputTexBase $ upt "program" uInput
+pInput slot uInput = baseProg slot InputTexBase $ upt "tex_input" uInput
 pShapes slot uSides uWidth uSize = baseProg slot Shapes $ mconcat [upf "sides" uSides, upf "width" uWidth, upf "size" uSize]
 pStringTheory slot uTimeMod uAngle uAngleDelta uXoff = baseProg slot StringTheory $ mconcat [upf "angle" uAngle, upf "angle_delta" uAngleDelta, upf "xoff" uXoff]
 pSine slot uXPos uScale uAmplitude = baseProg slot Sine $ mconcat [upf "time" $ uXPos, upf "scale" uScale, upf "amplitude" uAmplitude]
@@ -213,8 +213,8 @@ pText slot uText = baseProg slot TextType $ ups "text" uText
 pVoronoi slot uTime = baseProg slot Voronoi $ upf "time" uTime
 pVideo slot uPath uSpeed = baseProg slot Video $ mconcat [ups "video" uPath, upf "speed" uSpeed]
 
-pt s sp = baseProg s Passthrough (upsWithBase "program" sp)
-ptTriggered s sp uTrig = baseProg s TriggeredPassthrough $ upsWithBase "program" sp `mappend` upf "trigger" uTrig
+pt s sp = baseProg s Passthrough (upsWithBase "passthrough" sp)
+ptTriggered s sp uTrig = baseProg s TriggeredPassthrough $ upsWithBase "passthroughs" sp `mappend` upf "trigger" uTrig
 
 pBlur = Effect Blur mempty
 pBrightness u = singleUEffect Brightness u
