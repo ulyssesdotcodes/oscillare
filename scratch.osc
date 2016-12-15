@@ -1,9 +1,8 @@
 p $ pt "s" "a"progs
 
-base $ (+++) "a"
+base $ (++-) "c"
 
-base $ kk (flash (pure 1) (pure 0))
-
+base $ kk (midi  "button9")
 
 base $ resetCache
 
@@ -13,14 +12,14 @@ t 100
 
 p $ pBlank "a"
 
-p $ pSine "a" (VolumeInput, [1]) ((+) <$> ((* 3) <$> rand) <*> ((* 10) <$> timePattern)) 1
-  |+| pFade 0.9
+p $ pSine "a" (midi "pot1b") ((* 5) <$$> (midi "button1")) 1
+  |+| pFade (midi "pot1a")
 
-p $ pLines "a" (VolumeInput, [0.5, 0.05]) (VolumeInput, [0.6])
-  |+| pBlur
+p $ pLines "b" (midi "fader1") (midi "pot2a")
 
-p $ pInput "a" CameraTexInput
-  |+| pBlur
+p $ ptTriggered "a" "b c" (midi "button9")
+
+p $ pInput "c" CameraTexInput
 
 p $ pAudioData "a" 1 (EqTexInput, [256])
   |+| pBlur

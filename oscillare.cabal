@@ -26,6 +26,7 @@ library
                , mtl
                , network >= 2.6
                , parsec
+               , PortMidi
                , random
                , resourcet
                , split

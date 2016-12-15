@@ -22,3 +22,6 @@ tags
 /_site/
 /.dir-locals.el
 .#*
+
+# package  
+rtmidi/

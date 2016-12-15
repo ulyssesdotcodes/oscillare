@@ -9,9 +9,6 @@ import Data.ByteString.Char8 (ByteString, pack)
 
 import Pattern
 
-instance Eq (Pattern Uniform) where
-  (==) pu pu' = ((arc pu 0 0.1) == (arc pu' 0 0.1)) && ((arc pu 0.5 0.6) == (arc pu' 0.5 0.6))
-
 data FloatValue
   = FloatInputValue FloatInput [Double]
   | FloatDoubleValue Double
@@ -63,63 +60,63 @@ data UniformValue
 data Uniform =  Uniform { name :: ByteString, value :: UniformValue } deriving Eq
 
 timeUniform :: Pattern Uniform
-timeUniform = uniformPattern "time" (UniformFloatValue . FloatDoubleValue <$> timePattern)
+timeUniform = uniformPattern "time" $ (UniformFloatValue . FloatDoubleValue) <$$> timePattern
 
 deltaUniform :: Pattern Uniform
-deltaUniform = uniformPattern "delta" $ UniformFloatValue . FloatDoubleValue <$> deltaPattern
+deltaUniform = uniformPattern "delta" $ UniformFloatValue . FloatDoubleValue <$$> deltaPattern
 
 uniformPattern :: ByteString -> Pattern UniformValue -> Pattern Uniform
-uniformPattern n = fmap (Uniform n)
+uniformPattern n = ffmap (Uniform n)
 
 class FloatUniformPattern a where
   fPattern :: a -> Pattern FloatValue
 
 instance FloatUniformPattern Double  where
-  fPattern = pure . FloatDoubleValue
+  fPattern = pure . (:[]) . FloatDoubleValue
 
 instance FloatUniformPattern (Pattern Double)  where
-  fPattern = fmap FloatDoubleValue
+  fPattern = ffmap FloatDoubleValue
 
 instance RealFloat a => FloatUniformPattern [a]  where
-  fPattern = seqp . fmap (pure . FloatDoubleValue . realToFrac)
+  fPattern = seqp . fmap (pure . (:[]) . FloatDoubleValue . realToFrac)
 
 instance RealFloat a => FloatUniformPattern (a -> a)  where
-  fPattern f = FloatDoubleValue . realToFrac . f . realToFrac <$> timePattern
+  fPattern f = FloatDoubleValue . realToFrac . f . realToFrac <$$> timePattern
 
 class FloatPattern a where
   floatPattern :: a -> Pattern Double
 
 instance FloatPattern Double where
-  floatPattern = pure
+  floatPattern = mempty
 
 instance FloatPattern Integer where
-  floatPattern = pure . fromInteger
+  floatPattern = pure . (:[]) . fromInteger
 
 instance FloatPattern (Pattern Double) where
   floatPattern = id
 
 instance FloatPattern (Double -> Double) where
-  floatPattern f = f <$> timePattern
+  floatPattern f = f <$$> timePattern
 
 instance FloatPattern a => FloatUniformPattern (FloatInput, [a])  where
-  fPattern (i, m) = ffmap ((:[]) . FloatInputValue i) $ mconcat $ fmap floatPattern m
+  fPattern (i, m) = ((:[]) . FloatInputValue i) <$> (mconcat $ fmap floatPattern m)
 
 class StringUniformPattern a where
   sPattern :: a -> Pattern StringValue
 
 instance StringUniformPattern String where
-  sPattern = pure . pack
+  sPattern = pure . (:[]) . pack
 
 instance StringUniformPattern [String] where
-  sPattern = seqp . fmap (pure . pack)
+  sPattern = seqp . fmap (pure . (:[]) . pack)
 
 class TexUniformPattern a where
   tPattern :: a -> Pattern TexValue
 
 instance FloatPattern a => TexUniformPattern (TexInput, [a]) where
-  tPattern (EqTexInput, d:[]) = TexInputValue EqTexInput . (:[]) <$> floatPattern d
-  tPattern (_, _) = pure $ TexInputValue BlankTex []
+  tPattern (EqTexInput, d:[]) = TexInputValue EqTexInput . (:[]) <$$> floatPattern d
+  tPattern (_, _) = pure . (:[]) $ TexInputValue BlankTex []
 
 instance TexUniformPattern TexInput where
-  tPattern EqTexInput = pure $ TexInputValue BlankTex []
-  tPattern t = pure $ TexInputValue t []
+  tPattern EqTexInput = pure . (:[])$ TexInputValue BlankTex []
+  tPattern t = pure . (:[]) $ TexInputValue t []

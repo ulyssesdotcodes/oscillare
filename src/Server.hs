@@ -18,7 +18,7 @@ import Control.Monad.IO.Class
 import Data.Aeson (decode)
 import Data.ByteString.Char8 (ByteString, concat, pack, readInt, split, unpack, append)
 import Data.Char
-import Data.List (union, (\\))
+import Data.List (unionBy, (\\), deleteBy)
 import Data.Map.Lazy (Map, fromList, (!), lookup, insert)
 import Data.Maybe
 import Data.Text.Lazy.Encoding (encodeUtf8)
@@ -45,6 +45,11 @@ data ServerState = ServerState { _ts :: MVar TempoState, _toggles :: ActiveToggl
 type ActiveToggles = [(Int,Int)]
 
 makeLenses ''ServerState
+
+launchControlXLMap :: Map Int ByteString
+launchControlXLMap = fromList $ (map (\n -> (n, pack $ "pot" ++ (show . (+ 1) $ (n - 13) `mod` 8) ++ [chr $ (quot (n - 13) 8) + 97])) [13..37]) ++
+  ((map (\n -> (n, pack $ "fader" ++ show (n - 76))) [77..85])) ++
+  ((map (\n -> (n, pack $ "button" ++ show (n - 40))) [41..57]))
 
 serverState :: MVar TempoState -> IO (MVar ServerState)
 serverState mts = newMVar $ ServerState mts []
@@ -85,6 +90,7 @@ data Address =
   Mood
   | Time
   | Prog
+  | Midi
   | Input ByteString
   | None ByteString
 
@@ -93,6 +99,7 @@ strToAddress ["mood"] = Mood
 strToAddress ["tempo"] = Time
 strToAddress ["progs"] = Prog
 strToAddress ["input", i] = Input i
+strToAddress ("midi":_) = Midi
 strToAddress bs = None $ concat bs
 
 applyMessage :: MVar ServerState -> (Address, [OSC.Datum]) -> IO ()
@@ -120,6 +127,12 @@ applyMessage mss (Input inputName, xs) = do
     (log, ts'') <- runStateT (doInput inputName xs) ts'
     print log
     return ts''
+
+applyMessage mss (Midi, t:(fmap fromIntegral . OSC.datum_int32 -> Just c):(fmap ((/(127 :: Double)). fromIntegral) . OSC.datum_int32 -> Just v):[]) = do
+  ss <- readMVar mss
+  let tsf = maybe id (\c' -> inputs . at c' ?~ v) (lookup c launchControlXLMap)
+  modifyMVar_ (ss ^. ts) $ pure . tsf
+
 
 applyMessage _ (None bs, dat) =
   print ("Invalid Message Args : " ++ show bs ++ ", " ++ show dat)
@@ -170,7 +183,7 @@ effMap = fromList [ (0, [pFade 0.94])
                  , (5, [ pScale' (KickInput, [ 0.07 ]), pScale' (-0.015), pFade 0.98  ])
                  , (6, [ pBlur ])
                  , (7, [ pEdges ])
-                 , (7, [ pLumidots ])
+                 , (8, [ pLumidots ])
                  ]
 
 doProg :: Monad m => Int -> Int -> Float -> StateT TempoState m String
@@ -192,15 +205,15 @@ doProg x 1 1 = do
   let effs = lookup x effMap
   case effs of
     Just effs' -> do
-      exec . effects %= union effs'
+      exec . effects %= unionBy (\a b -> fst a == fst b) [(x, effs')]
       st <- get
       return $ show $ view (exec . effects) st
     Nothing -> return ""
 doProg x 1 0 = do
   let effs = lookup x effMap
   case effs of
-    Just eff' -> do
-      exec . effects %= (\\ eff')
+    Just effs' -> do
+      exec . effects %= deleteBy (\a b -> fst a == fst b) (x, effs')
       st <- get
       return $ show $ view (exec . effects) st
     Nothing -> return ""

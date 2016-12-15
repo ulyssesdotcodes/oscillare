@@ -114,9 +114,6 @@ instance Show LayerType where
 data Effect =
   Effect EffectType (Pattern Uniform)
 
-instance Eq Effect where
-  (==) (Effect et pu) (Effect et' pu') = (et == et') && (pu == pu')
-
 instance Show Effect where
   show (Effect et _) = unpack $ effectName et
 
@@ -136,7 +133,7 @@ data Program = Program {_slot :: Slot, _program :: Slottable }
 
 data Exec = Exec { _progs :: [ByteString]
                   , _kick :: Pattern FloatValue
-                  , _effects :: [Effect]
+                  , _effects :: [(Int, [Effect])]
                   }
 
 instance Show Exec where
@@ -153,7 +150,7 @@ instance Effectable Program where
   (Program s (Layer l ss es)) |+| e = Program s $ Layer l ss (e:es)
 
 instance Effectable Exec where
-  (Exec ps k es) |+| e = Exec ps k (e:es)
+  (Exec ps k es) |+| e = Exec ps k ((-1, [e]):es)
 
 programSlot :: Program -> Slot
 programSlot (Program s _) = s
@@ -165,16 +162,16 @@ layer :: LayerType -> String -> [String] -> Program
 layer l s ss = Program (pack s) (Layer l (pack <$> ss) [])
 
 upf :: FloatUniformPattern f => ByteString -> f -> Pattern Uniform
-upf t pu = uniformPattern t $ UniformFloatValue <$> fPattern pu
+upf t pu = uniformPattern t $ UniformFloatValue <$$> fPattern pu
 
 ups :: StringUniformPattern f => ByteString -> f -> Pattern Uniform
-ups t pu = uniformPattern t $ UniformStringValue <$> sPattern pu
+ups t pu = uniformPattern t $ UniformStringValue <$$> sPattern pu
 
 upsWithBase :: StringUniformPattern f => ByteString -> f -> Pattern Uniform
-upsWithBase t pu = uniformPattern t $ UniformStringValue . BSC.concat . (Prelude.map (`append` "0 ")) . (BSC.split ' ') <$> sPattern pu
+upsWithBase t pu = uniformPattern t $ UniformStringValue . BSC.concat . (Prelude.map (`append` "0 ")) . (BSC.split ' ') <$$> sPattern pu
 
 upt :: TexUniformPattern t => ByteString -> t -> Pattern Uniform
-upt t pu = uniformPattern t $ UniformTexValue <$> tPattern pu
+upt t pu = uniformPattern t $ UniformTexValue <$$> tPattern pu
 
 singleUEffect :: FloatUniformPattern f => EffectType -> f -> Effect
 singleUEffect e f = Effect e $ upf (effectName e) f
@@ -196,7 +193,7 @@ pSideEmitter slot uAmount uLifespan uSpread uYPos uXPos = baseProg slot SideEmit
   mconcat [ upf "emitterY" uYPos
           , upf "emitterX" uXPos
           , upf "emitVelX" uAmount
-          , upf "emitVelY" $ pure (*) <*> floatPattern uSpread <*> ((+ (-0.5)) <$> rand)
+          , upf "emitVelY" $ (pure [(*)] <**> floatPattern uSpread) <**> ((+ (-0.5)) <$$> rand)
           , upf "delta" deltaPattern
           , upf "time" timePattern
           , upf "speed" deltaPattern
