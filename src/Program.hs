@@ -42,6 +42,7 @@ data BaseType =
   | AudioData
   | CircleEmitter
   | Dots
+  | FadeComp
   | Flocking
   | Image
   | InputTexBase
@@ -88,6 +89,7 @@ baseName AbstractSpiral = "abstract_spiral"
 baseName AudioData = "audio_data"
 baseName CircleEmitter = "circle_emitter"
 baseName Dots = "dots"
+baseName FadeComp = "fade_comp"
 baseName Flocking = "flocking"
 baseName Image = "image"
 baseName InputTexBase = "input_texture"
@@ -211,6 +213,7 @@ pVoronoi slot uTime = baseProg slot Voronoi $ upf "time" uTime
 pVideo slot uPath uSpeed = baseProg slot Video $ mconcat [ups "video" uPath, upf "speed" uSpeed]
 
 pt s sp = baseProg s Passthrough (upsWithBase "passthrough" sp)
+pFadeComp s sp uIndex = baseProg s FadeComp $ upsWithBase "passthroughs" sp `mappend` upf "index" uIndex
 ptTriggered s sp uTrig = baseProg s TriggeredPassthrough $ upsWithBase "passthroughs" sp `mappend` upf "trigger" uTrig
 
 pBlur = Effect Blur mempty

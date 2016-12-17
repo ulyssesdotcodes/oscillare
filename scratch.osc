@@ -1,8 +1,8 @@
 p $ pt "s" "a"progs
 
-base $ (+++) "a"
+base $ (+++) "c"
 
-base $ kk (midi  "button9")
+base $ kk (KickInput, [1])
 
 base $ resetCache
 
@@ -14,11 +14,12 @@ t 100
 
 p $ pBlank "a"
 
-p $ pSine "a" (VolumeInput, [(* 3) <$$> (midi "pot1b")]) 5 1
+p $ pSine "a" (VolumeInput, [2]) 5 1
+  |+| pRepeat ((* 20) <$$> (midi "pot3a"))
 
-p $ pLines "b" (VolumeInput, [ (midi "fader1") ]) (midi "pot2a")
+p $ pLines "b" (VolumeInput, [0.1]) 0.2
 
-p $ ptTriggered "a" "b c" (midi "button9")
+p $ pFadeComp "c" "a b d e" (midi "fader2")
 
 p $ pAbstractSpiral "a" (((*) <$$> ((+ 1) <$$> (midi "fader2"))) <**> (midi "fader1"))
 
@@ -31,8 +32,7 @@ p $ pText "a" "Lots of text mothafucka"
 p $ pCircleEmitter "d" 1 ((* 5) <$$> midi "pot1a") 0 0.001 (EqTexInput, [1024])
   |+| pFade (midi "fader1")
 
-p $ pVoronoi "a" (((*) <$$> (midi "fader1")) <**> absTimePattern)
-  |+| pFire (midi "fader2")
+p $ pVoronoi "d" (((*) <$$> (midi "fader4")) <**> absTimePattern)
 
 p $ pInput "b" CameraTexInput
   |+| pFire (midi "pot3a")
@@ -42,14 +42,12 @@ p $ pAudioData "a" 1 (EqTexInput, [256])
 
 p $ pVoronoi "b" (* 2)
 
-p $ pFlocking "a" (VolumeInput, [4]) 0.6 ((* 0.6) <$$> (midi "fader1"))
+p $ pFlocking "d" (VolumeInput, [4]) 0.6 ((* 0.6) <$$> (midi "fader2"))
   |+| pFade 0.97
 
-p $ pAdd "c" ["a", "b", "d"]
+p $ pMult "c" ["a", "b", "d"]
 
-p $ pShapes "a" ((+ 3) . (* 6) . sinMod') 0.4 0.2
-  |+| pRepeat 30
-  |+| pDisplace (EqTexInput, 3)
+p $ pShapes "e" ((+ 3) . (* 6) . sinMod') 0.4 0.2
 
 
 p $ pDots "a" 1 (EqTexInput, 8)
