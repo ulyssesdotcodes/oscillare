@@ -166,11 +166,11 @@ doInput _ _ = return "Invalid value"
 
 progMap :: Map Int Program
 progMap = fromList [ (0, pAudioData "aa" 1 AudioTexInput)
-                   , (1, pInput "ab" CameraTexInput |+| pEdges |+| pBrightness 2)
+                   , (1, pInput "ab" CameraTexInput |+| pEdges |+| pBrightness 2 1)
                    , (2, pLines "ac" (KickInput, [0.1]) 0.2 |+| pMirror)
-                   , (3, pFlocking "ad" (KickInput, [ 80 ]) 1 64 |+| pFade 0.4)
+                   , (3, pFlocking "ad" (KickInput, [ 80 ]) 1.0 64 |+| pFade 0.4)
                    , (5, pShapes "ae" ((+ 3) . (* 6) . sinMod') 0.2 0.2 |+| pRepeat 9)
-                   , (6, pStringTheory "af" (* 3) sinMod' 1 1 |+| pRepeat 3 |+| pFilter (* 1))
+                   , (6, pStringTheory "af" (* 3) sinMod' 1 |+| pRepeat 3 |+| pFilter (* 1))
                    , (7, pShapes "ag" ((+ 3) . (* 6) . sinMod') 0.4 0.2 |+| pLittlePlanet)
                    ]
 

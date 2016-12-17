@@ -1,4 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE ViewPatterns #-}
 
 module State where
 
@@ -11,7 +12,7 @@ import Control.Monad.Trans.Writer
 import Control.Monad.Trans.State
 import Data.ByteString.Char8 (ByteString, pack, unpack, append)
 import Data.List (union)
-import Data.Map.Strict (Map, insert, foldMapWithKey)
+import Data.Map.Strict (Map, insert, foldMapWithKey, findWithDefault)
 import Data.Time.Clock
 import Sound.OSC
 
@@ -31,6 +32,9 @@ data TempoState = TempoState { _conn :: UDP
                              }
 
 makeLenses ''TempoState
+
+instance Effectable TempoState where
+  (|+|) ts e = ts & exec %~ (|+| e)
 
 setProg :: Monad m => Program -> ReaderT TempoState m TempoState
 setProg p = reader $ over patt (insert (programSlot p) p)
@@ -86,7 +90,10 @@ sps :: [String] -> Exec -> Exec
 sps = (progs .~) . (fmap (pack . (++ "0")))
 
 (|-|) :: TempoState -> TempoState
-(|-|) = execState $ zoom exec $ effects .= []
+(|-|) ts = ts & exec . effects .~ [] & id %~ resetCache
 
 resetCache :: TempoState -> TempoState
 resetCache = lastMessages .~ []
+
+midi :: String -> Pattern Double
+midi (pack -> s) = reader $ (:[]) . findWithDefault 0 s . pInputs

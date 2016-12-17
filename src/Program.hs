@@ -179,7 +179,6 @@ singleUEffect e f = Effect e $ upf (effectName e) f
 pAbstractSpiral slot uTime = baseProg slot AbstractSpiral $ (upf "time" uTime)
 pAudioData slot uVolume uData = baseProg slot AudioData $ (upf "volume" uVolume) `mappend` (upt "tex_audio" uData)
 pBlank slot = Program (pack slot) Blank
-pDots slot uVolume uData = baseProg slot Dots $ (upf "volume" uVolume) `mappend` (upt "eqs" uData)
 pCircleEmitter slot uLifespan uVel uRotation uPullback uTex = baseProg slot CircleEmitter $
   mconcat [ upf "delta" deltaPattern
           , upf "time" timePattern
@@ -189,6 +188,12 @@ pCircleEmitter slot uLifespan uVel uRotation uPullback uTex = baseProg slot Circ
           , upf "rotation" uRotation
           , upt "tex_audio" uTex
           ]
+pDots slot uVolume uData = baseProg slot Dots $ (upf "volume" uVolume) `mappend` (upt "eqs" uData)
+pFlocking slot uSeparation uMult uSpeed = baseProg slot Flocking $ mconcat [upf "alignment" uMult, upf "cohesion" ((* (0.4 :: Double)) <$$> floatPattern uMult), upf "separation" uSeparation, upf "time" timePattern, upf "delta" $ deltaPattern, upf "speed" uSpeed]
+pImage slot uImage uClear = baseProg slot Image $ mconcat [ups "image" uImage, upf "clear_shade" uClear]
+pInput slot uInput = baseProg slot InputTexBase $ upt "tex_input" uInput
+pLines slot uWidth uSpacing = baseProg slot Lines $ (upf "width" uWidth) `mappend` (upf "spacing" uSpacing)
+pShapes slot uSides uWidth uSize = baseProg slot Shapes $ mconcat [upf "sides" uSides, upf "width" uWidth, upf "size" uSize]
 pSideEmitter slot uAmount uLifespan uSpread uYPos uXPos = baseProg slot SideEmitter $
   mconcat [ upf "emitterY" uYPos
           , upf "emitterX" uXPos
@@ -199,13 +204,8 @@ pSideEmitter slot uAmount uLifespan uSpread uYPos uXPos = baseProg slot SideEmit
           , upf "speed" deltaPattern
           , upf "lifespan" uLifespan
           ]
-pFlocking slot uSeparation uMult uSpeed = baseProg slot Flocking $ mconcat [upf "alignment" uMult, upf "cohesion" uMult, upf "separation" uSeparation, upf "time" timePattern, upf "delta" $ deltaPattern, upf "speed" uSpeed]
-pLines slot uWidth uSpacing = baseProg slot Lines $ (upf "width" uWidth) `mappend` (upf "spacing" uSpacing)
-pImage slot uImage uClear = baseProg slot Image $ mconcat [ups "image" uImage, upf "clear_shade" uClear]
-pInput slot uInput = baseProg slot InputTexBase $ upt "tex_input" uInput
-pShapes slot uSides uWidth uSize = baseProg slot Shapes $ mconcat [upf "sides" uSides, upf "width" uWidth, upf "size" uSize]
-pStringTheory slot uTimeMod uAngle uAngleDelta uXoff = baseProg slot StringTheory $ mconcat [upf "angle" uAngle, upf "angle_delta" uAngleDelta, upf "xoff" uXoff]
 pSine slot uXPos uScale uAmplitude = baseProg slot Sine $ mconcat [upf "time" $ uXPos, upf "scale" uScale, upf "amplitude" uAmplitude]
+pStringTheory slot uAngle uAngleDelta uXoff = baseProg slot StringTheory $ mconcat [upf "angle" uAngle, upf "angle_delta" uAngleDelta, upf "xoff" uXoff]
 pText slot uText = baseProg slot TextType $ ups "text" uText
 pVoronoi slot uTime = baseProg slot Voronoi $ upf "time" uTime
 pVideo slot uPath uSpeed = baseProg slot Video $ mconcat [ups "video" uPath, upf "speed" uSpeed]
@@ -214,7 +214,7 @@ pt s sp = baseProg s Passthrough (upsWithBase "passthrough" sp)
 ptTriggered s sp uTrig = baseProg s TriggeredPassthrough $ upsWithBase "passthroughs" sp `mappend` upf "trigger" uTrig
 
 pBlur = Effect Blur mempty
-pBrightness u = singleUEffect Brightness u
+pBrightness uB uC = Effect Brightness $ mconcat [upf "brightness" uB, upf "contrast" uC]
 pEdges = Effect Edges mempty
 pFade u = singleUEffect Fade u
 pFilter u = singleUEffect Filter u
