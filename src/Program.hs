@@ -25,6 +25,8 @@ data EffectType =
   | LittlePlanet
   | Mirror
   | Overlay
+  | PaletteCycle
+  | PaletteVoronoi
   | Repeat
   | Reverse
   | Rotate
@@ -73,6 +75,8 @@ effectName Lumidots = "lumidots"
 effectName LittlePlanet = "little_planet"
 effectName Mirror = "mirror"
 effectName Overlay = "overlay"
+effectName PaletteCycle = "palette_cycle"
+effectName PaletteVoronoi = "palette_voronoi"
 effectName Repeat = "repeat"
 effectName Reverse = "reverse"
 effectName Rotate = "rotate"
@@ -216,7 +220,7 @@ pt s sp = baseProg s Passthrough (upsWithBase "passthrough" sp)
 pFadeComp s sp uIndex = baseProg s FadeComp $ upsWithBase "passthroughs" sp `mappend` upf "index" uIndex
 ptTriggered s sp uTrig = baseProg s TriggeredPassthrough $ upsWithBase "passthroughs" sp `mappend` upf "trigger" uTrig
 
-pBlur = Effect Blur mempty
+pBlur u = singleUEffect Blur u
 pBrightness uB uC = Effect Brightness $ mconcat [upf "brightness" uB, upf "contrast" uC]
 pEdges = Effect Edges mempty
 pFade u = singleUEffect Fade u
@@ -226,6 +230,8 @@ pLittlePlanet = Effect LittlePlanet mempty
 pLumidots = Effect Lumidots mempty
 pMirror = Effect Mirror mempty
 pOverlay u = singleUEffect Overlay u
+pPaletteCycle uPalette uOffset = Effect PaletteCycle $ mconcat [upt "palette" uPalette, upf "offset" uOffset]
+pPaletteVoronoi uPalette uTime = Effect PaletteVoronoi $ mconcat [upt "palette" uPalette, upf "time" uTime]
 pRepeat u = singleUEffect Repeat u
 pReverse = Effect Reverse mempty
 pRotate u = singleUEffect Rotate u

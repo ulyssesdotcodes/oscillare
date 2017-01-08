@@ -181,7 +181,7 @@ effMap = fromList [ (0, [pFade 0.94])
                  , (3, [ pFilter (* 1) ])
                  , (4, [ pFilter (VolumeInput, [ 2 ]) ])
                  , (5, [ pScale' (KickInput, [ 0.07 ]), pScale' (-0.015), pFade 0.98  ])
-                 , (6, [ pBlur ])
+                 , (6, [ pBlur 27 ])
                  , (7, [ pEdges ])
                  , (8, [ pLumidots ])
                  ]

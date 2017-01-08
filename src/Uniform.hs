@@ -38,15 +38,21 @@ data TexValue
   = TexInputValue TexInput [Double] deriving Eq
 data TexInput =
   AudioTexInput
-  | EqTexInput
   | CameraTexInput
+  | EqTexInput
+  | EclecticPalette
+  | PurpleBluePalette
+  | RibbonPalette
   | BlankTex
   deriving Eq
 
 texInputText :: TexInput -> ByteString
 texInputText AudioTexInput = "audio_texture"
-texInputText EqTexInput = "eq_texture"
 texInputText CameraTexInput = "camera_texture"
+texInputText EqTexInput = "eq_texture"
+texInputText EclecticPalette = "eclectic_palette"
+texInputText PurpleBluePalette = "purple_blue_palette"
+texInputText RibbonPalette = "ribbon_palette"
 texInputText BlankTex = "blank"
 
 type StringValue = ByteString
