@@ -76,16 +76,6 @@ programMessage :: Map ByteString Double -> Program -> Pattern Message
 programMessage inputs (Program s (SlottableProgram (BaseProgram prog us effs))) =
   slotMessages (baseSlot s) (BaseName prog) (nextSlot (baseSlot s)) us inputs `mappend`
     (effectsMessages inputs (baseSlot s) $ reverse effs)
-programMessage inputs (Program slot (Layer l ss es)) =
-  case es of
-    [] -> (addSlot (baseSlot slot) . mconcat $ ppure <$> [progMsg l, layerMsg ss])
-    e:effs ->
-      (addSlot (baseSlot slot) . mconcat $ ppure <$> [progMsg l, effMsg, layerMsg ss])
-      `mappend` (effectsMessages inputs (baseSlot slot) $ reverse (e:effs))
-  where
-    progMsg l = Message "/progs" [ostr (progName $ LayerName l)]
-    layerMsg ss = Message "/progs/connections" $ ostr . baseSlot <$> ss
-    effMsg = Message "/progs/effect" [ostr $ nextSlot (baseSlot slot)]
 programMessage _ (Program slot Blank) = ppure $ Message "/progs/clear" [ostr $ baseSlot slot]
 
 effectsMessages :: Map ByteString Double -> Slot -> [Effect] -> Pattern Message

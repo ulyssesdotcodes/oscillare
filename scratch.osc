@@ -10,7 +10,7 @@ base $ (|+| pFade (midi "fader1")) .  (|-|)
 
 base $ (|-|)
 
-t 60
+t 80
 
 p $ ptTriggered "t" "y x w" (KickInput, [0.7])
   |+| pBrightness ((* 10) <$$> (midi "pot2a")) ((* 5) <$$> midi "pot2b")
@@ -21,9 +21,8 @@ p $ ptTriggered "t" "y x w" (KickInput, [0.7])
 
 p $ pBlank "a"
 
-p $ pSine "a" (VolumeInput, [2]) 5 1
-  |+| pPaletteCycle PurpleBluePalette (* 1)
-  |+| pRepeat 3
+p $ pInput "a" CameraTexInput
+  |+| pNoiseDisplace (KickInput, [10])
 
 p $ pFadeComp "z" "y x" (midi "fader3")
 
@@ -31,13 +30,10 @@ p $ pShapes "x" ((+ 3) . (* 6) . sinMod') (KickInput, [0.3]) 0.2
 
 p $ pFadeComp "a" "b c" (midi "fader3")
 
-p $ pAudioData "b" 1 AudioTexInput
-  |+| pTranslate 0 (VolumeInput, [0.05])
-  |+| pRepeat 2
-  |+| pLittlePlanet
-  |+| pLumidots
-  |+| pRepeat 3
-  |+| pPaletteCycle EclecticPalette ((* 0.4) <$$> absTimePattern)
+p $ pAudioData "a" 1 AudioTexInput
+  |+| pPaletteCycle EclecticPalette 0.2
+  |+| pHueShift ((* 0.2))
+
 
 p $ pSine "c" ((* 2) <$$> absTimePattern) 2 1
   |+| pPaletteCycle EclecticPalette ((* 0.3) <$$> absTimePattern)
@@ -70,14 +66,28 @@ p $ pStringTheory "b" (VolumeInput, [1]) (VolumeInput, [1]) 1
   |+| pScale' (VolumeInput, [0.1])
   |+| pOverlay (midi "fader2")
 
-p $ pLines "b" (VolumeInput, [0.01]) 0.6
+p $ pLines "a" (VolumeInput, [0.01]) 0.6
   |+| pRepeat 3
-  |+| pBrightness (midi "button1") 1
+  |+| pNoiseDisplace (KickInput, [10])
 
 
 p $ pFadeComp "a" "b c" (midi )
 
-p $ pFlocking "a" (VolumeInput, [4]) 0.5 (KickInput, [1])
-  |+| pMirror
-  |+| pPaletteVoronoi EclecticPalette ((* 0.6) <$$> absTimePattern)
-  |+| pFade 0.97
+p $ pInput "a" CameraTexInput
+  |+| pEdges
+  |+| pBlur 3
+  |+| pBrightness 10 4
+  |+| pPaletteVoronoi PurpleBluePalette (* 1)
+  |+| pNoiseDisplace (KickInput, [10])
+  |+| pLittlePlanet
+
+p $ pOver "a" "b c"
+
+p $ pFlocking "b" (VolumeInput, [4]) 0.5 (KickInput, [4])
+  |+| pPaletteMap RibbonPalette 0
+  |+| pBrightness 0.2 0
+  |+| pFade 0.99
+
+p $ pVoronoi "c" ((* 0.2) <$$> absTimePattern)
+  |+| pBrightness (VolumeInput, [20]) 0
+  |+| pPaletteMap PurpleBluePalette (sin . (* 0.6) <$$> absTimePattern)

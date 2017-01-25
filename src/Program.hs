@@ -21,11 +21,14 @@ data EffectType =
   | Fade
   | Filter
   | Fire
+  | HueShift
   | Lumidots
   | LittlePlanet
   | Mirror
+  | NoiseDisplace
   | Overlay
   | PaletteCycle
+  | PaletteMap
   | PaletteVoronoi
   | Repeat
   | Reverse
@@ -33,11 +36,6 @@ data EffectType =
   | Scale
   | Translate
   deriving Eq
-
-data LayerType =
-  Add
-  | Displace
-  | Mult
 
 data BaseType =
   AbstractSpiral
@@ -49,20 +47,24 @@ data BaseType =
   | Image
   | InputTexBase
   | Lines
-  | Passthrough
   | Shapes
   | SideEmitter
   | Sine
   | StringTheory
   | TextType
-  | TriggeredPassthrough
   | Video
   | Voronoi
+
+  | Add
+  | Displace
+  | Mult
+  | Over
+  | Passthrough
+  | TriggeredPassthrough
 
 data Name =
   BaseName BaseType
   | EffName EffectType
-  | LayerName LayerType
 
 effectName :: EffectType -> ByteString
 effectName Blur = "blur"
@@ -71,11 +73,14 @@ effectName Edges = "edge_detection"
 effectName Fade = "fade"
 effectName Filter = "filter"
 effectName Fire = "fire"
+effectName HueShift = "hue_shift"
 effectName Lumidots = "lumidots"
 effectName LittlePlanet = "little_planet"
 effectName Mirror = "mirror"
+effectName NoiseDisplace = "noise_displace"
 effectName Overlay = "overlay"
 effectName PaletteCycle = "palette_cycle"
+effectName PaletteMap = "palette_map"
 effectName PaletteVoronoi = "palette_voronoi"
 effectName Repeat = "repeat"
 effectName Reverse = "reverse"
@@ -83,10 +88,6 @@ effectName Rotate = "rotate"
 effectName Scale = "scale"
 effectName Translate = "translate"
 
-layerName :: LayerType -> ByteString
-layerName Add = "add"
-layerName Displace = "displace"
-layerName Mult = "mult"
 
 baseName :: BaseType -> ByteString
 baseName AbstractSpiral = "abstract_spiral"
@@ -106,16 +107,16 @@ baseName TextType = "text"
 baseName Video = "video"
 baseName Voronoi = "voronoi"
 
+baseName Add = "add"
+baseName Displace = "displace"
+baseName Mult = "mult"
+baseName Over = "over"
 baseName Passthrough = "pt"
 baseName TriggeredPassthrough = "pt_triggered"
 
 progName :: Name -> ByteString
 progName (BaseName b) = baseName b
 progName (EffName e) = effectName e
-progName (LayerName l) = layerName l
-
-instance Show LayerType where
-  show = unpack . layerName
 
 data Effect =
   Effect EffectType (Pattern Uniform)
@@ -131,7 +132,6 @@ instance Show BaseProgram where
 
 data Slottable =
   SlottableProgram BaseProgram
-  | Layer LayerType [Slot] [Effect]
   | Blank deriving Show
 
 data Program = Program {_slot :: Slot, _program :: Slottable }
@@ -153,7 +153,6 @@ class Effectable a where
 
 instance Effectable Program where
   (Program s (SlottableProgram (BaseProgram b us es))) |+| e = Program s $ SlottableProgram $ BaseProgram b us (e:es)
-  (Program s (Layer l ss es)) |+| e = Program s $ Layer l ss (e:es)
 
 instance Effectable Exec where
   (Exec ps k es) |+| e = Exec ps k ((-1, [e]):es)
@@ -163,9 +162,6 @@ programSlot (Program s _) = s
 
 baseProg :: String -> BaseType -> Pattern Uniform -> Program
 baseProg s b us = Program (pack s) (SlottableProgram (BaseProgram b us []))
-
-layer :: LayerType -> String -> [String] -> Program
-layer l s ss = Program (pack s) (Layer l (pack <$> ss) [])
 
 upf :: FloatUniformPattern f => ByteString -> f -> Pattern Uniform
 upf t pu = uniformPattern t $ UniformFloatValue <$$> fPattern pu
@@ -219,6 +215,10 @@ pVideo slot uPath uSpeed = baseProg slot Video $ mconcat [ups "video" uPath, upf
 pt s sp = baseProg s Passthrough (upsWithBase "passthrough" sp)
 pFadeComp s sp uIndex = baseProg s FadeComp $ upsWithBase "passthroughs" sp `mappend` upf "index" uIndex
 ptTriggered s sp uTrig = baseProg s TriggeredPassthrough $ upsWithBase "passthroughs" sp `mappend` upf "trigger" uTrig
+pAdd s sp = baseProg s Add (upsWithBase "references" sp)
+pDisplace s sp = baseProg s Displace (upsWithBase "references" sp)
+pMult s sp = baseProg s Mult (upsWithBase "references" sp)
+pOver s sp = baseProg s Over (upsWithBase "references" sp)
 
 pBlur u = singleUEffect Blur u
 pBrightness uB uC = Effect Brightness $ mconcat [upf "brightness" uB, upf "contrast" uC]
@@ -226,11 +226,14 @@ pEdges = Effect Edges mempty
 pFade u = singleUEffect Fade u
 pFilter u = singleUEffect Filter u
 pFire u = singleUEffect Fire u
+pHueShift u = singleUEffect HueShift u
 pLittlePlanet = Effect LittlePlanet mempty
 pLumidots = Effect Lumidots mempty
 pMirror = Effect Mirror mempty
+pNoiseDisplace u = Effect NoiseDisplace $ upf "displacement" u
 pOverlay u = singleUEffect Overlay u
 pPaletteCycle uPalette uOffset = Effect PaletteCycle $ mconcat [upt "palette" uPalette, upf "offset" uOffset]
+pPaletteMap uPalette uOffset = Effect PaletteMap $ mconcat [upt "palette" uPalette, upf "offset" uOffset]
 pPaletteVoronoi uPalette uTime = Effect PaletteVoronoi $ mconcat [upt "palette" uPalette, upf "time" uTime]
 pRepeat u = singleUEffect Repeat u
 pReverse = Effect Reverse mempty
@@ -239,8 +242,5 @@ pScale uX uY = Effect Scale $ mconcat [upf "scale_x" uX, upf "scale_y" uY]
 pScale' uXY = pScale uXY uXY
 pTranslate uX uY = Effect Translate $ mconcat [upf "translate_x" uX, upf "translate_y" uY]
 
-pAdd = layer Add
-pDisplace = layer Displace
-pMult = layer Mult
 
 
