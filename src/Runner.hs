@@ -68,9 +68,9 @@ baseSlot s = append s (pack "0")
 
 execMessage :: Map ByteString Double -> Exec -> Pattern Message
 execMessage inputs (Exec ps k es) =
-  programMessage inputs (Program (pack "s") (SlottableProgram (BaseProgram TriggeredPassthrough us $ concatMap snd es)))
+  programMessage inputs (Program (pack "s") (SlottableProgram (BaseProgram FadeComp us $ concatMap snd es)))
   where
-    us = uniformPattern "passthroughs" (ppure . UniformStringValue $ unwords ps) `mappend` (uniformPattern "trigger" $ UniformFloatValue <$$> k)
+    us = uniformPattern "passthroughs" (ppure . UniformStringValue $ unwords ps) `mappend` (uniformPattern "index" $ UniformFloatValue <$$> k)
 
 programMessage :: Map ByteString Double -> Program -> Pattern Message
 programMessage inputs (Program s (SlottableProgram (BaseProgram prog us effs))) =

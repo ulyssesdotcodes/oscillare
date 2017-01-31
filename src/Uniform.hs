@@ -37,20 +37,24 @@ floatInputText Position1InputY = "pos1y"
 data TexValue
   = TexInputValue TexInput [Double] deriving Eq
 data TexInput =
-  AudioTexInput
+  AcidPalette
+  | AudioTexInput
   | CameraTexInput
   | EqTexInput
   | EclecticPalette
+  | PrayerFlagPalette
   | PurpleBluePalette
   | RibbonPalette
   | BlankTex
   deriving Eq
 
 texInputText :: TexInput -> ByteString
+texInputText AcidPalette = "acid_palette"
 texInputText AudioTexInput = "audio_texture"
 texInputText CameraTexInput = "camera_texture"
 texInputText EqTexInput = "eq_texture"
 texInputText EclecticPalette = "eclectic_palette"
+texInputText PrayerFlagPalette = "prayer_flag_palette"
 texInputText PurpleBluePalette = "purple_blue_palette"
 texInputText RibbonPalette = "ribbon_palette"
 texInputText BlankTex = "blank"

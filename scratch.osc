@@ -2,15 +2,15 @@ p $ pt "s" "a"progs
 
 base $ (+++) "a"
 
-base $ kk (KickInput, [0.8])
+base $ kk (midi "fader1")
 
 base $ resetCache
 
-base $ (|+| pFade (midi "fader1")) .  (|-|)
+base $ (|+| pFade (midi "pot1a")) .  (|-|)
 
 base $ (|-|)
 
-t 80
+t 60
 
 p $ ptTriggered "t" "y x w" (KickInput, [0.7])
   |+| pBrightness ((* 10) <$$> (midi "pot2a")) ((* 5) <$$> midi "pot2b")
@@ -18,15 +18,26 @@ p $ ptTriggered "t" "y x w" (KickInput, [0.7])
   |+| pFade (midi "fader2")
   |+| pScale' (midi "pot8c")
 
+p $ pOver "a" "b c"
+
+p $ pInput "b" BlankTex
+  |+| pPaletteMap AcidPalette ((+ 0.5) . sinMod' . (* 0.2)<$$> absTimePattern)
 
 p $ pBlank "a"
 
 p $ pInput "a" CameraTexInput
+  |+| pEdges 0.3
   |+| pNoiseDisplace (KickInput, [10])
 
 p $ pFadeComp "z" "y x" (midi "fader3")
 
-p $ pShapes "x" ((+ 3) . (* 6) . sinMod') (KickInput, [0.3]) 0.2
+p $ pVoronoi "c" ((* 0.2) <$$> absTimePattern)
+  |+| pPaletteMap RibbonPalette (sinMod' . (* 0.2)<$$> absTimePattern)
+
+p $ pShapes "c" ((+ 4) . (* 6)) 0.1 0.2
+  |+| pFade 0.9
+  |+| pPaletteMap RibbonPalette (sinMod' . (* 0.2)<$$> absTimePattern)
+  |+| pScale' (VolumeInput, [0.02])
 
 p $ pFadeComp "a" "b c" (midi "fader3")
 

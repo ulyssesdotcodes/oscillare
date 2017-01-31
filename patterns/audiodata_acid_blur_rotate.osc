@@ -1,14 +1,3 @@
-
--- Trippy colorful noise displace
-
-p $ pFlocking "a" (VolumeInput, [4]) 0.5 (KickInput, [4])
-  |+| pPaletteCycle EclecticPalette (* 1)
-  |+| pFade 0.9
-  |+| pBrightness 0.6 1
-  |+| pNoiseDisplace (KickInput, [10])
-
--- Blurred spirally colorful audiodata
-
 p $ pAudioData "b" 1.5 AudioTexInput
   |+| pPaletteCycle AcidPalette ((* 0.2) <$$> absTimePattern)
   |+| pTranslate (* 0.5) 0.2

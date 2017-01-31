@@ -166,7 +166,7 @@ doInput _ _ = return "Invalid value"
 
 progMap :: Map Int Program
 progMap = fromList [ (0, pAudioData "aa" 1 AudioTexInput)
-                   , (1, pInput "ab" CameraTexInput |+| pEdges |+| pBrightness 2 1)
+                   , (1, pInput "ab" CameraTexInput |+| pEdges 0 |+| pBrightness 2 1)
                    , (2, pLines "ac" (KickInput, [0.1]) 0.2 |+| pMirror)
                    , (3, pFlocking "ad" (KickInput, [ 80 ]) 1.0 64 |+| pFade 0.4)
                    , (5, pShapes "ae" ((+ 3) . (* 6) . sinMod') 0.2 0.2 |+| pRepeat 9)
@@ -182,7 +182,7 @@ effMap = fromList [ (0, [pFade 0.94])
                  , (4, [ pFilter (VolumeInput, [ 2 ]) ])
                  , (5, [ pScale' (KickInput, [ 0.07 ]), pScale' (-0.015), pFade 0.98  ])
                  , (6, [ pBlur 27 ])
-                 , (7, [ pEdges ])
+                 , (7, [ pEdges 0 ])
                  , (8, [ pLumidots ])
                  ]
 
