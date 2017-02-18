@@ -12,41 +12,37 @@ base $ (|-|)
 
 t 60
 
-p $ ptTriggered "t" "y x w" (KickInput, [0.7])
-  |+| pBrightness ((* 10) <$$> (midi "pot2a")) ((* 5) <$$> midi "pot2b")
-  |+| pFire (midi "pot2c")
-  |+| pFade (midi "fader2")
-  |+| pScale' (midi "pot8c")
+p $ ptTriggered "b" "d f g" (KickInput, [1.2])
+  |+| pPaletteCycle EclecticPalette ((* 0.2) <$$> absTimePattern)
 
 p $ pOver "a" "b c"
 
-p $ pInput "b" BlankTex
-  |+| pPaletteMap AcidPalette ((+ 0.5) . sinMod' . (* 0.2)<$$> absTimePattern)
+p $ pInput "a" BlankTex
+  |+| pPaletteMap RibbonPalette ((+ 0.5) . sinMod' . (* 0.2)<$$> absTimePattern)
 
 p $ pBlank "a"
 
 p $ pInput "a" CameraTexInput
-  |+| pEdges 0.3
-  |+| pNoiseDisplace (KickInput, [10])
+  |+| pEdges 0.9
+  |+| pNoiseDisplace (KickInput, [20])
 
 p $ pFadeComp "z" "y x" (midi "fader3")
 
-p $ pVoronoi "c" ((* 0.2) <$$> absTimePattern)
-  |+| pPaletteMap RibbonPalette (sinMod' . (* 0.2)<$$> absTimePattern)
+p $ pVoronoi "a" ((* 0.2) <$$> absTimePattern)
+  |+| pPaletteMap RibbonPalette (sinMod' . (* 0.2) <$$> absTimePattern)
 
-p $ pShapes "c" ((+ 4) . (* 6)) 0.1 0.2
+p $ pShapes "d" ((+ 4) . (* 6)) 0.1 0.2
   |+| pFade 0.9
-  |+| pPaletteMap RibbonPalette (sinMod' . (* 0.2)<$$> absTimePattern)
+  |+| pPaletteMap RibbonPalette (sinMod' . (* 0.2) <$$> absTimePattern)
   |+| pScale' (VolumeInput, [0.02])
 
 p $ pFadeComp "a" "b c" (midi "fader3")
 
 p $ pAudioData "a" 1 AudioTexInput
-  |+| pPaletteCycle EclecticPalette 0.2
-  |+| pHueShift ((* 0.2))
+  |+| pNoiseDisplace (KickInput, [10])
 
 
-p $ pSine "c" ((* 2) <$$> absTimePattern) 2 1
+p $ pSine "d" ((* 2) <$$> absTimePattern) 2 1
   |+| pPaletteCycle EclecticPalette ((* 0.3) <$$> absTimePattern)
   |+| pRotate (3.1415 * 0.25)
   |+| pMirror
@@ -61,11 +57,11 @@ p $ pAudioData "c" 1 (EqTexInput, [128])
   |+| pFilter (VolumeInput, [2])
   |+| pMirror
 
-p $ pCircleEmitter "b" 3 (VolumeInput, [16]) 0 0 AudioTexInput
-  |+| pScale' ((* 0.5) . sinMod' . (* 0.5) <$$> absTimePattern)
-  |+| pBlur ((* 56) <$$> midi "pot1a")
+p $ pCircleEmitter "a" 3 (VolumeInput, [16]) 0 0 AudioTexInput
+  |+| pPaletteMap PurpleBluePalette 0
+  |+| pOverlay 0.9
 
-p $ pShapes "c" (VolumeInput, [16, 3]) (VolumeInput, [0.2]) 0.2
+p $ pShapes "d" (VolumeInput, [16, 3]) (VolumeInput, [0.2]) 0.2
   |+| pRepeat 3
   |+| pLittlePlanet
   |+| pRotate (pi2Mod <$$> absTimePattern)
@@ -94,9 +90,7 @@ p $ pInput "a" CameraTexInput
 
 p $ pOver "a" "b c"
 
-p $ pFlocking "b" (VolumeInput, [4]) 0.5 (KickInput, [4])
-  |+| pPaletteMap RibbonPalette 0
-  |+| pBrightness 0.2 0
+p $ pFlocking "g" (VolumeInput, [4]) 0.5 (KickInput, [4])
   |+| pFade 0.99
 
 p $ pVoronoi "c" ((* 0.2) <$$> absTimePattern)

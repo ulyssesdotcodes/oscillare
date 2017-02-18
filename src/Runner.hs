@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ViewPatterns #-}
 
 module Runner where
 
@@ -11,12 +12,13 @@ import Control.Monad.Trans.State
 import Data.Map.Strict (Map, insert, foldMapWithKey, member, (!), lookup)
 import Data.ByteString.Char8 (ByteString, pack, unpack, unwords, append)
 import Data.Fixed
-import Data.List (nub, (\\))
 import Data.Map.Strict (Map, insert, foldMapWithKey)
 import Data.Maybe
+import Data.Set (Set, (\\), difference, fromList, empty, toList)
 import Data.Time.Clock
 import Network.Socket
 import Sound.OSC
+import Sound.OSC.Coding
 import qualified Sound.OSC.Transport.FD as T
 
 import Pattern
@@ -30,18 +32,21 @@ ostr = ASCII_String
 instance Show TempoState where
    show (TempoState _ p _ _ pr cu exec inputs _) =
      let
-       addName n p = (unpack n) ++ ": " ++ show (runReader (programMessage inputs p) (PatternState mempty pr cu))
+       addName n p = (unpack n) ++ ": " ++ show (runReader (programMessage p) (PatternState inputs pr cu))
        msgs = addName `foldMapWithKey` p
      in
       case msgs of
         [] -> ""
         e -> "{ messages " ++ e ++ " pr " ++ (show pr) ++ " cu " ++ (show cu) ++ " exec " ++ (show exec) ++ " }"
 
+instance Ord Message where
+  compare (encodeMessage -> m) (encodeMessage -> m') = compare (m :: ByteString) (m' :: ByteString)
+
 revEngines :: IO (MVar TempoState)
 revEngines = do
   now <- getCurrentTime
   conn' <- openUDP "127.0.0.1" 9001
-  newMVar $ TempoState conn' mempty (utctDayTime now) (secondsToDiffTime 1) 0 0 (Exec [] (fPattern (8 :: Double)) []) mempty []
+  newMVar $ TempoState conn' mempty (utctDayTime now) (secondsToDiffTime 1) 0 0 (Exec [] (fPattern (8 :: Double)) []) mempty (empty)
 
 gunEngines :: MVar TempoState -> IO ThreadId
 gunEngines = forkIO . sync
@@ -59,32 +64,32 @@ runProg :: MVar TempoState -> Program -> IO ()
 runProg mts p = modifyMVar_ mts $ \ts -> do
   (pLog, ts') <- runStateT (setProg' p) ts
   putStrLn pLog
-  return $ resetCache ts'
+  return ts'
 
 data SlotMessages = SlotMessages { dest :: Slot, messages :: Pattern Message }
 
 baseSlot :: ByteString -> ByteString
 baseSlot s = append s (pack "0")
 
-execMessage :: Map ByteString Double -> Exec -> Pattern Message
-execMessage inputs (Exec ps k es) =
-  programMessage inputs (Program (pack "s") (SlottableProgram (BaseProgram FadeComp us $ concatMap snd es)))
+execMessage :: Exec -> Pattern Message
+execMessage (Exec ps k es) =
+  programMessage (Program (pack "s") (SlottableProgram (BaseProgram FadeComp us $ concatMap snd es)))
   where
     us = uniformPattern "passthroughs" (ppure . UniformStringValue $ unwords ps) `mappend` (uniformPattern "index" $ UniformFloatValue <$$> k)
 
-programMessage :: Map ByteString Double -> Program -> Pattern Message
-programMessage inputs (Program s (SlottableProgram (BaseProgram prog us effs))) =
-  slotMessages (baseSlot s) (BaseName prog) (nextSlot (baseSlot s)) us inputs `mappend`
-    (effectsMessages inputs (baseSlot s) $ reverse effs)
-programMessage _ (Program slot Blank) = ppure $ Message "/progs/clear" [ostr $ baseSlot slot]
+programMessage :: Program -> Pattern Message
+programMessage (Program s (SlottableProgram (BaseProgram prog us effs))) =
+  slotMessages (baseSlot s) (BaseName prog) (nextSlot (baseSlot s)) us `mappend`
+    (effectsMessages (baseSlot s) $ reverse effs)
+programMessage (Program slot Blank) = ppure $ Message "/progs/clear" [ostr $ baseSlot slot]
 
-effectsMessages :: Map ByteString Double -> Slot -> [Effect] -> Pattern Message
-effectsMessages inputs s ((Effect e us):es) =
-  slotMessages s' (EffName e) s'' us inputs `mappend` effectsMessages inputs s' es
+effectsMessages :: Slot -> [Effect] -> Pattern Message
+effectsMessages s ((Effect e us):es) =
+  slotMessages s' (EffName e) s'' us `mappend` effectsMessages s' es
   where
     s' = nextSlot s
     s'' = nextSlot s'
-effectsMessages _ s [] = pure . (:[]) $ Message "/progs/effect/clear" [ostr s]
+effectsMessages s [] = pure . (:[]) $ Message "/progs/effect/clear" [ostr s]
 
 nextSlot :: Slot -> Slot
 nextSlot s = pack $ fromMaybe ("no: " ++ (unpack s)) $ init' s' >>= \i -> num >>= \n -> Just (i ++ show (n + 1))
@@ -96,21 +101,21 @@ nextSlot s = pack $ fromMaybe ("no: " ++ (unpack s)) $ init' s' >>= \i -> num >>
     init' [] = Nothing
     init' xs = Just (init xs)
 
-slotMessages :: Slot -> Name -> Slot -> Pattern Uniform -> Map ByteString Double -> Pattern Message
-slotMessages s n next us inputs = addSlot s $ mconcat $ [progMsg, effectMsg, uMsgs us]
+slotMessages :: Slot -> Name -> Slot -> Pattern Uniform -> Pattern Message
+slotMessages s n next us = addSlot s $ mconcat $ [progMsg, effectMsg, uMsgs us]
   where
     effectMsg = ppure $ Message "/progs/effect" [ostr next]
     progMsg = ppure $ Message "/progs" [ostr (progName n)]
-    uMsgs us' = uniformMessage inputs <$$> us'
+    uMsgs us' = uniformMessage <$$> us'
 
-uniformMessage :: Map ByteString Double -> Uniform -> Message
-uniformMessage _ (Uniform n (UniformFloatValue (FloatDoubleValue f))) =
+uniformMessage :: Uniform -> Message
+uniformMessage (Uniform n (UniformFloatValue (FloatDoubleValue f))) =
   Message "/progs/uniform" [ostr n, float f]
-uniformMessage inputMap (Uniform n (UniformFloatValue (FloatInputValue f m))) =
+uniformMessage (Uniform n (UniformFloatValue (FloatInputValue f m))) =
   Message "/progs/uniform" $ [ostr n, ostr "input", ostr $ floatInputText f] ++ (float <$> m)
-uniformMessage _ (Uniform n (UniformTexValue (TexInputValue i m))) =
+uniformMessage (Uniform n (UniformTexValue (TexInputValue i m))) =
   Message "/progs/uniform" $ [ostr n, ostr "input", ostr $ texInputText i] ++ (float <$> m)
-uniformMessage _ (Uniform n (UniformStringValue s)) =
+uniformMessage (Uniform n (UniformStringValue s)) =
   Message "/progs/uniform" [ostr n, ostr "string", ostr s]
 
 addSlot :: ByteString -> Pattern Message -> Pattern Message
@@ -132,12 +137,13 @@ sendMessages :: MonadIO io => StateT TempoState io ()
 sendMessages = do
   tState <- get
   -- liftIO $ if (show tState == "") then return () else print tState
-  let messages = runReader (execMessage (view inputs tState) (view exec tState) `mappend` foldr (mappend . programMessage (view inputs tState)) mempty (view patt tState)) (PatternState (view inputs tState) (view prev tState) (view current tState))
+  let messages = fromList $ runReader (execMessage (view exec tState) `mappend` foldr (mappend . programMessage) mempty (view patt tState)) (PatternState (view inputs tState) (view prev tState) (view current tState))
   -- liftIO $ putStrLn (show b)
-  liftIO $ T.sendOSC (conn' tState) $ Bundle 0 $ (flip (\\) $ view lastMessages tState) . nub $ messages
+  liftIO $ T.sendOSC (conn' tState) $ Bundle 0 $ toList $ difference messages (view lastMessages tState)
   lastMessages .= messages
   where
     conn' = view conn
+
 
 frame :: MonadIO io => StateT TempoState io ()
 frame = do

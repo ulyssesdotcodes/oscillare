@@ -13,6 +13,7 @@ import Control.Monad.Trans.State
 import Data.ByteString.Char8 (ByteString, pack, unpack, append)
 import Data.List (union)
 import Data.Map.Strict (Map, insert, foldMapWithKey, findWithDefault)
+import Data.Set (Set, empty)
 import Data.Time.Clock
 import Sound.OSC
 
@@ -28,7 +29,7 @@ data TempoState = TempoState { _conn :: UDP
                              , _current :: Double
                              , _exec :: Exec
                              , _inputs :: Map ByteString Double
-                             , _lastMessages :: [Message]
+                             , _lastMessages :: Set Message
                              }
 
 makeLenses ''TempoState
@@ -93,7 +94,7 @@ sps = (progs .~) . (fmap (pack . (++ "0")))
 (|-|) ts = ts & exec . effects .~ [] & id %~ resetCache
 
 resetCache :: TempoState -> TempoState
-resetCache = lastMessages .~ []
+resetCache = lastMessages .~ empty
 
 midi :: String -> Pattern Double
 midi (pack -> s) = reader $ (:[]) . findWithDefault 0 s . pInputs

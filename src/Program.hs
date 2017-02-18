@@ -193,7 +193,7 @@ pCircleEmitter slot uLifespan uVel uRotation uPullback uTex = baseProg slot Circ
           , upt "tex_audio" uTex
           ]
 pDots slot uVolume uData = baseProg slot Dots $ (upf "volume" uVolume) `mappend` (upt "eqs" uData)
-pFlocking slot uSeparation uMult uSpeed = baseProg slot Flocking $ mconcat [upf "alignment" uMult, upf "cohesion" ((* (0.4 :: Double)) <$$> floatPattern uMult), upf "separation" uSeparation, upf "time" timePattern, upf "delta" $ deltaPattern, upf "speed" uSpeed]
+pFlocking slot uSeparation uMult uSpeed = baseProg slot Flocking $ mconcat [upf "alignment" uMult, upf "cohesion" uMult, upf "separation" uSeparation, upf "time" timePattern, upf "delta" $ deltaPattern, upf "speed" uSpeed]
 pImage slot uImage uClear = baseProg slot Image $ mconcat [ups "image" uImage, upf "clear_shade" uClear]
 pInput slot uInput = baseProg slot InputTexBase $ upt "tex_input" uInput
 pLines slot uWidth uSpacing = baseProg slot Lines $ (upf "width" uWidth) `mappend` (upf "spacing" uSpacing)
