@@ -17,6 +17,7 @@ type Slot = ByteString
 data EffectType =
   Blur
   | Brightness
+  | Clone
   | ColorRepeat
   | Edges
   | Fade
@@ -70,6 +71,7 @@ data Name =
 effectName :: EffectType -> ByteString
 effectName Blur = "blur"
 effectName Brightness = "brightness"
+effectName Clone = "clone"
 effectName ColorRepeat = "color_repeat"
 effectName Edges = "edge_detection"
 effectName Fade = "fade"
@@ -224,6 +226,7 @@ pOver s sp = baseProg s Over (upsWithBase "references" sp)
 
 pBlur u = singleUEffect Blur u
 pBrightness uB uC = Effect Brightness $ mconcat [upf "brightness" uB, upf "contrast" uC]
+pClone uTx uTy = Effect Clone $ mconcat [upf "translate_x" uTx, upf "translate_y" uTy]
 pColorRepeat u uP = Effect ColorRepeat $ mconcat [upf "repeat" u, upt "palette" uP]
 pEdges u = Effect Edges $ upf "overlay" u
 pFade u = singleUEffect Fade u
