@@ -8,8 +8,8 @@ import Control.Arrow (first)
 import Control.Lens
 import Control.Monad
 import Control.Monad.Trans.Reader
-import Control.Monad.Trans.Writer
-import Control.Monad.Trans.State
+import Control.Monad.Trans.Writer.Strict
+import Control.Monad.Trans.State.Strict
 import Data.ByteString.Char8 (ByteString, pack, unpack, append)
 import Data.List (union)
 import Data.Map.Strict (Map, insert, foldMapWithKey, findWithDefault)
@@ -29,7 +29,7 @@ data TempoState = TempoState { _conn :: UDP
                              , _current :: Double
                              , _exec :: Exec
                              , _inputs :: Map ByteString Double
-                             , _lastMessages :: Set Message
+                             , _lastMessages :: Set ByteString
                              }
 
 makeLenses ''TempoState

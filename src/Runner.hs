@@ -8,13 +8,13 @@ import Prelude hiding (unwords, lookup)
 import Control.Concurrent
 import Control.Lens
 import Control.Monad.Reader
-import Control.Monad.Trans.State
+import Control.Monad.Trans.State.Strict
 import Data.Map.Strict (Map, insert, foldMapWithKey, member, (!), lookup)
 import Data.ByteString.Char8 (ByteString, pack, unpack, unwords, append)
 import Data.Fixed
 import Data.Map.Strict (Map, insert, foldMapWithKey)
 import Data.Maybe
-import Data.Set (Set, (\\), difference, fromList, empty, toList)
+import Data.Set (Set, (\\), difference, fromList, empty, toList, singleton, elemAt, size)
 import Data.Time.Clock
 import Network.Socket
 import Sound.OSC
@@ -130,16 +130,16 @@ oscConnected (UDP sock) = isBound sock
 updateCycle :: MonadIO io => DiffTime -> StateT TempoState io ()
 updateCycle now = do
   tState <- get
-  prev .= view current tState
+  (.=) prev $! (view current tState)
   current .= ((fromRational . toRational) $ now / (view cycleLength tState))
 
 sendMessages :: MonadIO io => StateT TempoState io ()
 sendMessages = do
   tState <- get
   -- liftIO $ if (show tState == "") then return () else print tState
-  let messages = fromList $ runReader (execMessage (view exec tState) `mappend` foldr (mappend . programMessage) mempty (view patt tState)) (PatternState (view inputs tState) (view prev tState) (view current tState))
+  let messages = fromList . map encodeMessage $ runReader (execMessage (view exec tState) `mappend` foldr (mappend . programMessage) mempty (view patt tState)) (PatternState (view inputs tState) (view prev tState) (view current tState))
   -- liftIO $ putStrLn (show b)
-  liftIO $ T.sendOSC (conn' tState) $ Bundle 0 $ toList $ difference messages (view lastMessages tState)
+  liftIO $ T.sendOSC (conn' tState) $ Bundle 0 $ map (fromJust . decodeMessage) . toList $ difference messages (view lastMessages tState)
   lastMessages .= messages
   where
     conn' = view conn

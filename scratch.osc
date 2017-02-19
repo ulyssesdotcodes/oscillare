@@ -18,7 +18,7 @@ p $ ptTriggered "b" "d f g" (KickInput, [1.2])
 p $ pOver "a" "b c"
 
 p $ pInput "c" BlankTex
-  |+| pPaletteMap RibbonPalette ((+ 0.5) . sinMod' . (* 0.2)<$$> absTimePattern)
+  |+| pPaletteMap RibbonPalette ((+ 0.5) . sinMod' . (* 0.1)<$$> absTimePattern)
 
 p $ pBlank "a"
 
@@ -27,23 +27,22 @@ p $ pInput "b" CameraTexInput
 
 p $ pFadeComp "z" "y x" (midi "fader3")
 
-p $ pVoronoi "a" ((* 0.2) <$$> absTimePattern)
-  |+| pPaletteMap RibbonPalette (sinMod' . (* 0.2) <$$> absTimePattern)
-  |+| pRepeat 8
+p $ pVoronoi "b" ((* 0.4) <$$> absTimePattern)
+  |+| pPaletteMap RibbonPalette (sinMod' . (* 0.7) <$$> absTimePattern)
+  |+| pRepeat (* 4)
 
-p $ pShapes "d" ((+ 4) . (* 6)) 0.1 0.2
-  |+| pFade 0.9
-  |+| pPaletteMap RibbonPalette (sinMod' . (* 0.2) <$$> absTimePattern)
+p $ pShapes "b" ((+ 4) . (* 6)) 0.2 0.2
   |+| pScale' (VolumeInput, [0.02])
 
 p $ pFadeComp "a" "b c" (midi "fader3")
 
-p $ pAudioData "a" 1 AudioTexInput
+p $ pAudioData "a" 1.1 AudioTexInput
   |+| pFade 0.9
 
 
-p $ pSine "a" ((* 1.2) <$$> absTimePattern) 1 1
+p $ pSine "b" ((* 1.2) <$$> absTimePattern) 1 1
   |+| pPaletteCycle EclecticPalette ((* 0.4) <$$> absTimePattern)
+  |+| pFade 0.97
 
 p $ pVoronoi "a" (VolumeInput, [absTimePattern])
   |+| pEdges

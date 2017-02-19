@@ -12,8 +12,8 @@ import Control.Lens
 import Control.Lens.TH
 import Control.Lens.Zoom
 import Control.Monad.Trans.Reader
-import Control.Monad.Trans.State
-import Control.Monad.Trans.Writer
+import Control.Monad.Trans.State.Strict
+import Control.Monad.Trans.Writer.Strict
 import Control.Monad.IO.Class
 import Data.Aeson (decode)
 import Data.ByteString.Char8 (ByteString, concat, pack, readInt, split, unpack, append)
