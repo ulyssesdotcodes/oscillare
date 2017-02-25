@@ -97,7 +97,7 @@ class FloatPattern a where
   floatPattern :: a -> Pattern Double
 
 instance FloatPattern Double where
-  floatPattern = mempty
+  floatPattern = pure . (:[])
 
 instance FloatPattern Integer where
   floatPattern = pure . (:[]) . fromInteger

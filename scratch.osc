@@ -15,10 +15,12 @@ t 60
 p $ ptTriggered "b" "d f g" (KickInput, [1.2])
   |+| pPaletteCycle EclecticPalette ((* 0.2) <$$> absTimePattern)
 
-p $ pOver "a" "b c"
+p $ pOver "a" "b d c"
 
-p $ pInput "c" BlankTex
-  |+| pPaletteMap RibbonPalette ((+ 0.5) . sinMod' . (* 0.1)<$$> absTimePattern)
+p $ pMult "a" ""
+
+p $ pInput "z" BlankTex
+  |+| pPaletteMap RibbonPalette (VolumeInput, [10])
 
 p $ pBlank "a"
 
@@ -31,14 +33,30 @@ p $ pVoronoi "b" ((* 0.4) <$$> absTimePattern)
   |+| pPaletteMap RibbonPalette (sinMod' . (* 0.7) <$$> absTimePattern)
   |+| pRepeat (* 4)
 
-p $ pShapes "b" ((+ 4) . (* 6)) 0.2 0.2
-  |+| pScale' (VolumeInput, [0.02])
+p $ pMult "z" "y b"
+
+p $ pAdd "y" "x w v"
+
+p $ pShapes "z" 3 0.3 0
+  |+| pRepeat 20
+
+p $ pShapes "x" 4 0.3 0
+  |+| pBrightness (sinMod') 0
+
+p $ pShapes "w" 3 0.3 0
+  |+| pTranslate 0.3 0
+  |+| pBrightness (sinMod' . (+ 0.33)) 0
+
+p $ pShapes "v" 5 0.3 0
+  |+| pTranslate (-0.3) 0
+  |+| pBrightness (sinMod' . (+ 0.66)) 0
 
 p $ pFadeComp "a" "b c" (midi "fader3")
 
-p $ pAudioData "a" 1.1 AudioTexInput
-  |+| pFade 0.9
-
+p $ pAudioData "d" 0.7 AudioTexInput
+  |+| pPaletteCycle RibbonPalette ((* 0.6) <$$> absTimePattern)
+  |+| pClone 0 0.4
+  |+| pFade 0.97
 
 p $ pSine "b" ((* 1.2) <$$> absTimePattern) 1 1
   |+| pPaletteCycle EclecticPalette ((* 0.4) <$$> absTimePattern)
@@ -54,7 +72,7 @@ p $ pAudioData "c" 1 (EqTexInput, [128])
   |+| pFilter (VolumeInput, [2])
   |+| pMirror
 
-p $ pCircleEmitter "a" 3 (VolumeInput, [16]) 0 0 AudioTexInput
+p $ pCircleEmitter "b" 3 (VolumeInput, [16]) 0 0 AudioTexInput
   |+| pPaletteMap PurpleBluePalette 0
   |+| pOverlay 0.9
 
@@ -77,17 +95,13 @@ p $ pLines "a" (VolumeInput, [0.01]) 0.6
 
 p $ pFadeComp "a" "b c" (midi )
 
-p $ pInput "a" CameraTexInput
-  |+| pEdges
-  |+| pBlur 3
-  |+| pBrightness 10 4
-  |+| pPaletteVoronoi PurpleBluePalette (* 1)
-  |+| pNoiseDisplace (KickInput, [10])
-  |+| pLittlePlanet
+p $ pInput "z" CameraTexInput
+  |+| pEdges (KickInput, [5])
+  |+| pClone 0 (KickInput, [0.2])
 
 p $ pOver "a" "b c"
 
-p $ pFlocking "b" 3 0.7 1
+p $ pFlocking "z" (KickInput, [4]) 0.7 (KickInput, [2])
   |+| pFade 0.99
 
 p $ pVoronoi "c" ((* 0.2) <$$> absTimePattern)

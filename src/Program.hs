@@ -36,6 +36,7 @@ data EffectType =
   | Reverse
   | Rotate
   | Scale
+  | Strobe
   | Translate
   deriving Eq
 
@@ -90,6 +91,7 @@ effectName Repeat = "repeat"
 effectName Reverse = "reverse"
 effectName Rotate = "rotate"
 effectName Scale = "scale"
+effectName Strobe = "strobe"
 effectName Translate = "translate"
 
 
@@ -246,7 +248,5 @@ pReverse = Effect Reverse mempty
 pRotate u = singleUEffect Rotate u
 pScale uX uY = Effect Scale $ mconcat [upf "scale_x" uX, upf "scale_y" uY]
 pScale' uXY = pScale uXY uXY
+pStrobe u = singleUEffect Strobe u
 pTranslate uX uY = Effect Translate $ mconcat [upf "translate_x" uX, upf "translate_y" uY]
-
-
-
