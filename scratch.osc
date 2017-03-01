@@ -19,8 +19,7 @@ p $ pOver "a" "b d c"
 
 p $ pMult "a" ""
 
-p $ pInput "z" BlankTex
-  |+| pPaletteMap RibbonPalette (VolumeInput, [10])
+p $ pInput "a" BlankTex
 
 p $ pBlank "a"
 
@@ -53,9 +52,11 @@ p $ pShapes "v" 5 0.3 0
 
 p $ pFadeComp "a" "b c" (midi "fader3")
 
-p $ pAudioData "d" 0.7 AudioTexInput
-  |+| pPaletteCycle RibbonPalette ((* 0.6) <$$> absTimePattern)
-  |+| pClone 0 0.4
+p $ ptTriggered "a" "b" 0
+  |+| pClone 2 0 0.2 0 0
+
+p $ pAudioData "b" 0.7 AudioTexInput
+  |+| pPaletteCycle EclecticPalette ((* 0.4) <$$> absTimePattern)
   |+| pFade 0.97
 
 p $ pSine "b" ((* 1.2) <$$> absTimePattern) 1 1
@@ -76,10 +77,8 @@ p $ pCircleEmitter "b" 3 (VolumeInput, [16]) 0 0 AudioTexInput
   |+| pPaletteMap PurpleBluePalette 0
   |+| pOverlay 0.9
 
-p $ pShapes "d" (VolumeInput, [16, 3]) (VolumeInput, [0.2]) 0.2
-  |+| pRepeat 3
-  |+| pLittlePlanet
-  |+| pRotate (pi2Mod <$$> absTimePattern)
+p $ pShapes "a" 5 (VolumeInput, [0.5]) 0.5
+  |+| pClone 0.1 0 (-0.1) (-0.1)
 
 p $ pStringTheory "b" (VolumeInput, [1]) (VolumeInput, [1]) 1
   |+| pRotate (3.1415 * 0.5)

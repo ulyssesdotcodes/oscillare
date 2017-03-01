@@ -228,7 +228,7 @@ pOver s sp = baseProg s Over (upsWithBase "references" sp)
 
 pBlur u = singleUEffect Blur u
 pBrightness uB uC = Effect Brightness $ mconcat [upf "brightness" uB, upf "contrast" uC]
-pClone uTx uTy = Effect Clone $ mconcat [upf "translate_x" uTx, upf "translate_y" uTy]
+pClone  uClones uTx uTy uSx uSy = Effect Clone $ mconcat [upf "clones" uClones, upf "translate_x" uTx, upf "translate_y" uTy, upf "scale_x" uSx, upf "scale_y" uSy]
 pColorRepeat u uP = Effect ColorRepeat $ mconcat [upf "repeat" u, upt "palette" uP]
 pEdges u = Effect Edges $ upf "overlay" u
 pFade u = singleUEffect Fade u
