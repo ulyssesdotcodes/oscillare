@@ -6,6 +6,7 @@
 module Uniform where
 
 import Data.ByteString.Char8 (ByteString, pack)
+import Control.Monad.Identity
 
 import Pattern
 
@@ -16,6 +17,7 @@ data FloatValue
 data FloatInput =
   VolumeInput
   | KickInput
+  | PassInput
   | Slider1Input
   | Slider2Input
   | Slider3Input
@@ -27,6 +29,7 @@ data FloatInput =
 floatInputText :: FloatInput -> ByteString
 floatInputText VolumeInput = "volume"
 floatInputText KickInput = "kick"
+floatInputText PassInput = "pass"
 floatInputText Slider1Input = "slider1"
 floatInputText Slider2Input = "slider2"
 floatInputText Slider3Input = "slider3"
@@ -108,8 +111,17 @@ instance FloatPattern (Pattern Double) where
 instance FloatPattern (Double -> Double) where
   floatPattern f = f <$$> timePattern
 
-instance FloatPattern a => FloatUniformPattern (FloatInput, [a])  where
-  fPattern (i, m) = ((:[]) . FloatInputValue i) <$> (mconcat $ fmap floatPattern m)
+instance FloatPattern a => FloatUniformPattern (FloatInput, Identity a)  where
+  fPattern (i, Identity m) = ((:[]) . FloatInputValue i) <$> floatPattern m
+
+instance (FloatPattern a, FloatPattern b) => FloatUniformPattern (FloatInput, (a, b))  where
+  fPattern (i, (a, b)) = ((:[]) . FloatInputValue i) <$> mconcat [floatPattern a, floatPattern b]
+
+instance (FloatPattern a, FloatPattern b, FloatPattern c) => FloatUniformPattern (FloatInput, (a, b, c))  where
+  fPattern (i, (a, b, c)) = ((:[]) . FloatInputValue i) <$> mconcat [floatPattern a, floatPattern b, floatPattern c]
+
+instance (FloatPattern a, FloatPattern b, FloatPattern c, FloatPattern d) => FloatUniformPattern (FloatInput, (a, b, c, d))  where
+  fPattern (i, (a, b, c, d)) = ((:[]) . FloatInputValue i) <$> mconcat [floatPattern a, floatPattern b, floatPattern c, floatPattern d]
 
 class StringUniformPattern a where
   sPattern :: a -> Pattern StringValue

@@ -14,6 +14,7 @@ import Control.Lens.Zoom
 import Control.Monad.Trans.Reader
 import Control.Monad.Trans.State.Strict
 import Control.Monad.Trans.Writer.Strict
+import Control.Monad.Identity
 import Control.Monad.IO.Class
 import Data.Aeson (decode)
 import Data.ByteString.Char8 (ByteString, concat, pack, readInt, split, unpack, append)
@@ -148,7 +149,7 @@ maybeTuple (a, b) = do
 
 doMood :: Monad m => OSC.Datum -> StateT TempoState m String
 doMood (OSC.ASCII_String "energetic") =
-  setProgs [ pSideEmitter "a" (VolumeInput, [2]) (KickInput, [10]) (0.2 :: Double) ((* 10) . sinMod) ((-30) :: Double)
+  setProgs [ pSideEmitter "a" (VolumeInput, Identity 2) (KickInput, Identity 10) (0.2 :: Double) ((* 10) . sinMod) ((-30) :: Double)
            , (pSine "b" (* 1) (1 :: Double) (1 :: Double))
            ]
 
@@ -167,8 +168,8 @@ doInput _ _ = return "Invalid value"
 progMap :: Map Int Program
 progMap = fromList [ (0, pAudioData "aa" 1 AudioTexInput)
                    , (1, pInput "ab" CameraTexInput |+| pEdges 0 |+| pBrightness 2 1)
-                   , (2, pLines "ac" (KickInput, [0.1]) 0.2 |+| pMirror)
-                   , (3, pFlocking "ad" (KickInput, [ 80 ]) 1.0 64 |+| pFade 0.4)
+                   , (2, pLines "ac" (KickInput, Identity 0.1) 0.2 |+| pMirror)
+                   , (3, pFlocking "ad" (KickInput, Identity 80) 1.0 64 |+| pFade 0.4)
                    , (5, pShapes "ae" ((+ 3) . (* 6) . sinMod') 0.2 0.2 |+| pRepeat 9)
                    , (6, pStringTheory "af" (* 3) sinMod' 1 |+| pRepeat 3 |+| pFilter (* 1))
                    , (7, pShapes "ag" ((+ 3) . (* 6) . sinMod') 0.4 0.2 |+| pLittlePlanet)
@@ -176,11 +177,11 @@ progMap = fromList [ (0, pAudioData "aa" 1 AudioTexInput)
 
 effMap :: Map Int [Effect]
 effMap = fromList [ (0, [pFade 0.94])
-                 , (1, [pFade 0.7, pFade (VolumeInput, [1])])
+                 , (1, [pFade 0.7, pFade (VolumeInput, Identity 1)])
                  , (2, [ pLittlePlanet ])
                  , (3, [ pFilter (* 1) ])
-                 , (4, [ pFilter (VolumeInput, [ 2 ]) ])
-                 , (5, [ pScale' (KickInput, [ 0.07 ]), pScale' (-0.015), pFade 0.98  ])
+                 , (4, [ pFilter (VolumeInput, Identity 2) ])
+                 , (5, [ pScale' (KickInput, Identity 0.07), pScale' (-0.015), pFade 0.98  ])
                  , (6, [ pBlur 27 ])
                  , (7, [ pEdges 0 ])
                  , (8, [ pLumidots ])

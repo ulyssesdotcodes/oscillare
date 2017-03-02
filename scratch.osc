@@ -12,97 +12,27 @@ base $ (|-|)
 
 t 60
 
-p $ ptTriggered "b" "d f g" (KickInput, [1.2])
-  |+| pPaletteCycle EclecticPalette ((* 0.2) <$$> absTimePattern)
-
-p $ pOver "a" "b d c"
-
-p $ pMult "a" ""
+p $ pOver "z" "y a"
 
 p $ pInput "a" BlankTex
+  |+| pPaletteMap EclecticPalette (VolumeInput, [1])
+  |+| pStrobe 5
 
-p $ pBlank "a"
+p $ ptTriggered "y" "b" [1, 0]
 
-p $ pInput "b" CameraTexInput
-  |+| pEdges 1
+p $ pStringTheory "b" 5 (VolumeInput, [1]) 0.5
+  |+| pTranslate (* 1) 0
 
-p $ pFadeComp "z" "y x" (midi "fader3")
+p $ pFlocking "a" (VolumeInput, [4]) 1 (KickInput, [4])
+  |+| pPaletteCycle EclecticPalette (* 1)
+  |+| pOverlay 0.99
 
-p $ pVoronoi "b" ((* 0.4) <$$> absTimePattern)
-  |+| pPaletteMap RibbonPalette (sinMod' . (* 0.7) <$$> absTimePattern)
-  |+| pRepeat (* 4)
+p $ pAudioData "a" 1 AudioTexInput
+  |+| pPaletteCycle EclecticPalette (KickInput, [2])
+  |+| pOverlay 0.94
 
-p $ pMult "z" "y b"
+p $ pLines "b" (KickInput, [0.1, 0.1]) (KickInput, [0.5, 0.1])
+  |+| pBrightness 0.2 0
 
-p $ pAdd "y" "x w v"
+p $ pShapes "z" 5 (PassInput, [(* 1), const 0.5, const 0, const 0]) 0.2
 
-p $ pShapes "z" 3 0.3 0
-  |+| pRepeat 20
-
-p $ pShapes "x" 4 0.3 0
-  |+| pBrightness (sinMod') 0
-
-p $ pShapes "w" 3 0.3 0
-  |+| pTranslate 0.3 0
-  |+| pBrightness (sinMod' . (+ 0.33)) 0
-
-p $ pShapes "v" 5 0.3 0
-  |+| pTranslate (-0.3) 0
-  |+| pBrightness (sinMod' . (+ 0.66)) 0
-
-p $ pFadeComp "a" "b c" (midi "fader3")
-
-p $ ptTriggered "a" "b" 0
-  |+| pClone 2 0 0.2 0 0
-
-p $ pAudioData "b" 0.7 AudioTexInput
-  |+| pPaletteCycle EclecticPalette ((* 0.4) <$$> absTimePattern)
-  |+| pFade 0.97
-
-p $ pSine "b" ((* 1.2) <$$> absTimePattern) 1 1
-  |+| pPaletteCycle EclecticPalette ((* 0.4) <$$> absTimePattern)
-  |+| pFade 0.97
-
-p $ pVoronoi "a" (VolumeInput, [absTimePattern])
-  |+| pEdges
-  |+| pPaletteCycle EclecticPalette ((* 0.3) <$$> absTimePattern)
-
-p $ pAudioData "c" 1 (EqTexInput, [128])
-  |+| pTranslate (0.5) 0.2
-  |+| pRotate (3.1415 * 0.5)
-  |+| pFilter (VolumeInput, [2])
-  |+| pMirror
-
-p $ pCircleEmitter "b" 3 (VolumeInput, [16]) 0 0 AudioTexInput
-  |+| pPaletteMap PurpleBluePalette 0
-  |+| pOverlay 0.9
-
-p $ pShapes "a" 5 (VolumeInput, [0.5]) 0.5
-  |+| pClone 0.1 0 (-0.1) (-0.1)
-
-p $ pStringTheory "b" (VolumeInput, [1]) (VolumeInput, [1]) 1
-  |+| pRotate (3.1415 * 0.5)
-  |+| pScale' (0.4)
-  |+| pTranslate 0 ((* (-0.3)) <$$> absTimePattern)
-  |+| pScale' (VolumeInput, [0.1])
-  |+| pOverlay (midi "fader2")
-
-p $ pLines "a" (VolumeInput, [0.01]) 0.6
-  |+| pRepeat 3
-  |+| pNoiseDisplace (KickInput, [10])
-
-
-p $ pFadeComp "a" "b c" (midi )
-
-p $ pInput "z" CameraTexInput
-  |+| pEdges (KickInput, [5])
-  |+| pClone 0 (KickInput, [0.2])
-
-p $ pOver "a" "b c"
-
-p $ pFlocking "z" (KickInput, [4]) 0.7 (KickInput, [2])
-  |+| pFade 0.99
-
-p $ pVoronoi "c" ((* 0.2) <$$> absTimePattern)
-  |+| pBrightness (VolumeInput, [20]) 0
-  |+| pPaletteMap PurpleBluePalette (sin . (* 0.6) <$$> absTimePattern)
