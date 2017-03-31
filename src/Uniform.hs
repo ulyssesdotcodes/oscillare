@@ -43,8 +43,11 @@ data TexInput =
   AcidPalette
   | AudioTexInput
   | CameraTexInput
+  | DesaturatedPalette
   | EqTexInput
   | EclecticPalette
+  | LavaPalette
+  | NoiseTex
   | PrayerFlagPalette
   | PurpleBluePalette
   | RibbonPalette
@@ -55,8 +58,11 @@ texInputText :: TexInput -> ByteString
 texInputText AcidPalette = "acid_palette"
 texInputText AudioTexInput = "audio_texture"
 texInputText CameraTexInput = "camera_texture"
+texInputText DesaturatedPalette = "desaturated_palette"
 texInputText EqTexInput = "eq_texture"
 texInputText EclecticPalette = "eclectic_palette"
+texInputText LavaPalette = "lava_palette"
+texInputText NoiseTex = "noise"
 texInputText PrayerFlagPalette = "prayer_flag_palette"
 texInputText PurpleBluePalette = "purple_blue_palette"
 texInputText RibbonPalette = "ribbon_palette"

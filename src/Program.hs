@@ -27,6 +27,7 @@ data EffectType =
   | Lumidots
   | LittlePlanet
   | Mirror
+  | Mosaic
   | NoiseDisplace
   | Overlay
   | PaletteCycle
@@ -60,6 +61,7 @@ data BaseType =
 
   | Add
   | Displace
+  | Mask
   | Mult
   | Over
   | Passthrough
@@ -82,6 +84,7 @@ effectName HueShift = "hue_shift"
 effectName Lumidots = "lumidots"
 effectName LittlePlanet = "little_planet"
 effectName Mirror = "mirror"
+effectName Mosaic = "mosaic"
 effectName NoiseDisplace = "noise_displace"
 effectName Overlay = "overlay"
 effectName PaletteCycle = "palette_cycle"
@@ -115,6 +118,7 @@ baseName Voronoi = "voronoi"
 
 baseName Add = "add"
 baseName Displace = "displace"
+baseName Mask = "mask"
 baseName Mult = "mult"
 baseName Over = "over"
 baseName Passthrough = "pt"
@@ -223,6 +227,7 @@ pFadeComp s sp uIndex = baseProg s FadeComp $ upsWithBase "passthroughs" sp `map
 ptTriggered s sp uTrig = baseProg s TriggeredPassthrough $ upsWithBase "passthroughs" sp `mappend` upf "trigger" uTrig
 pAdd s sp = baseProg s Add (upsWithBase "references" sp)
 pDisplace s sp = baseProg s Displace (upsWithBase "references" sp)
+pMask s sp = baseProg s Mask (upsWithBase "references" sp)
 pMult s sp = baseProg s Mult (upsWithBase "references" sp)
 pOver s sp = baseProg s Over (upsWithBase "references" sp)
 
@@ -238,6 +243,7 @@ pHueShift u = singleUEffect HueShift u
 pLittlePlanet = Effect LittlePlanet mempty
 pLumidots = Effect Lumidots mempty
 pMirror = Effect Mirror mempty
+pMosaic uScale uTime = Effect Mosaic $ mconcat [upf "time" uTime, upf "scale" uScale]
 pNoiseDisplace u = Effect NoiseDisplace $ upf "displacement" u
 pOverlay u = singleUEffect Overlay u
 pPaletteCycle uPalette uOffset = Effect PaletteCycle $ mconcat [upt "palette" uPalette, upf "offset" uOffset]
