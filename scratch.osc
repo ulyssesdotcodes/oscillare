@@ -1,1 +1,139 @@
-r $ adata (float 3)
+r <- topRunner
+
+let comp = constC [float 0]
+
+let comp = tox "toxes/relay.tox" [] (Just $ mergeC [constC [mchan "b1"], count' ((countThresh ?~ mchan "s1a" !* float 0.05) .
+                                     (countLimMax ?~ float 1) .
+                                     (countLimType ?~ int 1)
+                                    ) highv, count' ((countThresh ?~ mchan "s1b") .
+                                     (countLimMax ?~ float 1) .
+                                     (countLimType ?~ int 1)
+                                    ) lowv, count' ((countThresh ?~ mchan "s1c" !* float 0.5) .
+                                     (countLimMax ?~ float 1) .
+                                     (countLimType ?~ int 1)
+                                    ) volume])
+
+r $ adata (float 1)
+  & palettecycle neon (seconds !* float 10)
+  & fade (mchan "s1")
+
+r . (\t -> (comp, t)) $ adata (float 1)
+
+r $ addops [adatat 0.3 0.5 , adatat 0.5 0.5 , adatat 0.7 1.3, adatat 1.5 0.5]
+  & noisedisplace (lowvc !* float 40)
+  & translate (seconds !* float 0.2, float 0)
+  & edges
+  & fade' id (translatey (float 0.1 !* volc)) ((float 0.5 !* mchan "s1") !+ float 0.5)
+  & palettemap fire (sincycle 0.3 1)
+  & sat (float 1.3)
+  & val (float 1.2)
+  & mosaic seconds (float 40)
+  & translate (seconds !* float 0.2, float 0)
+  & flowermod (seconds !* float 0.2)
+
+r . (\t -> (comp, t))  $ adata (float 2)
+  & translatey (scycle 0.3 0.8)
+  & mirror
+  & paletterepeatT neon (scycle 0.8 10)
+  & fade (float 0.9)
+  & val (float 0.6)
+
+shapes ((volc !* float 3) !+ float 3) ((highvc !* float 22) !+ float 0.1) (lowvc !* mchan "s2")
+
+r $ adata (float 1)
+  & littleplanet
+  & translatey (float (-0.1))
+  & fade' id (translatey (float 0) . scalexy (float (0.04) !* lowvc)) (float 0 !+ float 0.5)
+  & palettemap fire (sincycle 0.8 1)
+  & sat (float 0.8)
+  & val (float 0)
+
+r $ sphereNoise
+
+r $ flocking (float 1, float 2) (float 3)
+  & palettecycle buddhist seconds
+  & val (float 2)
+  & fade (mchan "s1")
+
+let adatat x y = adata (float y) & translatey (float x)
+
+r $ addops [adatat 0.3 0.5 & littleplanet & translatey (float (-0.5)), adatat 0 1 & rotate (float 90) & flowermod seconds, adatat 0.3 1.3]
+  & translatex (seconds !* float 0.4)
+  & fade (mchan "s1")
+  & palettemap buddhist (seconds !* float 0.6)
+  & sat (float 0.75)
+  & val (float 1.7)
+  & mosaic seconds (float 20)
+
+r $ addops [adata (float 1) & repeatT (float 2), adata (float 1) & repeatT (float 2) & rotate (float 90)]
+  & rotate (mchan "b1" !* float 45)
+  & translate (float 0, float 0)
+  & fade' id ((scalexy (float (0.04) !* lowvc)) . (translatey (float (0.005)))) (float 0.5 !+ (float 0.5 !* mchan "s1"))
+  & palettemap fire (sincycle 0.4 1)
+  & sat (float 1.1)
+  & val (float 1.8)
+  & mosaic seconds (float 60)
+
+
+let adatat x y = adata (float y) & translatey (scycle x 1)
+
+r $ multops [shapes (float 6) (float 0.8 !+ lowvc) (float 0.2) & paletterepeatT neon (float 10), lines (volc !* float 0.8) (float 0.2) & translatex (seconds !* float 0.3) & mirror]
+  & val (float 1)
+  & fade' id ((scalexy (float (-0.02) !* lowvc)) . (translatey (float (-0.01)))) (float 0.99)
+  & fade (volc !* float 5)
+
+
+
+let churchmap = movie (float 0) "church.png" & transformT' ((transformExtend ?~ int 2) . (transformTranslate .~ (Just $ float 0.002, Just $ float (-0.04))))
+
+
+
+r $ multops
+    [ churchmap & blur (float 4) & val (float 4)
+    , flocking (float 0.5, float 4) (float 3.1) & fade (float 0.95)
+    ]
+  & palettecycle neon
+  & fade' id (scalexy (lowvc !* float 0.04)) (float 0.93)
+  & val (float 10)
+
+r $ adata (float 1)
+  & val (float 0)
+
+r $ movie ((lowvc !+ seconds) !* float 30 !+ float 1800) "highway.mp4" & edges & val (mchan "b1")
+  
+
+r $ addops [movie (float 60 !+ (lowvc !* float 300)) "Purple flowers.mp4"
+  & edges
+  & mirror
+  & fade (mchan "s1")
+  , adata (float 1) & palettecycle fire & translate (Just $ float 0, Just $ float 0.5) & val (mchan "b1")
+    & fade' id (scalexy (float (-0.02) !* lowvc)) (lowvc !* float 2)
+  ]
+
+-- Purple flowers bass start
+
+r $ movie (float 60 !+ (lowvc !* float 360)) "Purple flowers.mp4"
+  & fade (volc !* float 5)
+
+-- abstract adata rotating
+
+let adatat x y = adata (float y) & translatey (scycle x 1) & rotate (float (x * 180) !* seconds)
+
+r $ addops [adatat 0.3 0.5, adatat 0.5 1, adatat 0.7 1.3, adatat 1.5 1.3]
+  & fade (float 0.9)
+  & palettemap buddhist (float 0.2 !* seconds)
+  & val (float 0.3)
+  & fade' id (scalexy (float 0.02 !* volc)) (float 0.7)
+
+-- chaos adata
+
+r $ adata (float 1)
+  & noisedisplace (lowvc !* float 100)
+  & translate (Just $ seconds !* float 0.1 !+ (volc !* float 2), Just $ seconds !* float 0.3)
+  & mirror
+  & repeatT (float 3)
+  & palettecycle buddhist
+  & val (float 1.3)
+  & fade' id (littleplanet . translate (Just $ float 0.1 !* seconds, Just $ float (0.01))) (float 0.97)
+  & mirror
+  & repeatT (float 0.7)

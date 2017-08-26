@@ -42,27 +42,22 @@ PROMPT-OPTIONS are passed to `intero-repl-buffer' if supplied."
   (intero-repl)
   (oscillare-send-string ":load src/Visuals")
   (oscillare-send-string "r <- topRunner")
-  (split-window-below-and-focus)
   )
 
 (defun oscillare-mode-keybindings (map)
   "Oscillare keybindings"
   (define-key map (kbd "<C-return>") 'oscillare-run-multiple-lines))
 
-(defvar oscillare-mode-map nil
+(defvar oscillare-mode-map (make-sparse-keymap)
   "Keymap for oscillare")
-
-(if oscillare-mode-map
-         ()
-       (let ((map (make-sparse-keymap "Oscillare")))
-             (oscillare-mode-keybindings map)
-             (setq oscillare-mode-map map)))
 
 (define-minor-mode
   oscillare-mode
-  "Oscillare"
-  "Minor mode for interacting with oscillare.")
+  "Minor mode for Oscillare"
+  :lighter " oscillare"
+  :keymap oscillare-mode-map)
 
-(add-to-list 'auto-mode-alist '("\\.osc$" . oscillare-mode))
+(define-key oscillare-mode-map (kbd "<C-return>") 'oscillare-run-multiple-lines)
+
 
 (provide 'oscillare)

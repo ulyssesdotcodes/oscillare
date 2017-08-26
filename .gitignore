@@ -23,6 +23,7 @@ tags
 /.dir-locals.el
 .#*
 test.*
+*.mp4
 
 # package  
 rtmidi/

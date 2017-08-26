@@ -4,6 +4,7 @@ module Visuals where
 
 import LambdaDesigner.Op
 import LambdaDesigner.Lib
+import Data.IORef
 
 import Prelude hiding (floor, mod, lines)
 
@@ -15,6 +16,9 @@ import qualified Data.ByteString.Char8 as BS
 data VoteType = Movie | Effect deriving Eq
 data VoteEffect = VoteEffect VoteType BS.ByteString BS.ByteString BS.ByteString deriving Eq
 
+compRunner :: IO ((Tree CHOP, Tree TOP) -> IO ())
+compRunner = do init <- newIORef mempty
+                return $ \(a, b) -> run2 init [outT $ b] [a]
 
 ain' m = math' (mathMult ?~ float m) [audioIn]
 ain = ain' 1
@@ -54,7 +58,7 @@ launchmapping = strobe (float 10 !* mchan "s1c")
   $ switchT (float (-1) !+ (chopChan0 $ hold buttons buttons))
           [adata (mchan "s1a" !* float 2), shapes (float 3 !+ scycle 1 3) (volc !* mchan "s2a") (mchan "s2b")]
 
-effects = [ \n -> palettecycle' (passmchan n) neon
+effects = [ \n -> palettecycle' (passmchan n) neon seconds
           , \n -> translatex' (passmchan n) (mchan ("s" ++ show n) !* seconds)
           , \n -> paletterepeatT' (passmchan n) neon (float 20 !* mchan ("s" ++ show n))
           , \n -> mirror' (passmchan n)
@@ -68,7 +72,7 @@ mheld n = constC [float (fromIntegral n) !* (mchan $ "b" ++ show (n + 8))]
 
 stresstest = fadeops (float 0.5) [
        noisedisplace (float 10) $ mosaic (seconds !* float 20) (float 100) $
-       fade (float 0.96) $ blur (float 128) $ palettecycle neon $
+       fade (float 0.96) $ blur (float 128) $ palettecycle neon seconds $
        flocking (float 0.5, float 1) (float 10 !* volc),
        blur (float 27) $
        fade (float 0.99) $ flocking (float 0.4, float 1) (float 10 !* volc)]
@@ -127,6 +131,10 @@ stringtheory t a = frag "string_theory.frag" [ ("i_time", xV4 t)
                                              , ("i_angle_delta", xV4 $ float 0.2)
                                              , ("i_xoff", xV4 $ float 0)
                                              ] []
+movie s f = movieFileIn' ((moviePlayMode ?~ int 1) .
+                          (movieIndex ?~ casti s) .
+                          (topResolution .~ iv2 (1920, 1080))) $ str $ "videos/" ++ f
+
 -- vidIn
 
 -- Effects
@@ -152,7 +160,7 @@ mosaic' f t s top = frag' f "mosaic.frag" [("uTime", xV4 t), ("uScale", xV4 s)] 
 mosaic = mosaic' id
 noisedisplace' f d top = frag' f "noise_displace.frag" [("uTime", xV4 seconds), ("uDisplacement", xV4 d)] [top]
 noisedisplace = noisedisplace' id
-palettecycle' f p t = compT' f 27 [crop' ((cropLeft ?~ seconds) . (cropRight ?~ seconds)) $ palette p, t]
+palettecycle' f p s t = compT' f 27 [crop' ((cropLeft ?~ s) . (cropRight ?~ s)) $ palette p, t]
 palettecycle = palettecycle' id
 palettemap' f p o t = frag' f "palette_map.frag" [("uOffset", xV4 o), ("uSamples", xV4 $ float 16)] [t, palette p]
 palettemap = palettemap' id
@@ -168,10 +176,10 @@ scalexy = scalexy' id
 strobe' f s top = frag' f "strobe.frag" [("uSpeed", xV4 s), ("uTime", xV4 seconds)] [top]
 strobe = strobe' id
 translate' f t = transformT' ((transformExtend ?~ int 3) . (transformTranslate .~ t) . f)
-translate = translate' id
-translatex' f x = translate' f $ emptyV2 & _1 ?~ x
+translate (a, b) = translate' id (Just a, Just b)
+translatex' f x = translate' f $ (Just x, Just $ float 0)
 translatex = translatex' id
-translatey' f y = translate' f $ emptyV2 & _2 ?~ y
+translatey' f y = translate' f $ (Just $ float 0, Just y)
 translatey = translatey' id
 val v = hsvT' (hsvAdjValMult ?~ v)
 
