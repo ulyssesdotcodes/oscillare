@@ -8,7 +8,7 @@ packages:
 - '.'
 - location:
     git: git@github.com:ulyssesp/lambdadesigner.git
-    commit: d18bec16525a7a15f7173acda09349bd16ac2e08
+    commit: e58e5a4b7698f237157f1518ff8689c3a04c1349
   extra-dep: true
 
 # Packages to be pulled from upstream that are not in the resolver (e.g., acme-missiles-0.3)

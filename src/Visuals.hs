@@ -110,10 +110,11 @@ metaballs mat = let wrapJust n x = Just $ chopChan0 x !* float n
                                    (chopChan 2 noisex !+ float (-0.2))
                                    (chopChan 2 noisey !+ float (-0.7))
                                  ]
-movingSquiggly = rendered $ geo' ((geoTranslate .~ (Just $ chopChan0 $ mnoise 5, Just $ chopChan0 $ mnoise 10, Just $ float  0)) .
+movingSquiggly = geo' ((geoTranslate .~ (Just $ chopChan0 $ mnoise 5, Just $ chopChan0 $ mnoise 10, Just $ float  0)) .
             (geoScale.each ?~ float 0.3) .
             (geoMat ?~ constM' (constColor .~ (Just $ osin $ seconds, Just $ osin $ (seconds !* float 2), Just $ osin $ (seconds !* chopChan0 volume)))))
-       $ outS acirc
+            $ outS acirc
+
 particlemover v a p s = tox "toxes/Visuals/particlemover.tox" [ ("Palette", ResolveP $ palette p)
                                                             , ("Vmult", ResolveP v)
                                                             , ("Emitalpha", ResolveP a)
@@ -134,6 +135,8 @@ stringtheory t a = frag "string_theory.frag" [ ("i_time", xV4 t)
 movie s f = movieFileIn' ((moviePlayMode ?~ int 1) .
                           (movieIndex ?~ casti s) .
                           (topResolution .~ iv2 (1920, 1080))) $ str $ "videos/" ++ f
+
+geoT tr sc top sop = render (geo' ((geoTranslate .~ tr) . (geoScale .~ sc) . (geoMat ?~ topM top)) (outS sop)) cam
 
 -- vidIn
 
@@ -166,6 +169,7 @@ palettemap' f p o t = frag' f "palette_map.frag" [("uOffset", xV4 o), ("uSamples
 palettemap = palettemap' id
 repeatT' f r top = frag' f "repeat.frag" [("i_repeat", xV4 r)] [top]
 repeatT = repeatT' id
+rgbsplit' s top = frag' id "rgbsplit.frag" [("uFrames", xV4 s)] [top]
 rotate' f r = transformT' (transformRotate ?~ r)
 rotate = rotate' id
 sat s = hsvT' (hsvAdjSatMult ?~ s)
@@ -182,6 +186,8 @@ translatex = translatex' id
 translatey' f y = translate' f $ (Just $ float 0, Just y)
 translatey = translatey' id
 val v = hsvT' (hsvAdjValMult ?~ v)
+
+clone c (tx, ty) (sx, sy) top = frag' id "clone.frag" [("uClones", xV4 c), ("uTranslate", emptyV4 & _1 ?~ tx & _2 ?~ ty), ("uScale", emptyV4 & _1 ?~ sx & _2 ?~ sy)] [top]
 
 -- combiners
 

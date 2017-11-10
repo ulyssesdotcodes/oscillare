@@ -6,7 +6,17 @@ Requires https://github.com/ulyssesp/oschader-cinder as a backend.
 
 ### Installation
 
-#### Emacs
+#### Prerequisites
+
+* TouchDesigner
+* Haskell (only tested with [haskellstack](https://docs.haskellstack.org/en/stable/README/))
+* An editor (preferably emacs)
+
+#### Editor configuration
+
+##### Emacs
+
+If you're using spacemacs, in `dotspacemacs-configuration-layers` add `(haskell :variables haskell-completion-backend 'intero)`.
 
 Add these lines to your configuration. If you're using spacemacs they should go into `user-config`. Replace the load path with where Oscillare is located.
 
@@ -18,175 +28,100 @@ Add these lines to your configuration. If you're using spacemacs they should go 
 (require 'oscillare)
 ```
 
-#### Other editors
+##### Other editors
 
 You can probably try the instructions located at http://tidalcycles.org/getting_started.html, but they haven't been tested.
 
 
+### Running
+
+#### 1. Start TouchDesigner
+
+You have to start with the correct project loaded. Open `FunctionalDesigner.toe` from the TD directory.
+
+#### 2. Load oscillare
+
+1. Open `scratch.osc`
+2. Run the command `intero-mode`
+3. Run the command `oscillare-start-haskell` 
+4. Switch back to `scratch.osc`
+5. Run the command `oscillare-mode`
+6. Press C-Enter while the cursor is over the code directly below "Initialization check"
+
+
+---------------
+
+Note: This is really bad right now. It will be easier soon. Sorry for the hassle.
+
+
+#### 3. Check that it's working in TouchDesigner
+
+The `lambda` COMP should have a TOP output of a bunch of triangles that move!
+
 ### Usage
-
-First, make sure it's installed correctly:
-
-1. Install oscillare
-2. Start [Oschader](`https://github.com/ulyssesp/oschader-cinder`)
-3. Run `oscillare-start-haskell`
-4. Double check that you see `Prelude Oscillare>` when you run `oscillare-see-output`
 
 Now it's time to get started! Check out `scratch.osc` for some example programs. So long as everything is set up correctly and you have a .osc file open you can run individual lines by pressing `Ctrl-c Ctrl-c`. You can see the haskell buffer by pressing `Ctrl-c Ctrl-s`.
 
 For example, to display a simple sine wave:
 
-`p $ pSine "s" 0 1 1`
+`r $ sineT (float 0) (float 1) (float 1)` 
 
 This creates a Sine program and places it in the "s" slot, which is the main slot you'll see displayed.
 
 
 To get it moving:
 
-`p $ pSine "s" (* 1) 1 1`
+`r $ sineT seconds (float 1) (float 1)` 
 
-Since the first input of `pSine` is the x position, that's the one we want to edit. If there's a function in that position like `(* 1)` then it will take the base time and apply that function to it.
+Since the first input of `sineT` is the x position, that's the one we want to edit. Using `seconds` there maps the x position to `absTime.seconds` in TouchDesigner.
 
 
 Let's make it scale too:
 
-`p $ pSine "s" (* 1) ((+ 1) . (* 2)) 1`
+`r $ sineT seconds (float 2 !+ (scycle 1 1 !* float 2)) (float 1)` 
 
-Note that we can combine functions with Haskell's `.` operator.
+`scycle x y` cycles the value `y` at `seconds * x` speed. Note that we can combine functions with `!+` and `!*`.
 
 
-But it's still jerky! We can make it slightly more smooth by using a handy built in `sinMod'` that oscilates between 0 and 1.
+But it's still jerky! We can make it slightly more smooth by using `sincycle` instead of `scycle` that oscilates between 0 and 1.
 
-`p $ pSine "s" (* 1) ((+ 1) . (* 2) . sinMod') 1`
-
-There's also a `sinMod` operator that goes between -1 and 1, and `cos` versions of both.
+`r $ sineT seconds (float 2 !+ (sincycle 1 1 !* float 2)) (float 1)` 
 
 
 Now let's make it react to some audio!
 
-`p $ pSine "s" (* 1) ((+ 1) . (* 2) . sinMod') (VolumeInput, 1)`
+`r $ sineT seconds (float 2 !+ (sincycle 1 1 !* float 2)) (volc)` 
 
-We can use float inputs like `VolumeInput` in place of any float value or function. The form for inputs is always `([Input], [float modifier])`
+We can use float inputs like `volc` in place of any float value or function. 
 
-
-Adding an effect can be done with the `|+|` operator
-
-```
-p $ pSine "s" (* 1) ((+ 1) . (* 2) . sinMod') (VolumeInput, 1)
-  |+| pFade 0.98
-```
-
-If we use an array instead of a plain float value, it goes in sequence over Oscillare's cycle
+Adding an effect can be done with the `&` operator
 
 ```
-p $ pSine "s" (* 1) ((+ 1) . (* 2) . sinMod') (VolumeInput, 1)
-  |+| pFade [0.5, 0.98]
+r $ sineT seconds (float 2 !+ (sincycle 1 1 !* float 2)) (volc)
+  & fade (float 0.95)
 ```
 
-We can also use `pt` to switch between programs but keep them in memory, and apply effects to both programs:
+
+We can also use `triggerops` to switch between programs but keep them in memory, and apply effects to both programs:
 
 ```
-p "s" $ pt ["a", "b"']
-  |+| pFade [0.5, 0.98]
-
-p $ pSine "a" (* 1) ((+ 1) . (* 2) . sinMod') (VolumeInput, 1)
-
-p $ pAudioData "b" 1 (AudioTexInput, 1)
+r $ triggerops (constC [sincycle 1 1])
+  [ sineT seconds (float 2 !+ (sincycle 1 1 !* float 2)) (volc)
+  , adata (float 1)
+  ]
 ```
 
 If we want to combine them instead of switching between them, that's easy too.
 
 ```
-p "s" $ pAdd ["a", "b"']
-  |+| pFade [0.5, 0.98]
-
-p $ pSine "a" (* 1) ((+ 1) . (* 2) . sinMod') (VolumeInput, 1)
-
-p $ pAudioData "b" 1 (AudioTexInput, 1)
-```
-
-Finally let's slow everything down a bit:
-
-```
-t 2.3
-```
-
-### Inputs
-
-There are three input types: strings, floats, and textures. Each one can be a single value, a list, a pattern, or a backend input with modifier. 
-
-Single values are sent every frame, lists are split evenly over a single cycle, and patterns are evaluated and sent. 
-
-Backend inputs have to be selected from valid input types:
-
-Float inputs are `VolumeInput`, and `KickInput`. The modifier for both multiplies the value.
-
-Texture inputs are `(CameraTexInput, [not used])`, `(EqTexInput, [number of bands])`, and `(AudioTexInput, [not used])`.
-
-There are no string inputs right now.
-
-### Base Programs
-
-Base programs draw directly to an FBO.
-
-```
-pAudioData Volume(float) Data(texture)
-pDots  Volume(float) Data(texture)
-pFlocking  Separation(float) Mult(float) Speed(float) 
-pLines  Width(float) Spacing(float)
-pImage Image(Image)
-pInput  Input(texture)
-pShapes  Sides(float) Width(float) Size(float) 
-pStringTheory  TimeMod(float) Angle(float) AngleDelta(float) Xoff(float) 
-pSine  XPos(float) Scale(float) Amplitude(float) 
-pText  Text(string)
-```
-
-### Effects
-
-Effects take a base fbo and perfor some operation on it.
-
-```
-pBrightness Brightness(float)
-pFade Fade(float)
-pFilter Filter(float)
-pMirror
-pOverlay Fade(float)
-pRepeat Times(float)
-pReverse
-pRotate Rotation(float)
-pScale XScale(float) YScale(float)
-pScale' XYScale(float)
-pTranslate XScale(float) YScale(float)
-```
-
-### Passthroughs
-
-Passthroughs take a slot name (or list, or pattern) and apply their own effects on top.
-
-```
-pt Slot(string)
-ptTriggered Slots(string) // Note that since triggers can span multiple cycles, the Slots input here is a space-separated list of slots e.g. "a b c"
-```
-
-### Layers
-
-Layers combine multiple slots into one and add effects
-
-```
-pAdd Slot(string)
-pMult Slot(string)
+r $ addops
+  [ sineT seconds (float 2 !+ (sincycle 1 1 !* float 2)) (volc)
+  , adata (float 1)
+  ]
 ```
 
 ### Tips and Tricks
 
 - Alpha transparent emacs can be found at https://www.emacswiki.org/emacs/TransparentEmacs
 
-### Known Issues
-
-- On OSX you have to start oschader-cinder first. If you quit oschader-cinder you have to restart oscillare.
-- Effects on programs using passthrough don't work.
-- EqTexInput is buggy
-- Stack overflows are still possible - be wary!
-
-    Copyright (C) 2016  Ulysses Popple
+    Copyright (C) 2017  Ulysses Popple
