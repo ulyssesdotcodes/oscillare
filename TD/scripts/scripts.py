@@ -15,11 +15,13 @@ classes = {
   'inTop' : (inTOP, 'in', 'TOP'),
   'nullTop' : (nullTOP, 'null', 'TOP'),
   'outTop' : (outTOP, 'out', 'TOP'),
+  'rectangleTop' : (rectangleTOP, 'rectangle', 'TOP'),
   'render' : (renderTOP, 'render', 'TOP'),
   'hsvAdjustTop' : (hsvadjustTOP, 'hsvadj', 'TOP'),
   'levelTop' : (levelTOP, 'level', 'TOP'),
   'transform' : (transformTOP, 'transform', 'TOP'),
   'noiseTop' : (noiseTOP, 'noise', 'TOP'),
+  'ndiinTop' : (ndiinTOP, 'ndiin', 'TOP'),
   'ramp' : (rampTOP, 'ramp', 'TOP'),
   'switchTop' : (switchTOP, 'switch', 'TOP'),
   'selectTop' : (selectTOP, 'select', 'TOP'),
@@ -129,6 +131,8 @@ def apply(newState):
         addParameter(curop, splits[2], diffi[2][1])
       elif diffi[0] == 'remove':
         for param in diffi[2]:
+          if(param[0] == 'tx'):
+            curop.par.tx = 0
           par = curop.pars(param[0])[0]
           if par.val:
             par.val = par.default
@@ -203,7 +207,7 @@ def createOp(addr, ty):
     op(addr).destroy()
 
   # Special case things that can't have duplicates
-  if clazz[1] == 'audiodevin' or clazz[1] == 'videodevin':
+  if clazz[1] == 'audiodevin' or clazz[1] == 'videodevin' or clazz[1] == 'ndiin':
     if op(clazz[1]) == None:
       parent().create(clazz[0], clazz[1])
     if clazz[2] == "CHOP":
