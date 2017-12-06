@@ -2,17 +2,16 @@ r <- topRunner
 
 -- Initialization check
 
-r $ shapes (float 3) (float 0.3) (float 0.3)
-  & fade (float 0.95)
+r $ shapes (float 3) (float 0.3 !+ volc) (float 0.3)
   & repeatT (float 30)
   & translatex (seconds !* float 0.1)
-
-
 
 -------------------------------------------------------------------------
 -- For shows
 
 r $ sineT seconds (float 1) (float 1)
+
+r $ sineT seconds (chopChanName "s8" $ oscin 9000) (float 0.9)
 
 r $ addops [sineT seconds (float 2 !+ (sincycle 1 1 !* float 2)) (volc), sineT seconds (float 2 !+ ((sincycle 1 1 !* float 1.33))) (volc) & translatey (float 0.3)]
   & littleplanet
@@ -27,13 +26,106 @@ r $ vidIn
 
 let camT = compT' (topResolution .~ iv2 (1920, 1080)) 0 [vidIn]
 
-r $ addops [
-    vidIn
-    & edges
-  , adata (float 1)
-  ]
+let ndiops t = overops [ ndiinT ""
+                       , t
+                       ]
+
+let commandCode t = textT' ( (topResolution .~ (Just $ int 1920, Just $ int 1080))
+                           . (textFontSize ?~ float 62)
+                           . (textAlign .~ iv2 (0, 2))
+                           ) (str t)
+
+r $ addops [ commandCode {Command}
+             & translatex (seconds !* float 0.2)
+           , adata (float 1)
+             & fade (float 0.95)
+           ]
+           & transformscale (Just $ float 2, Just $ float 2) 0
+
+
+r $ addops [ adata (float 0.5)
+             & translatey (volc !* float 0.6)
+             & rotate (float 45)
+             & mirror
+             & val (float 1.5)
+             & rotate (float 45 !* seconds)
+             & scalexy (float 0.7)
+             & palettecycle buddhist (seconds !* float 0.4)
+             & fade (float 0.97)
+             & val (float 1 !+ (volc !* float (-1.5)))
+           , flocking (float 0.5, float 4 !* volc) (float 0.5)
+             & fade (float 0.8 !* volc !+ float 0.3)
+             & palettemap buddhist ((seconds !* float 0.4) !+ float 0.5)
+             & val (volc !* float 3)
+           ]
+
+
+
+addops [ adata (float 0.7) & translatey (float 0.3 !* seconds) & palettecycle neon (seconds !* float 0.5) & fade ((volc !* float 0.3) !+ float 0.6)
+           , adata (float 1) & mosaic (seconds) (float 80)
+           , adata (float 1) & translatey (float (-0.4) !* seconds) & edges & noisedisplace (volc !* float 10) & val (float 0.3)
+           ]
+      & fade' id (scalexy (float 0.01 !* volc)) (sincycle 1.3 0.38 !+ float 0.6)
+
+addops [ addops [ adata (float 4)
+                      & rotate (float (45))
+                      & translatex (seconds !* float 0.2)
+                      , adata (float 4)
+                        & rotate (float (-45))
+                      ]
+                      & mirror
+                      & noisedisplace (lowvc !* float 10)
+                      & fade (float 0.7)
+                      & palettemap buddhist (float 0)
+                      & val ((lowvc !* float 0.9))
+                    , shapes (float 2) ((float 0.8 !* volc) !+ float 0.1) (float 0.2 !+ (volc !* float (-0.2) ))
+                      & translatey ((seconds !* float 0.3) !+ volc)
+                      & littleplanet
+                      & fade' id (repeatT (float 0.999)) (float 0.9)
+                    ]
+
+
+
+flocking (float 1, float 3 !* volc) (float 3 !* volc)
+              & fade ((volc !* float 0.85) !+ float 0.5)
+              & mirror
+              & edges
+              & lumidots
+              & noisedisplace (volc !* float 32)
+              & val (volc !* float 4)
+              & fade (float 0.8)
+
+
+  addops [
+  shapes (float 2 !+ (lowvc !* float 3)) ((volc !* float 1.3) !+ float 0.2) (float 0.2)
+           & repeatT (scycle (-0.4) 10 !+ (volc !* float 2))
+         , adata (float 1)
+           & val (float 0)
+           & translate (sincycle 0.4 (-0.1), float 0.3 !* seconds)
+           & mirror
+         ]
+         & val (float 0)
+         & fade' id (repeatT (float 1.01) . translatex (sincycle 0.4 0.01)) (float 0.8 !+ (volc !* float 0.2))
+
+
+
+r $ ndiops $
+  adata (float 1) & val (float 1)
+  & translatey (volc !* float (0.5) !+ (seconds !* float 0.3))
+  & repeatT (float 3)
+  & littleplanet
+  & repeatT (float 2)
+  & fade' id (scalexy (float (0.04) !* volc)) (float 0.95)
+  & translatex (float 0.5)
+  & scalexy (float 1.5 !* (float 2 !+ (lowvc !* float (-0.5))))
+  & blur (float 8)
+  & edges
+  & mirror
+  & palettemap fire (volc)
+  & val (float 0.3)
+  & fade (float 0.8)
   
-r $ adata (float 1)
+r $ adata (float 1.3)
     & noisedisplace (lowvc !* float 100)
     & translate (seconds !* float 0.1 !+ (volc !* float 2), seconds !* float 0.3)
     & mirror
@@ -244,3 +336,42 @@ r $ addops [adata (float 1)
   & palettemap neon ((volc !* float 0.3) !+ (seconds !* float 0.4))
   & val (float 0.4)
   & fade (float 0.7)
+
+r $ ndiops $ flocking (float 1, float 3 !* volc) (float 3 !* volc)
+             & fade (float 0.95)
+             & edges
+             & noisedisplace (volc !* float 16)
+             & palettemap neon (seconds !* float 0.6)
+             & val (volc !* float 4)
+             & fade (float 0.8)
+
+
+r $ ndiops $ multops [ stringtheory (volc !* float 0.4) (volc)
+                       & edges
+                       & translatex (seconds !* float 0.2)
+                       & repeatT (float 3)
+                       & fade (float 0.95 !+ (lowvc !* float (-0.2)))
+                       & translatey (seconds !* float 0.3)
+                       & littleplanet
+                       & scalexy (float 0.7)
+                     , lines (float 0.4 !* volc) (float 0.2)
+                       & fade (float 0.95)
+                       & translatex (seconds !* float 0.2)
+                       & mirror
+                     ]
+
+r $ addops [ adata (float 0.5)
+             & translatey (volc !* float 0.6)
+             & rotate (float 45)
+             & mirror
+             & val (float 1.5)
+             & rotate (float 45 !* seconds)
+             & scalexy (float 0.7)
+             & palettecycle buddhist (seconds !* float 0.4)
+             & fade (float 0.97)
+             & val (float 1 !+ (volc !* float (-1.5)))
+           , flocking (float 0.5, float 4 !* volc) (float 0.5)
+             & fade (float 0.8 !* volc !+ float 0.3)
+             & palettemap buddhist ((seconds !* float 0.4) !+ float 0.5)
+             & val (volc !* float 3)
+           ]

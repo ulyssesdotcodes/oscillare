@@ -29,9 +29,10 @@ PROMPT-OPTIONS are passed to `intero-repl-buffer' if supplied."
   (save-excursion
     (mark-paragraph)
     (let* ((s (buffer-substring-no-properties (region-beginning)
-                                              (region-end))))
+                                              (region-end)))
+           (print-escape-newlines t))
       (oscillare-send-string ":{")
-      (oscillare-send-string s)
+      (oscillare-send-string (replace-regexp-in-string "{Command}" (prin1-to-string s) s t t))
       (oscillare-send-string ":}")
       (mark-paragraph)
       )))

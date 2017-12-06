@@ -75,6 +75,7 @@ classes = {
   'chopExec' : (chopexecuteDAT, 'chopexecute', 'DAT'),
   'datExec' : (datexecuteDAT, 'datexecute', 'DAT'),
   'inDat' : (inDAT, 'in', 'DAT'),
+  'oscInDat' : (oscinDAT, 'oscin', 'DAT'),
   'outDat' : (outDAT, 'out', 'DAT'),
   'scriptDat' : (scriptDAT, 'script', 'DAT'),
   'selectDat' : (selectDAT, 'select', 'DAT'),
@@ -131,10 +132,15 @@ def apply(newState):
         addParameter(curop, splits[2], diffi[2][1])
       elif diffi[0] == 'remove':
         for param in diffi[2]:
+          print(param[0])
           if(param[0] == 'tx'):
             curop.par.tx = 0
+          elif param[0] == 'ty':
+            curop.par.ty = 0
           par = curop.pars(param[0])[0]
+          print("val: " + str(par.val))
           if par.val:
+            print("def: " + str(par.default))
             par.val = par.default
 
     elif splits[1] == 'text':
@@ -236,6 +242,9 @@ def createOp(addr, ty):
 
 def addParameter(newOp, name, value):
   pars = newOp.pars(name)
+  if len(pars) == 0:
+    return
+
   par = pars[0]
   if isfloat(value):
     if par.isMenu:

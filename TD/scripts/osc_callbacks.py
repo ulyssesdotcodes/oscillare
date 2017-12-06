@@ -18,11 +18,14 @@
 #
 
 import scripts
+import hooks
 import json
 
 def receiveOSC(dat, rowIndex, message, bytes, timeStamp, address, args, peer):
+
   if address == "/json":
     scripts.apply(json.loads(args[0]))
+    hooks.newJson(json.loads(args[0]))
     return
 
   addr = "/project1/lambda" + address

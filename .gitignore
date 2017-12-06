@@ -24,6 +24,8 @@ tags
 .#*
 test.*
 *.mp4
+*.mov
+json_output.txt
 
 # package  
 rtmidi/
