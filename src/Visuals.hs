@@ -92,7 +92,6 @@ lines w s = frag "lines.frag" [("i_width", xV4 w), ("i_spacing", xV4 s)] []
 metaballs mat = let wrapJust n x = Just $ chopChan0 x !* float n
                     mball n r tx ty = metaball' ((metaballRadius .~ (wrapJust n r, wrapJust n r, wrapJust n r)) .
                                                 (metaballCenter .~ (Just tx, Just ty, Nothing)))
-                    lagmod = lag (float 0) (float 0.2)
                     noiset m = noiseC' ((chopTimeSlice ?~ bool True) .
                                         (noiseCTranslate._1 ?~ seconds !* float 0.3) .
                                         (noiseCTranslate._3 ?~ float (m * 3)) .
@@ -100,13 +99,14 @@ metaballs mat = let wrapJust n x = Just $ chopChan0 x !* float n
                                         (noiseCChannels ?~ str "chan[1-3]"))
                     noisex = noiset 1
                     noisey = noiset 0
+                    lagmodC = lag (float 0) (float 0.2)
                 in rendered . geo' (geoMat ?~ mat) .
-                   outS $ mergeS [ mball 1 (lagmod lowv) (chopChan 0 noisex !+ float 0.2)
+                   outS $ mergeS [ mball 1 (lagmodC lowv) (chopChan 0 noisex !+ float 0.2)
                                    (chopChan0 noisey)
-                                 , mball 9 (lagmod highv)
+                                 , mball 9 (lagmodC highv)
                                    (chopChan 1 noisex !+ float (-0.2))
                                    (chopChan 1 noisey !+ float 0.7)
-                                 , mball 4 (lagmod $ bandv (float 0.5))
+                                 , mball 4 (lagmodC $ bandv (float 0.5))
                                    (chopChan 2 noisex !+ float (-0.2))
                                    (chopChan 2 noisey !+ float (-0.7))
                                  ]
@@ -137,6 +137,10 @@ movie s f = movieFileIn' ((moviePlayMode ?~ int 1) .
                           (topResolution .~ iv2 (1920, 1080))) $ str $ "videos/" ++ f
 
 geoT tr sc top sop = render (geo' ((geoTranslate .~ tr) . (geoScale .~ sc) . (geoMat ?~ topM top)) (outS sop)) cam
+commandCode t = textT' ( (topResolution .~ (Just $ int 1920, Just $ int 1080))
+                         . (textFontSize ?~ float 16)
+                         . (textAlign .~ iv2 (0, 0))
+                         ) (str t)
 
 -- vidIn
 
@@ -208,6 +212,11 @@ triggerops f tops = switchT (chopChan0 $
                                      (countLimType ?~ int 1)
                                     ) f
                             ) tops
+showwork g es =
+  let
+    scans = scanl (\g e -> e g) g es
+  in
+    addops $ (head $ reverse scans):(zipWith (\i -> (translate (float (-0.45) !+ (float 0.1 !* float i), float 0.4)) . scalexy (float 10)) [0..] (take (length es) $ scans))
 
 -- palettes
 
@@ -218,6 +227,7 @@ tealness = Palette ["#6cb6bd", "#71b8b9", "#7abbb3", "#81bead", "#8cc1a5"]
 
 ------------------------
 
+lagmod l = chopChan0 . lag (float 0) (float l)
 tres = (topResolution .~ (Just $ int 1920, Just $ int 1080)) . (pixelFormat ?~ int 3)
 scr = (++) "scripts/Visuals/"
 frag = frag' id

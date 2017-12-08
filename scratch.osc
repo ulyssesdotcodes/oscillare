@@ -30,10 +30,6 @@ let ndiops t = overops [ ndiinT ""
                        , t
                        ]
 
-let commandCode t = textT' ( (topResolution .~ (Just $ int 1920, Just $ int 1080))
-                           . (textFontSize ?~ float 62)
-                           . (textAlign .~ iv2 (0, 2))
-                           ) (str t)
 
 r $ addops [ commandCode {Command}
              & translatex (seconds !* float 0.2)
@@ -41,6 +37,22 @@ r $ addops [ commandCode {Command}
              & fade (float 0.95)
            ]
            & transformscale (Just $ float 2, Just $ float 2) 0
+
+comb :: [(Tree TOP -> Tree TOP)] -> Tree TOP -> Tree TOP
+
+scanf :: [(Tree TOP -> Tree TOP)] -> Tree TOP -> [Tree TOP]
+
+r $ comb (adata (float 1)) [ translatey (seconds !* float 0.2)
+                           , fade (float 0.95)
+                           , littleplanet
+                           ]
+
+r $ addops [ commandCode {Command}
+           , showwork (adata (float 0.5))
+              [ scalexy (lagmod 0.2 lowv)
+              , fade (float 0.9)
+              ]
+           ]
 
 
 r $ addops [ adata (float 0.5)
