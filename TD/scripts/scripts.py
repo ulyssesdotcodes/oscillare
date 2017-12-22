@@ -1,4 +1,5 @@
 from dictdiffer import diff, dot_lookup
+from collections import deque
 
 classes = {
   'blur' : (blurTOP, 'blur', 'TOP'),
@@ -51,13 +52,17 @@ classes = {
   'noiseChop' : (noiseCHOP, 'noise', 'CHOP'),
   'oscInChop' : (oscinCHOP, 'oscin', 'CHOP'),
   'outChop' : (outCHOP, 'out', 'CHOP'),
+  'replaceChop' : (replaceCHOP, 'replace', 'CHOP'),
   'sopToChop' : (soptoCHOP, 'sopto', 'CHOP'),
   'selectChop' : (selectCHOP, 'select', 'CHOP'),
+  'shuffleChop' : (shuffleCHOP, 'shuffle', 'CHOP'),
   'switchChop' : (switchCHOP, 'switch', 'CHOP'),
+  'topToChop' : (toptoCHOP, 'topto', 'CHOP'),
   'timer' : (timerCHOP, 'timer', 'CHOP'),
 
   'chopToSop' : (choptoSOP, 'chopto', 'SOP'),
   'circleSop' : (circleSOP, 'circle', 'SOP'),
+  'gridSop' : (gridSOP, 'grid', 'SOP'),
   'lineSop' : (lineSOP, 'line', 'SOP'),
   'mergeSop' : (mergeSOP, 'merge', 'SOP'),
   'metaball' : (metaballSOP, 'metaball', 'SOP'),
@@ -155,9 +160,10 @@ def getName(name):
 
 def addAll(state):
   connections = []
-  queue = state
+  queue = deque(state)
+  i = 0
   while len(queue) > 0:
-    (key, value) = queue.pop()
+    (key, value) = queue.popleft()
     addr = getName(key)
     par = addr[:(addr.rfind('/'))]
     if op(par) != None:

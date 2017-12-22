@@ -45,11 +45,11 @@ acirc = cTSMod amult (circleS' ((circArc ?~ int 1) . (circType ?~ int 2)))
 
 asphere = cTSMod amult $ sphere' (sphereType ?~ int 3)
 
-mnoise s = noiseC' ((noiseCType ?~ int 2) .
+mnoise t s = noiseC' ((noiseCType ?~ int 2) .
                          (noiseCPeriod ?~ float s) .
-                         (noiseCTranslate._2 ?~ seconds !* float 20) .
+                         (noiseCTranslate._2 ?~ t) .
                          (chopTimeSlice ?~ bool True))
-mnoisec s = chopChan0 $ mnoise s
+mnoisec t s = chopChan0 $ mnoise t s
 
 launchmapping = strobe (float 10 !* mchan "s1c")
   $ scalexy (float 0.2 !* mchan "s1b")
@@ -110,16 +110,16 @@ metaballs mat = let wrapJust n x = Just $ chopChan0 x !* float n
                                    (chopChan 2 noisex !+ float (-0.2))
                                    (chopChan 2 noisey !+ float (-0.7))
                                  ]
-movingSquiggly = geo' ((geoTranslate .~ (Just $ chopChan0 $ mnoise 5, Just $ chopChan0 $ mnoise 10, Just $ float  0)) .
+movingSquiggly = geo' ((geoTranslate .~ (Just $ mnoisec (seconds !* float 20) 5, Just $ mnoisec (seconds !* float 20) 10, Just $ float  0)) .
             (geoScale.each ?~ float 0.3) .
             (geoMat ?~ constM' (constColor .~ (Just $ osin $ seconds, Just $ osin $ (seconds !* float 2), Just $ osin $ (seconds !* chopChan0 volume)))))
             $ outS acirc
 
 particlemover v a p s = tox "toxes/Visuals/particlemover.tox" [ ("Palette", ResolveP $ palette p)
-                                                            , ("Vmult", ResolveP v)
-                                                            , ("Emitalpha", ResolveP a)
-                                                            , ("Shape", ResolveP s)
-                                                            ] (Nothing :: Maybe (Tree TOP))
+                                                              , ("Vmult", ResolveP v)
+                                                              , ("Emitalpha", ResolveP a)
+                                                              , ("Shape", ResolveP s)
+                                                              ] (Nothing :: Maybe (Tree TOP))
 
 shapes sides w s = frag "shapes.frag" [ ("i_size", xV4 s)
                                       , ("i_width", xV4 w)
@@ -153,6 +153,7 @@ over = over' id id
 brightness' f b = levelT' (levelBrightness ?~ b)
 brightness = brightness' id
 --blur
+crosshatch' f = frag' f "crosshatch.frag" [] . (:[])
 paletterepeatT' f p r top = frag' f "color_repeat.frag" [("i_repeat", xV4 r)] [top, palette p]
 paletterepeatT = paletterepeatT' id
 edgesc' f c t = compT 0 [edges' f t, levelT' (levelOpacity ?~ c) t]
