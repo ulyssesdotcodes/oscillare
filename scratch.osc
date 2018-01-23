@@ -1,28 +1,74 @@
 r <- topRunner
 
+r <- compRunner
+
 -- Initialization check
 
 r $ shapes (float 3) (float 0.3 !+ volc) (float 0.3)
-  & repeatT (float 30)
+  & repeatTxy (float 30)
   & translatex (seconds !* float 0.1)
 
 -------------------------------------------------------------------------
 -- For shows
 
-r $ sineT seconds (float 1) (float 1)
 
-r $ sineT seconds (chopChanName "s8" $ oscin 9000) (float 0.9)
 
-r $ addops [sineT seconds (float 2 !+ (sincycle 1 1 !* float 2)) (volc), sineT seconds (float 2 !+ ((sincycle 1 1 !* float 1.33))) (volc) & translatey (float 0.3)]
-  & littleplanet
-  & fade (float 0.95)
+let
+  tsnenum n = ((lowvc !* chanf (n * 5) tsne) !+ (volc !* chanf (n * 5 + 1) tsne) !+ (seconds !* chanf (n * 5 + 2) tsne)) !% chanf (n * 5 + 4) tsne !+ chanf (n * 5 + 3) tsne
+  tsneoutput = tableF "../tsneoutput.txt"
+               & scriptD "scripts/distance_dat.py" . (:[tsnepos])
+               & datToC' (datToChopFirstColumn ?~ int 2)
+               & expressionC [(PyExpr "max(0, sorted(map(float, me.inputs[0].chans()))[-4] - me.inputVal)")] . (:[])
+               & expressionC [(PyExpr "math.sqrt((max(map(float, me.inputs[0].chans())) - me.inputVal) % max(map(float, me.inputs[0].chans())))")] . (:[])
+               & expressionC [(PyExpr "me.inputVal / sum(map(float, me.inputs[0].chans()))")] . (:[])
+  tsnedata = tableF "../tsnedata.txt" & datToC' (datToChopFirstColumn ?~ int 2)
+  tsnepos = chopToD $ expressionC [PyExpr "me.inputVal * (max(me.inputs[0][me.chanIndex].vals) - min(me.inputs[0][me.chanIndex].vals)) + min(me.inputs[0][me.chanIndex].vals)"] [constC [mchan "s1", mchan "s2"]]
+  tsne = expressionC [(PyExpr "me.inputs[1][me.chanIndex] * me.inputVal")] [tsnedata, tsneoutput]
+            & math' (mathCombChans ?~ int 1) . (:[])
+            & shuffleC (int 1)
+in 
+  r $ fadeops ((tsnenum 0) !* float 3)
+        [ shapes (tsnenum 1) (tsnenum 2) (float 0.2)
+        , adata (float 1)
+        , lines (tsnenum 3) (tsnenum 4)
+        ]
+      & translate (tsnenum 13, tsnenum 14)
+      & clone (tsnenum 5) (tsnenum 6, tsnenum 7) (tsnenum 8, tsnenum 9)
+      & repeatTxy (tsnenum 10)
+      & palettecycle neon (tsnenum 11)
+      & fade (tsnenum 12)
 
-r $ triggerops (constC [sincycle 1 1])
-  [ sineT seconds (float 2 !+ (sincycle 1 1 !* float 2)) (volc)
-  , adata (float 1)
-  ]
 
-r $ vidIn
+-- Rotating adatas
+let
+  adatat x y = adata (float (y * 0.2)) & translatey ((x !* seconds) !% float 1) & rotate (x !* float 180 !* seconds)
+  tsnevals = [ [ 0 ,  0 ,  0 ,  0.97 ] -- fade
+             , [ 0 ,  0 ,  0.2 ,  0 ] -- palette
+             , [ 0 ,  0 ,  0 ,  0.3] -- val
+             , [ 0 ,  -0.02 ,  0 ,  0 ] -- fade scale
+             , [ 0 ,  0 ,  0 ,  0.7 ] -- fade final
+             ]
+  -- tsne = mergeC $ zipWith (\i ns -> fix (BS.pack $ "tsne" ++ show i) $ constC $ float <$> ns) [0..] tsnevals
+  tsnenummod n = ((lowvc !* chanf (n * 5) tsne) !+ (volc !* chanf (n * 5 + 1) tsne) !+ (seconds !* chanf (n * 5 + 2) tsne)) !% chanf (n * 5 + 4) tsne !+ chanf (n * 5 + 3) tsne
+  tsnenum n = ((lowvc !* chanf (n * 4) tsne) !+ (volc !* chanf (n * 4 + 1) tsne) !+ (seconds !* chanf (n * 4 + 2) tsne)) !+ chanf (n * 4 + 3) tsne
+  tsneoutput = tableF "../tsnerotatingoutput.txt"
+               & scriptD "scripts/distance_dat.py" . (:[tsnepos])
+               & datToC' (datToChopFirstColumn ?~ int 2)
+               & expressionC [(PyExpr "max(0, sorted(map(float, me.inputs[0].chans()))[-1] - me.inputVal)")] . (:[])
+               & expressionC [(PyExpr "math.sqrt((max(map(float, me.inputs[0].chans())) - me.inputVal) % max(map(float, me.inputs[0].chans())))")] . (:[])
+               & expressionC [(PyExpr "me.inputVal / sum(map(float, me.inputs[0].chans()))")] . (:[])
+  tsnedata = tableF "../tsnerotatingdata.txt" & datToC' (datToChopFirstColumn ?~ int 2)
+  tsnepos = chopToD $ expressionC [PyExpr "me.inputVal * (max(me.inputs[0][me.chanIndex].vals) - min(me.inputs[0][me.chanIndex].vals)) + min(me.inputs[0][me.chanIndex].vals)"] [constC [mchan "s1", mchan "s2"]]
+  tsne = expressionC [(PyExpr "me.inputs[1][me.chanIndex] * me.inputVal")] [tsnedata, tsneoutput]
+            & math' (mathCombChans ?~ int 1) . (:[])
+            & shuffleC (int 1)
+in 
+  r $ addops [adatat (float 0.3) 0.5, adatat (float 0.5) 1, adatat (float 0.7) 1.3, adatat (float 1.3) 1.3]
+    & fade (tsnenum 0)
+    & palettemap buddhist (tsnenum 1)
+    & val (tsnenum 2)
+    & fade' id (scalexy (tsnenum 3 !+ float 1)) (tsnenum 4)
+
 
 let camT = compT' (topResolution .~ iv2 (1920, 1080)) 0 [vidIn]
 
@@ -30,63 +76,55 @@ let ndiops t = overops [ ndiinT ""
                        , t
                        ]
 
+let v3 x y z = (Just x, Just y, Just z)
+
+r $ particlemover (volc !* float 2) (lowvc !* float 1) fire (asphere & transformS' ((transformSTranslate .~ v3 ((mnoisec (seconds !* float 3) 10) !* float 2) ((mnoisec (seconds !* float 3) 20) !* float 1.5 !+ float (-1)) (float  0)) . (transformSUniformScale ?~ float 0.8)))
+
+-- counter circling geos
+r $ addops [spiralGeo (int 100) (seconds) (sidesTorus (int 8) (volc !* float 10)) & palettecycle neon seconds, spiralGeo (int 100) (seconds !* float (-1)) (sphere) & palettecycle neon (seconds !+ float 0.5)]
+
+-- command code aspectex adata
 
 r $ addops [ commandCode {Command}
-             & translatex (seconds !* float 0.2)
-           , adata (float 1)
-             & fade (float 0.95)
-           ]
-           & transformscale (Just $ float 2, Just $ float 2) 0
-
-r $ adata (float 1) & val (float 4)  & fade (float 0.9) & crosshatch' id
-
-r $ particlemover (float 1) (float 5) neon (acirc & transformS' ((transformSTranslate .~ (Just $ (mnoisec (seconds !* float 200) 10) !* float 2, Just $ (mnoisec (seconds !* float 200) 20) !* float 1.5, Just $ float  0)) . (transformSUniformScale ?~ float 0.5)))
-
-comb :: [(Tree TOP -> Tree TOP)] -> Tree TOP -> Tree TOP
-
-scanf :: [(Tree TOP -> Tree TOP)] -> Tree TOP -> [Tree TOP]
-
-r $ comb (adata (float 1)) [ translatey (seconds !* float 0.2)
-                           , fade (float 0.95)
-                           , littleplanet
-                           ]
-
-r $ addops [ commandCode {Command}
-           , showwork (adata (float 0.5))
-              [ scalexy (lagmod 0.2 lowv)
+           , showwork (tdata (float 1) aspecttex)
+              [ translatey (float 0.1)
+              , mirror
               , fade (float 0.9)
               ]
            ]
 
-r $ switch 
-
-
-r $ switchT' (switchTBlend ?~ bool True) (sincycle 0.5 1) [ adata (float 0.5)
-             & translatey (volc !* float 0.6)
-             & rotate (float 45)
-             & mirror
-             & val (float 1.5)
-             & rotate (float 45 !* seconds)
-             & scalexy (float 0.7)
-             & palettecycle buddhist (seconds !* float 0.4)
-             & fade (float 0.97)
-             & val (float 1 !+ (volc !* float (-1.5)))
-             & mosaic (seconds) (float 40)
-           , flocking (float 0.5, float 4 !* volc) (float 0.5)
-             & fade (float 0.8 !* volc !+ float 0.3)
-             & palettemap buddhist ((seconds !* float 0.4) !+ float 0.5)
-             & val (volc !* float 3)
-           ]
-
-
-
-addops [ adata (float 0.7) & translatey (float 0.3 !* seconds) & palettecycle neon (seconds !* float 0.5) & fade ((volc !* float 0.3) !+ float 0.6)
+-- Crossing adatas
+r $ addops [ adata (float 0.7) & translatey (float 0.3 !* seconds) & palettecycle neon (seconds !* float 0.5) & fade ((volc !* float 0.3) !+ float 0.6)
            , adata (float 1) & mosaic (seconds) (float 80)
            , adata (float 1) & translatey (float (-0.4) !* seconds) & edges & noisedisplace (volc !* float 10) & val (float 0.3)
            ]
-      & fade' id (scalexy (float 0.01 !* volc)) (sincycle 1.3 0.38 !+ float 0.6)
+      & fade' id (scalexy (float 0.01 !* volc !+ float 1)) (sincycle 1.3 0.38 !+ float 0.6)
 
-addops [ addops [ adata (float 4)
+
+-- relay
+let comp = constC [float 0, float 0, float 0, float 0]
+
+let comp = tox "toxes/relay.tox" [] (Just $ mergeC [constC [float 1], count' ((countThresh ?~ mchan "s1a" !* float 0.05) .
+                                     (countLimMax ?~ float 1) .
+                                     (countLimType ?~ int 1)
+                                    ) highv, count' ((countThresh ?~ mchan "s1b") .
+                                     (countLimMax ?~ float 1) .
+                                     (countLimType ?~ int 1)
+                                    ) lowv, count' ((countThresh ?~ mchan "s1c" !* float 0.5) .
+                                     (countLimMax ?~ float 1) .
+                                     (countLimType ?~ int 1)
+                                    ) volume])
+
+let v3 (x, y, z) = (Just x, Just y, Just z)
+
+let v2 (x, y) = (Just x, Just y)
+
+r $ geoT emptyV3 (v3 (float 1.5, float 1.5, float 1.5)) (adata (float 1) & fade (float 0.96)) sphere
+
+r . (\t -> (comp, t)) $ shapes (float 3) (float 0.1 !+ volc) (float 0.2) & repeatTxy (v2 (float 40) (float 40))
+
+-- circle crosshatch
+r $ addops [ addops [ adata (float 4)
                       & rotate (float (45))
                       & translatex (seconds !* float 0.2)
                       , adata (float 4)
@@ -100,12 +138,12 @@ addops [ addops [ adata (float 4)
                     , shapes (float 2) ((float 0.8 !* volc) !+ float 0.1) (float 0.2 !+ (volc !* float (-0.2) ))
                       & translatey ((seconds !* float 0.3) !+ volc)
                       & littleplanet
-                      & fade' id (repeatT (float 0.999)) (float 0.9)
+                      & fade' id (repeatTxy (float 0.999)) (float 0.9)
                     ]
 
+-- lumidots flocking
 
-
-flocking (float 1, float 3 !* volc) (float 3 !* volc)
+r $ flocking (float 1, float 3 !* volc) (float 3 !* volc)
               & fade ((volc !* float 0.85) !+ float 0.5)
               & mirror
               & edges
@@ -115,122 +153,111 @@ flocking (float 1, float 3 !* volc) (float 3 !* volc)
               & fade (float 0.8)
 
 
-  addops [
-  shapes (float 2 !+ (lowvc !* float 3)) ((volc !* float 1.3) !+ float 0.2) (float 0.2)
-           & repeatT (scycle (-0.4) 10 !+ (volc !* float 2))
-         , adata (float 1)
-           & val (float 0)
-           & translate (sincycle 0.4 (-0.1), float 0.3 !* seconds)
-           & mirror
-         ]
-         & val (float 0)
-         & fade' id (repeatT (float 1.01) . translatex (sincycle 0.4 0.01)) (float 0.8 !+ (volc !* float 0.2))
+-- Cloned squares
 
-
-
-r $ ndiops $
-  adata (float 1) & val (float 1)
-  & translatey (volc !* float (0.5) !+ (seconds !* float 0.3))
-  & repeatT (float 3)
-  & littleplanet
-  & repeatT (float 2)
-  & fade' id (scalexy (float (0.04) !* volc)) (float 0.95)
-  & translatex (float 0.5)
-  & scalexy (float 1.5 !* (float 2 !+ (lowvc !* float (-0.5))))
-  & blur (float 8)
-  & edges
+r $ shapes (float 4) (float 0.2) (float 0.2)
+  & translate (sincycle 0.7 0.5 !+ float 0.8, float 0.25)
+  & clone (float 3) (float 0.2, float 0.1) (float (-0.2), float (-0.2))
+  & val (float 0.7)
   & mirror
-  & palettemap fire (volc)
-  & val (float 0.3)
+  & palettemap neon (float 0.5 !* seconds)
+
+r $ adata (float 1)
+  & littleplanet
+  & fade' id (scalexy (float 1 !+ (float (-0.1) !* volc))) (float 0.98)
+  & palettemap (Palette [RGB 63 124 7, RGB 201 121 66, RGB 213 101 23, RGB 177 201 80, RGB 180 207 127]) (float 0.4 !* seconds)
+
+[RGB 215 40 26, RGB 157 60 121, RGB 179 83 154, RGB 187 59 98, RGB 70 71 73]
+
+[RGB 150 110 100, RGB 223 143 67, RGB 76 73 100, RGB 146 118 133, RGB 165 148 180]
+
+[RGB 185 117 19, RGB 228 187 108, RGB 251 162 1, RGB 1 1 1, RGB 255 243 201]
+
+[RGB 50 107 113, RGB 211 90 30, RGB 209 122 43, RGB 206 193 183, RGB 188 242 246]
+
+
+[RGB 153 7 17, RGB 97 6 11, RGB 49 7 8, RGB 13 7 7, RGB 189 5 13]
+
+
+[RGB 63 124 7, RGB 201 121 66, RGB 213 101 23, RGB 177 201 80, RGB 180 207 127]
+
+
+
+
+-- Fire circles
+
+r $ addops [adata (float 0.3) & translatey (float (-0.2)), adata (float 0.3) & translatey (float 0.3)]
+  & littleplanet
+  & fade' id (scalexy (float 1 !+ (float (-0.1) !* volc))) (float 0.98)
+  & palettemap fire (sincycle (-0.2) 1)
+  & blur (float 8)
+  & scalexy (float 0.7)
+  & val (float 2)
+
+-- Spiral hexes
+
+r $ spiralGeo (int 100) seconds (sidesTorus (int 6) (float 2 !* lagmod 0.7 lowvc !+ float 0.5))
+  & palettecycle neon (sincycle 1 0.4)
+  & val (float 2.5)
+  & mirror
+  & fade (float 0.7)
+
+-- octogon line
+
+r $ lineLines (float 10) (float 2) (casti $ lowvc !* float 40) (sidesTorus (int 8) (float 0.1))
   & fade (float 0.8)
-  
-r $ adata (float 1.3)
-    & noisedisplace (lowvc !* float 100)
-    & translate (seconds !* float 0.1 !+ (volc !* float 2), seconds !* float 0.3)
-    & mirror
-    & repeatT (float 3)
-    & fade' id (littleplanet . translate (float 0.1 !* seconds, float (0.01))) (float 0.97)
-    & mirror
-    & repeatT (float 0.7)
-
-
-r $ triggerops (constC $ [ volc !* float 4 ] )
-  [adata (float 2)
-    & translatey (scycle 0.3 0.8)
-    & mirror
-    & fade (float 0.9)
-  , adata (float 1)
-    & noisedisplace (lowvc !* float 100)
-    & translate (seconds !* float 0.1 !+ (volc !* float 2), seconds !* float 0.3)
-    & mirror
-    & repeatT (float 3)
-    & fade' id (littleplanet . translate (float 0.1 !* seconds, float (0.01))) (float 0.97)
-    & mirror
-    & repeatT (float 0.7)
-  ]
-
-
-r $ flocking (float 0.5, lowvc) (float 0.4 !+ (volc !* float 4))
-  & fade (float 0.97)
-  & palettemap neon (seconds !* float 0.3) 
-  & val (float 1.5)
-
-
-
-
-
-
-
-r $ shapes ((volc !* float 4) !+ float 2) (float 0.3) (float 0.3)
-    & fade (lowvc !* float 0.3 !+ float 0.3)
-    & palettemap fire (float 0.3 !* seconds)
-    & val (float 0.2)
-    & blur (float 32)
-    & val (float 4)
-    & noisedisplace (lowvc !* float 10)
-
-
-
-let comp = constC [float 0]
-
-let comp = tox "toxes/relay.tox" [] (Just $ mergeC [constC [mchan "b1"], count' ((countThresh ?~ mchan "s1a" !* float 0.05) .
-                                     (countLimMax ?~ float 1) .
-                                     (countLimType ?~ int 1)
-                                    ) highv, count' ((countThresh ?~ mchan "s1b") .
-                                     (countLimMax ?~ float 1) .
-                                     (countLimType ?~ int 1)
-                                    ) lowv, count' ((countThresh ?~ mchan "s1c" !* float 0.5) .
-                                     (countLimMax ?~ float 1) .
-                                     (countLimType ?~ int 1)
-                                    ) volume])
-
-let v3 (x, y, z) = (Just x, Just y, Just z)
-
-r $ geoT emptyV3 (v3 (float 1.5, float 1.5, float 1.5)) (adata (float 1) & fade (float 0.96)) sphere
+  & translate (float (-0.15), float 0.2)
+  & transformT' ((transformExtend ?~ int 2) . (transformTranslate .~ (Just $ float 0.3 !* seconds, Just $ float 0)))
+  & mirror
+  & palettecycle fire (float 0.5)
+  & fade (float 0.9)
+  & val (float 4)
 
 r . (\t -> (comp, t)) $ adata (float 1)
+  & noisedisplace (lowvc !* float 100)
+  & translatex (seconds !* float 0.1 !+ (volc !* float 2))
+  & mirror
+  & repeatTxy (float 3)
+  & palettecycle buddhist (seconds !* float 0.3)
+  & val (float 1.3)
+  & fade' id (littleplanet . translate (float 0.1 !* seconds, float (0.01))) (float 0.97)
+  & mirror
+  & repeatTxy (float 0.7)
 
-r $ addops [adatat 0.4 0.2 , adatat 1.5 0.2]
+r . (\t -> (comp, t)) $ shapes (float 4) (float 0.2) (float 0.2)
+  & translatey (seconds !* float (-0.4))
+  & fade' id (repeatTxy (float 3)) (float 0.8)
+  & palettemap buddhist (sincycle 0.7 0.3 !+ float 0)
+
+let adatat x y = adata (float (y * 0.2)) & translatey (scycle x 1) & rotate (float (x * 30) !* seconds)
+
+r . (\t -> (comp, t)) $ addops [adatat 0.3 0.5, adatat 0.5 1, adatat 0.7 1.3, adatat 1.5 1.3]
+  & fade (float 0.97)
+  & palettemap buddhist (float 0.1 !* seconds)
+  & val (float 0.3)
+  & fade' id (scalexy (float 1 !+ (float (-0.02) !* volc))) (float 0.7)
+
+r . (\t -> (comp, t)) $ addops [adatat 0.4 0.2 , adatat 1.5 0.2]
   & translate (seconds !* float 0.1, float 0)
   & mirror
   & edges
   & val (float 0.5)
   & translate (seconds !* float 0.1, float 0)
   & littleplanet
-  & repeatT ((sincycle 0.6 2.3 !+ float 0.5) !+ volc)
   & translate (float 0.2 !* seconds, float 0.1)
   & mirror
   & palettecycle buddhist (sincycle 0.7 0.3 !+ float 0)
   & fade (float 0.9)
-  & val (float 1.5)
+  & val (float 3)
 
-r $ shapes (float 3) (float 0.3) (float 0.3)
+
+r . (\t -> (comp, t))  $ shapes (float 3) (float 0.3) (float 0.3)
   & fade (float 0.95)
-  & repeatT (float 30)
+  & repeatTxy (float 30)
   & translatex (seconds !* float 0.1)
 
-r $ addops [adatat 0.3 0.5 & rotate (float 45), adatat 0.5 0.5 & rotate (float (-45)), adatat 1.5 0.5]
-  & repeatT (float 10)
+r . (\t -> (comp, t))  $ addops [adatat 0.3 0.5 & rotate (float 45), adatat 0.5 0.5 & rotate (float (-45)), adatat 1.5 0.5]
+  & repeatTxy (float 10)
   & translatey (float (-0.1))
   & fade (float 0.9)
   & palettemap neon (sincycle 0.05 1)
@@ -239,17 +266,9 @@ r $ addops [adatat 0.3 0.5 & rotate (float 45), adatat 0.5 0.5 & rotate (float (
 
 r $ sphereNoise
 
-r $ addops [adata (float 0.3) & translatey (float (-0.2)), adata (float 0.3) & translatey (float 0.3)]
-  & littleplanet
-  & fade' id (scalexy (float 0.03 !* volc)) (float 0.98)
-  & palettemap fire (sincycle 0.2 1)
-  & blur (float 8)
-  & scalexy (float 0.7)
-  & val (float 2)
-
 let adatat x y = adata (float y) & translatey (float x !* float 0.5)
 
-r $ addops [ adatat 0.3 0.5 & palettecycle buddhist (sincycle 0.4 1)
+r . (\t -> (comp, t)) $ addops [ adatat 0.3 0.5 & palettecycle buddhist (sincycle 0.4 1)
            , adatat 0 1 & palettecycle neon (seconds !* float 0.3)
            , adatat 0.6 1.3 & mosaic seconds (float 60)
            ]
@@ -266,7 +285,7 @@ r $ addops [ adata (float 1) & translatey (float 0.3) & littleplanet & translate
   & translatex (seconds !* float 0.2)
   & mirror
 
-r $ addops [adata (float 1) & repeatT (float 2), adata (float 1) & repeatT (float 2) & rotate (float 90)]
+r $ addops [adata (float 1) & repeatTxy (float 2), adata (float 1) & repeatT (float 2) & rotate (float 90)]
   & rotate (mchan "b1" !* float 45)
   & translate (float 0, float 0)
   & fade' id ((scalexy (float (0.05) !* lowvc)) . (translatey (float (0.005)))) (float 0.5 !+ (float 0.5 !* mchan "s1"))
@@ -276,8 +295,8 @@ r $ addops [adata (float 1) & repeatT (float 2), adata (float 1) & repeatT (floa
 
 let adatat x y = adata (float y) & translatey (scycle x 1)
 
-r $ shapes (float 2 !+ (float 10 !* volc)) (float 0.6 !* volc) (float 0.3)
-  & repeatT ((sincycle (-0.3) 15 !+ float 1) !+ (volc !* float 4))
+r . (\t -> (comp, t)) $ shapes (float 2 !+ (float 10 !* volc)) (float 0.6 !* volc) (float 0.3)
+  & repeatTxy ((sincycle (-0.3) 15 !+ float 1) !+ (volc !* float 4))
   & rotate (float 60 !* seconds)
   & palettecycle neon (seconds !* float 0.3)
   & fade (float 0.9)
@@ -319,13 +338,14 @@ r $ movie (float 60 !+ (lowvc !* float 360)) "Purple flowers.mp4"
 
 -- abstract adata rotating
 
-let adatat x y = adata (float (y * 0.2)) & translatey (scycle x 1) & rotate (float (x * 180) !* seconds)
-
-r $ addops [adatat 0.3 0.5, adatat 0.5 1, adatat 0.7 1.3, adatat 1.5 1.3]
-  & fade (float 0.97)
-  & palettemap buddhist (float 0.2 !* seconds)
-  & val (float 0.3)
-  & fade' id (scalexy (float 0.02 !* volc)) (float 0.7)
+let
+  adatat x y = adata (float (y * 0.2)) & translatey (scycle x 1) & rotate (float (x * 180) !* seconds)
+in 
+  r $ addops [adatat 0.3 0.5, adatat 0.5 1, adatat 0.7 1.3, adatat 1.5 1.3]
+    & fade (float 0.97)
+    & palettemap buddhist (float 0.2 !* seconds)
+    & val (float 0.3)
+    & fade' id (scalexy (float 0.02 !* volc !+ float 1)) (float 0.7)
 
 -- chaos adata
 
@@ -333,12 +353,12 @@ r $ adata (float 1)
   & noisedisplace (lowvc !* float 100)
   & translatex (seconds !* float 0.1 !+ (volc !* float 2))
   & mirror
-  & repeatT (float 3)
+  & repeatTxy (float 3)
   & palettecycle buddhist (seconds !* float 0.3)
   & val (float 1.3)
   & fade' id (littleplanet . translate (float 0.1 !* seconds, float (0.01))) (float 0.97)
   & mirror
-  & repeatT (float 0.7)
+  & scalexy (float 0.7)
 
 -- up fade
 
@@ -350,34 +370,34 @@ r $ addops [adata (float 1)
     ]
   & val (lowvc !* float (4))
   & translatey (float (-0.2))
-  & repeatT (float 0.4)
+  & scalexy (float 0.4)
   & fade' id (scalexy (volc !* float (-0.04)) . translatey (float 0.02)) (float 0.99)
   & palettemap neon ((volc !* float 0.3) !+ (seconds !* float 0.4))
   & val (float 0.4)
   & fade (float 0.7)
 
-r $ ndiops $ flocking (float 1, float 3 !* volc) (float 3 !* volc)
-             & fade (float 0.95)
-             & edges
-             & noisedisplace (volc !* float 16)
-             & palettemap neon (seconds !* float 0.6)
-             & val (volc !* float 4)
-             & fade (float 0.8)
+r $ flocking (float 1, float 3 !* volc) (float 3 !* volc)
+    & fade (float 0.95)
+    & edges
+    & noisedisplace (volc !* float 16)
+    & palettemap neon (seconds !* float 0.6)
+    & val (volc !* float 4)
+    & fade (float 0.8)
 
 
-r $ ndiops $ multops [ stringtheory (volc !* float 0.4) (volc)
-                       & edges
-                       & translatex (seconds !* float 0.2)
-                       & repeatT (float 3)
-                       & fade (float 0.95 !+ (lowvc !* float (-0.2)))
-                       & translatey (seconds !* float 0.3)
-                       & littleplanet
-                       & scalexy (float 0.7)
-                     , lines (float 0.4 !* volc) (float 0.2)
-                       & fade (float 0.95)
-                       & translatex (seconds !* float 0.2)
-                       & mirror
-                     ]
+r $ multops [ stringtheory (volc !* float 0.4) (volc)
+              & edges
+              & translatex (seconds !* float 0.2)
+              & repeatTxy (float 3)
+              & fade (float 0.95 !+ (lowvc !* float (-0.2)))
+              & translatey (seconds !* float 0.3)
+              & littleplanet
+              & scalexy (float 0.7)
+            , lines (float 0.4 !* volc) (float 0.2)
+              & fade (float 0.95)
+              & translatex (seconds !* float 0.2)
+              & mirror
+            ]
 
 r $ addops [ adata (float 0.5)
              & translatey (volc !* float 0.6)

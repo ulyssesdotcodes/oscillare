@@ -36,9 +36,12 @@ classes = {
   'audioIn' : (audiodeviceinCHOP, 'audiodevin', 'CHOP'),
   'audioMovie' : (audiomovieCHOP, 'audiomovie', 'CHOP'),
   'audioSpectrum' : (audiospectrumCHOP, 'audiospect', 'CHOP'),
+  'chopToDat' : (choptoDAT, 'chopto', 'DAT'),
   'constantChop' : (constantCHOP, 'constant', 'CHOP'),
   'count' : (countCHOP, 'count', 'CHOP'),
+  'datToChop' : (dattoCHOP, 'datto', 'CHOP'),
   'delay' : (delayCHOP, 'delay', 'CHOP'),
+  'expressionChop' : (expressionCHOP, 'expression', 'CHOP'),
   'fan' : (fanCHOP, 'fan', 'CHOP'),
   'feedbackChop' : (feedbackCHOP, 'feedback', 'CHOP'),
   'hold' : (holdCHOP, 'hold', 'CHOP'),
@@ -52,13 +55,17 @@ classes = {
   'noiseChop' : (noiseCHOP, 'noise', 'CHOP'),
   'oscInChop' : (oscinCHOP, 'oscin', 'CHOP'),
   'outChop' : (outCHOP, 'out', 'CHOP'),
+  'renameChop' : (renameCHOP, 'rename', 'CHOP'),
   'replaceChop' : (replaceCHOP, 'replace', 'CHOP'),
+  'resampleChop' : (resampleCHOP, 'resample', 'CHOP'),
   'sopToChop' : (soptoCHOP, 'sopto', 'CHOP'),
   'selectChop' : (selectCHOP, 'select', 'CHOP'),
   'shuffleChop' : (shuffleCHOP, 'shuffle', 'CHOP'),
   'switchChop' : (switchCHOP, 'switch', 'CHOP'),
+  'stretchChop' : (stretchCHOP, 'stretch', 'CHOP'),
   'topToChop' : (toptoCHOP, 'topto', 'CHOP'),
   'timer' : (timerCHOP, 'timer', 'CHOP'),
+  'waveChop' : (waveCHOP, 'wave', 'CHOP'),
 
   'chopToSop' : (choptoSOP, 'chopto', 'SOP'),
   'circleSop' : (circleSOP, 'circle', 'SOP'),
@@ -70,10 +77,12 @@ classes = {
   'inSop' : (inSOP, 'in', 'SOP'),
   'outSop' : (outSOP, 'out', 'SOP'),
   'sphere' : (sphereSOP, 'sphere', 'SOP'),
+  'torusSop' : (torusSOP, 'torus', 'SOP'),
   'sweep' : (sweepSOP, 'sweep', 'SOP'),
   'transformSop' : (transformSOP, 'transform', 'SOP'),
 
   'inMat' : (inMAT, 'in', 'MAT'),
+  'wireframeMat' : (wireframeMAT, 'wireframe', 'MAT'),
   'outMat' : (outMAT, 'out', 'MAT'),
   'constMat' : (constantMAT, 'constant', 'MAT'),
 
@@ -263,7 +272,7 @@ def addParameter(newOp, name, value):
   # Special case loading tox as soon as we know source
   if name == "externaltox":
     newOp.par.reinitnet.pulse()
-  elif name == 'file' and newOp.type == "text":
+  elif name == 'file' and (newOp.type == "text" or newOp.type == "table"):
     newOp.par.loadonstartpulse.pulse()
 
 def runCommand(newOp, command, args):

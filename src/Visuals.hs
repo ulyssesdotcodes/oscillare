@@ -1,10 +1,15 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ViewPatterns #-}
 
 module Visuals where
 
 import LambdaDesigner.Op
 import LambdaDesigner.Lib
+import Data.Char
 import Data.IORef
+import Data.List.Split
+import Data.Maybe
+import Debug.Trace
 
 import Prelude hiding (floor, mod, lines)
 
@@ -12,14 +17,14 @@ import Control.Lens
 import Data.Matrix
 
 import qualified Data.ByteString.Char8 as BS
+import qualified Data.List as L
 
 data VoteType = Movie | Effect deriving Eq
 data VoteEffect = VoteEffect VoteType BS.ByteString BS.ByteString BS.ByteString deriving Eq
 
 compRunner :: IO ((Tree CHOP, Tree TOP) -> IO ())
 compRunner = do init <- newIORef mempty
-                return $ \(a, b) -> run2 init [outT $ b] [a]
-
+                return $ \(a, b) -> run2 init [outT $ b] [outC $ a]
 ain' m = math' (mathMult ?~ float m) [audioIn]
 ain = ain' 1
 atex = chopToT $ ain
@@ -27,15 +32,15 @@ aspect = audioSpectrum $ audioIn
 aspecttex = chopToT $ aspect
 
 volume = analyze (int 6) ain
-volc = chopChan0 volume
+volc = chan0f volume
 lowv' = analyze (int 6) . lowPass . ain'
 lowv = lowv' 4
-lowvc' = chopChan0 . lowv'
+lowvc' = chan0f . lowv'
 lowvc = lowvc' 4
 highv = analyze (int 6) $ highPass ain
-highvc = chopChan0 highv
+highvc = chan0f highv
 bandv b = analyze (int 6) $ bandPass b ain
-bandvc = chopChan0 . bandv
+bandvc = chan0f . bandv
 
 cTSMod tf s = chopToS' ((chopToSResample ?~ bool True) . (chopToSopAttrScope ?~ str "P")) (tf (sopToC s)) (Just s)
 
@@ -49,13 +54,13 @@ mnoise t s = noiseC' ((noiseCType ?~ int 2) .
                          (noiseCPeriod ?~ float s) .
                          (noiseCTranslate._2 ?~ t) .
                          (chopTimeSlice ?~ bool True))
-mnoisec t s = chopChan0 $ mnoise t s
+mnoisec t s = chan0f $ mnoise t s
 
 launchmapping = strobe (float 10 !* mchan "s1c")
   $ scalexy (float 0.2 !* mchan "s1b")
   $ fade (mchan "s1")
   $ foldr (.) id (zipWith ($) (reverse effects) (reverse [1..(length effects)]))
-  $ switchT (float (-1) !+ (chopChan0 $ hold buttons buttons))
+  $ switchT (float (-1) !+ (chan0f $ hold buttons buttons))
           [adata (mchan "s1a" !* float 2), shapes (float 3 !+ scycle 1 3) (volc !* mchan "s2a") (mchan "s2b")]
 
 effects = [ \n -> palettecycle' (passmchan n) neon seconds
@@ -89,7 +94,7 @@ flocking (c, s) sp = tox "toxes/Visuals/flockingGpu.tox" [ ("Cohesion", ResolveP
                                                             , ("Speed", ResolveP sp)
                                                             ] (Nothing :: Maybe (Tree TOP))
 lines w s = frag "lines.frag" [("i_width", xV4 w), ("i_spacing", xV4 s)] []
-metaballs mat = let wrapJust n x = Just $ chopChan0 x !* float n
+metaballs mat = let wrapJust n x = Just $ chan0f x !* float n
                     mball n r tx ty = metaball' ((metaballRadius .~ (wrapJust n r, wrapJust n r, wrapJust n r)) .
                                                 (metaballCenter .~ (Just tx, Just ty, Nothing)))
                     noiset m = noiseC' ((chopTimeSlice ?~ bool True) .
@@ -101,18 +106,18 @@ metaballs mat = let wrapJust n x = Just $ chopChan0 x !* float n
                     noisey = noiset 0
                     lagmodC = lag (float 0) (float 0.2)
                 in rendered . geo' (geoMat ?~ mat) .
-                   outS $ mergeS [ mball 1 (lagmodC lowv) (chopChan 0 noisex !+ float 0.2)
-                                   (chopChan0 noisey)
+                   outS $ mergeS [ mball 1 (lagmodC lowv) (chanf 0 noisex !+ float 0.2)
+                                   (chan0f noisey)
                                  , mball 9 (lagmodC highv)
-                                   (chopChan 1 noisex !+ float (-0.2))
-                                   (chopChan 1 noisey !+ float 0.7)
+                                   (chanf 1 noisex !+ float (-0.2))
+                                   (chanf 1 noisey !+ float 0.7)
                                  , mball 4 (lagmodC $ bandv (float 0.5))
-                                   (chopChan 2 noisex !+ float (-0.2))
-                                   (chopChan 2 noisey !+ float (-0.7))
+                                   (chanf 2 noisex !+ float (-0.2))
+                                   (chanf 2 noisey !+ float (-0.7))
                                  ]
 movingSquiggly = geo' ((geoTranslate .~ (Just $ mnoisec (seconds !* float 20) 5, Just $ mnoisec (seconds !* float 20) 10, Just $ float  0)) .
             (geoScale.each ?~ float 0.3) .
-            (geoMat ?~ constM' (constColor .~ (Just $ osin $ seconds, Just $ osin $ (seconds !* float 2), Just $ osin $ (seconds !* chopChan0 volume)))))
+            (geoMat ?~ constM' (constColor .~ (Just $ osin $ seconds, Just $ osin $ (seconds !* float 2), Just $ osin $ (seconds !* chan0f volume)))))
             $ outS acirc
 
 particlemover v a p s = tox "toxes/Visuals/particlemover.tox" [ ("Palette", ResolveP $ palette p)
@@ -141,6 +146,45 @@ commandCode t = textT' ( (topResolution .~ (Just $ int 1920, Just $ int 1080))
                          . (textFontSize ?~ float 16)
                          . (textAlign .~ iv2 (0, 0))
                          ) (str t)
+
+-- Geometry generators and utilities
+
+sinC i = waveC' (waveCNames ?~ str "rz") i $ osin (castf sampleIndex) !* float 360
+scaleC i n = waveC' (waveCNames ?~ str "sx") i $ castf sampleIndex !* n
+
+sidesTorus sides scale = torus' ((torusOrientation ?~ int 2) . (torusRows ?~ int 10) . (torusColumns ?~ sides) . (torusRadius .~ v2 (scale !* float 1) (scale !* float 0.5)))
+
+lineLines width scale inst sop =
+  let
+    instances = casti inst !+ int 2
+  in
+    lineGeo (math' (mathMult ?~ scale) [ain]) (sinC instances) (scaleC instances $ float 0.1) (scaleC instances $ float 0.1) sop width instances wireframeM
+
+lineGeo ty rz sx sy sop width instances mat =
+  let
+    ain = math' (mathMult ?~ float 10) [audioIn]
+    sgeo = instanceGeo' ((geoMat ?~ mat)) poses (outS $ sop)
+    poses = mergeC' (mergeCAlign ?~ int 7) [tx, ty', rz & renameC (str "rz"), sx & renameC (str "sx"), sy & renameC (str "sy")]
+    tx = waveC' (waveCNames ?~ str "tx") instances $ ((castf (sampleIndex !* casti width !* int 2)) !/ castf instances) !- width
+    ty' = ty & resampleC' ((resampleEnd ?~ instances) . (resampleRate ?~ instances)) False & renameC (str "ty")
+    centerCam t r = cam' ((camTranslate .~ t) . (camPivot .~ v3mult (float (-1)) t) . (camRotate .~ r))
+    volume = analyze (int 6) ain
+    volc = chan0f volume
+  in
+    render sgeo (centerCam (v3 (float 0) (float 0) (float 50)) emptyV3)
+
+spiralGeo inst speed sop =
+  let
+    sgeo = instanceGeo' ((geoMat ?~ wireframeM) . (geoUniformScale ?~ float 0.1)) poses (outS $ sop)
+    instances = casti $ inst
+    poses = mergeC' (mergeCAlign ?~ int 7) [ty, tx, tz]
+    instanceIter n = (castf sampleIndex !+ (speed !* float n) !% castf instances)
+    tx = waveC' (waveCNames ?~ str "tx") instances $ ocos (castf sampleIndex !* float 60 !+ instanceIter 0.2) !* ((instanceIter 10 !* float 0.1) !+ float 4)
+    ty = waveC' (waveCNames ?~ str "ty") instances $ osin (castf sampleIndex !* float 60 !+ instanceIter 0.2) !* ((instanceIter 10 !* float 0.1) !+ float 4)
+    tz = waveC' (waveCNames ?~ str "tz") instances $ instanceIter 10 !* float 1 !- float 50
+    centerCam t r = cam' ((camTranslate .~ t) . (camPivot .~ v3mult (float (-1)) t) . (camRotate .~ r))
+  in
+    render sgeo (centerCam (v3 (float 0) (float 0) (float 5)) emptyV3)
 
 -- vidIn
 
@@ -207,7 +251,7 @@ addops = compT 0
 fadeops f = switchT' (switchTBlend ?~ bool True) f
 multops = compT 27
 overops = compT 31
-triggerops f tops = switchT (chopChan0 $
+triggerops f tops = switchT (chan0f $
                              count' ((countThresh ?~ float 0.5) .
                                      (countLimMax ?~ float (fromIntegral $ length tops)) .
                                      (countLimType ?~ int 1)
@@ -221,22 +265,40 @@ showwork g es =
 
 -- palettes
 
-neon = Palette ["A9336B", "5F2F88", "CB673D", "87BB38"]
-fire = Palette ["f07f13", "800909", "f27d0c", "fdcf58"]
-buddhist = Palette ["0000FF", "FFFF00", "FF0000", "FFFFFF", "FF9800"]
-tealness = Palette ["#6cb6bd", "#71b8b9", "#7abbb3", "#81bead", "#8cc1a5"]
+data Palette = Palette [Color]
+data Color = Hex BS.ByteString | RGB Int Int Int
+neon = Palette $ Hex <$> ["A9336B", "5F2F88", "CB673D", "87BB38"]
+fire = Palette $ Hex . BS.pack . fmap toUpper <$> ["f07f13", "800909", "f27d0c", "fdcf58"]
+buddhist = Palette $ Hex . BS.pack . fmap toUpper <$> ["0000FF", "FFFF00", "FF0000", "FFFFFF", "FF9800"]
+tealcontrast = Palette [RGB 188 242 246, RGB 50 107 113, RGB 211 90 30, RGB 209 122 43, RGB 188 242 246]
+purplish = Palette [RGB 150 110 100, RGB 223 143 67, RGB 76 73 100 , RGB 146 118 133, RGB 165 148 180]
+sunset = Palette [RGB 185 117 19, RGB 228 187 108, RGB 251 162 1, RGB 255 243 201]
+coolpink = Palette [RGB 215 40 26, RGB 157 60 121, RGB 179 83 154, RGB 187 59 98]
+darkestred = Palette [RGB 153 7 17, RGB 97 6 11, RGB 49 7 8, RGB 13 7 7, RGB 189 5 13]
+nature = Palette [RGB 63 124 7, RGB 201 121 66, RGB 213 101 23, RGB 177 201 80, RGB 180 207 127]
 
 ------------------------
 
-lagmod l = chopChan0 . lag (float 0) (float l)
+lagmod l = chan0f . lag (float 0) (float l) . constC . (:[])
 tres = (topResolution .~ (Just $ int 1920, Just $ int 1080)) . (pixelFormat ?~ int 3)
 scr = (++) "scripts/Visuals/"
 frag = frag' id
 frag' f s = glslTP' (tres . f) (scr s)
 rendered g = render' (renderLight ?~ light) g cam
 tdata v t = frag "audio_data.frag" [("i_volume", xV4 v)] [t]
-data Palette = Palette [BS.ByteString]
-palette (Palette colors) = ramp' (topResolution .~ iv2 (128, 0)) . scriptD (scr "palette_mapper.py") . table . transpose
-  $ fromLists [colors]
+palette (Palette colors) = ramp' (topResolution .~ iv2 (128, 0)) . table
+  . fromLists $ ["r", "g", "b", "a", "pos"]:(zipWith (colorToBS (length colors)) [0..] colors)
 
-
+colorToBS :: Int -> Int -> Color -> [BS.ByteString]
+colorToBS n i (Hex str) =
+  let
+    hexes = chunksOf 2 . drop 1
+    todig = flip L.elemIndex "0123456789ABCDEF"
+    toIntList = fmap todig
+    toInt = foldr (\i acc -> acc * 16 + i) 0
+    toHex = fmap toInt . sequence . toIntList
+    hextorgb = fmap (BS.pack . show . (/ 256) . fromIntegral)
+  in
+    catMaybes $ (hextorgb <$> (toHex <$> hexes (show str))) ++ [Just "1.0", Just . BS.pack . show $ fromIntegral i / fromIntegral n]
+colorToBS n i (RGB r g b) =
+  (++ [BS.pack . show $ fromIntegral i / fromIntegral n]) $ fmap (BS.pack . show . (/ 256) . fromIntegral) [r, g, b, 256]

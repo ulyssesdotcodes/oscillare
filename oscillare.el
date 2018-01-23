@@ -42,6 +42,7 @@ PROMPT-OPTIONS are passed to `intero-repl-buffer' if supplied."
   (interactive)
   (intero-repl)
   (oscillare-send-string ":load src/Visuals")
+  (oscillare-send-string ":set -XOverloadedStrings")
   (oscillare-send-string "r <- topRunner")
   )
 
