@@ -41,11 +41,13 @@ classes = {
   'count' : (countCHOP, 'count', 'CHOP'),
   'datToChop' : (dattoCHOP, 'datto', 'CHOP'),
   'delay' : (delayCHOP, 'delay', 'CHOP'),
+  'deleteChop' : (deleteCHOP, 'delete', 'CHOP'),
   'expressionChop' : (expressionCHOP, 'expression', 'CHOP'),
   'fan' : (fanCHOP, 'fan', 'CHOP'),
   'feedbackChop' : (feedbackCHOP, 'feedback', 'CHOP'),
   'hold' : (holdCHOP, 'hold', 'CHOP'),
   'lag' : (lagCHOP, 'lag', 'CHOP'),
+  'leapmotion' : (leapmotionCHOP, 'leapmotion', 'CHOP'),
   'logic' : (logicCHOP, 'logic', 'CHOP'),
   'inChop' : (inCHOP, 'in', 'CHOP'),
   'math' : (mathCHOP, 'math', 'CHOP'),
@@ -58,15 +60,19 @@ classes = {
   'renameChop' : (renameCHOP, 'rename', 'CHOP'),
   'replaceChop' : (replaceCHOP, 'replace', 'CHOP'),
   'resampleChop' : (resampleCHOP, 'resample', 'CHOP'),
-  'sopToChop' : (soptoCHOP, 'sopto', 'CHOP'),
+  'scriptChop' : (scriptCHOP, 'script', 'CHOP'),
   'selectChop' : (selectCHOP, 'select', 'CHOP'),
+  'sopToChop' : (soptoCHOP, 'sopto', 'CHOP'),
   'shuffleChop' : (shuffleCHOP, 'shuffle', 'CHOP'),
   'switchChop' : (switchCHOP, 'switch', 'CHOP'),
   'stretchChop' : (stretchCHOP, 'stretch', 'CHOP'),
+  'speedChop' : (speedCHOP, 'speed', 'CHOP'),
   'topToChop' : (toptoCHOP, 'topto', 'CHOP'),
   'timer' : (timerCHOP, 'timer', 'CHOP'),
+  'trailChop' : (trailCHOP, 'trail', 'CHOP'),
   'waveChop' : (waveCHOP, 'wave', 'CHOP'),
 
+  'boxSop' : (boxSOP, 'box', 'SOP'),
   'chopToSop' : (choptoSOP, 'chopto', 'SOP'),
   'circleSop' : (circleSOP, 'circle', 'SOP'),
   'gridSop' : (gridSOP, 'grid', 'SOP'),
@@ -80,19 +86,23 @@ classes = {
   'torusSop' : (torusSOP, 'torus', 'SOP'),
   'sweep' : (sweepSOP, 'sweep', 'SOP'),
   'transformSop' : (transformSOP, 'transform', 'SOP'),
+  'tubeSop' : (tubeSOP, 'tube', 'SOP'),
 
   'inMat' : (inMAT, 'in', 'MAT'),
   'wireframeMat' : (wireframeMAT, 'wireframe', 'MAT'),
   'outMat' : (outMAT, 'out', 'MAT'),
+  'pbrMat' : (pbrMAT, 'pbr', 'MAT'),
   'constMat' : (constantMAT, 'constant', 'MAT'),
 
   'chopExec' : (chopexecuteDAT, 'chopexecute', 'DAT'),
+  'executeDat' : (executeDAT, 'execute', 'DAT'),
   'datExec' : (datexecuteDAT, 'datexecute', 'DAT'),
   'inDat' : (inDAT, 'in', 'DAT'),
   'oscInDat' : (oscinDAT, 'oscin', 'DAT'),
   'outDat' : (outDAT, 'out', 'DAT'),
   'scriptDat' : (scriptDAT, 'script', 'DAT'),
   'selectDat' : (selectDAT, 'select', 'DAT'),
+  'serialDat' : (serialDAT, 'serial', 'DAT'),
   'table' : (tableDAT, 'table', 'DAT'),
   'textDat' : (textDAT, 'text', 'DAT'),
   'tcpip' : (tcpipDAT, 'tcpip', 'DAT'),
@@ -187,6 +197,10 @@ def addAll(state):
       for connector in op(conn[1]).inputConnectors:
         connector.disconnect()
     op(getName(conn[0])).outputConnectors[0].connect(op(conn[1]).inputConnectors[conn[2]])
+    if op(conn[1]).type == 'feedback' and op(conn[1]).isCHOP:
+      print("feedback chop11")
+      op(conn[1]).par.reset.pulse(1, frames=2)
+
 
 def addChange(key, value):
   addr = getName(key)
@@ -228,7 +242,7 @@ def createOp(addr, ty):
     op(addr).destroy()
 
   # Special case things that can't have duplicates
-  if clazz[1] == 'audiodevin' or clazz[1] == 'videodevin' or clazz[1] == 'ndiin':
+  if clazz[1] == 'audiodevin' or clazz[1] == 'videodevin' or clazz[1] == 'ndiin' or clazz[1] == 'leapmotion':
     if op(clazz[1]) == None:
       parent().create(clazz[0], clazz[1])
     if clazz[2] == "CHOP":

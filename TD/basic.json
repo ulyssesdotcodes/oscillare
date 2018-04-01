@@ -1,0 +1,2828 @@
+{
+ "/audiodevin": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "autoexportroot": {
+    "mode": "expression",
+    "value": "parent()"
+   },
+   "device": {
+    "mode": "constant",
+    "value": "{0.0.1.00000000}.{75402680-5f71-4393-ab85-0f7822f1d257}||Microphone_(Realtek_Audio)||2"
+   },
+   "specifydevice": {
+    "mode": "constant",
+    "value": true
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "timeslice": {
+    "mode": "constant",
+    "value": true
+   }
+  },
+  "json_type": "audiodeviceinCHOP",
+  "nodeX": -325,
+  "nodeY": 575,
+  "render": false,
+  "tags": []
+ },
+ "/chopexec1": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "chop": {
+    "mode": "constant",
+    "value": "container1/null1"
+   },
+   "edit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "fromop": {
+    "mode": "expression",
+    "value": "parent()"
+   },
+   "offtoon": {
+    "mode": "constant",
+    "value": true
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "valuechange": {
+    "mode": "constant",
+    "value": false
+   }
+  },
+  "json_type": "chopexecuteDAT",
+  "nodeX": 575,
+  "nodeY": 500,
+  "render": false,
+  "tags": [],
+  "text": "# me - this DAT\n# \n# channel - the Channel object which has changed\n# sampleIndex - the index of the changed sample\n# val - the numeric value of the changed sample\n# prev - the previous sample value\n# \n# Make sure the corresponding toggle is enabled in the CHOP Execute DAT.\n\ndef onSwitchOn(channel, sampleIndex, val, prev):\n\top('scripts').par.loadonstartpulse.pulse()\n\top('oscin1_callbacks').par.loadonstartpulse.pulse()\n\treturn\n\ndef whileOn(channel, sampleIndex, val, prev):\n\treturn\n\ndef onSwitchOff(channel, sampleIndex, val, prev):\n\treturn\n\ndef whileOff(channel, sampleIndex, val, prev):\n\treturn\n\ndef onValueChange(channel, sampleIndex, val, prev):\n\treturn\n\t"
+ },
+ "/container1": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "enablecloningpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "h": {
+    "mode": "constant",
+    "value": 57
+   },
+   "reinitextensions": {
+    "mode": "constant",
+    "value": 0
+   },
+   "reinitnet": {
+    "mode": "constant",
+    "value": 0
+   },
+   "repocomp": {
+    "mode": "expression",
+    "value": "me"
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "w": {
+    "mode": "constant",
+    "value": 214
+   }
+  },
+  "json_type": "containerCOMP",
+  "nodeX": -325,
+  "nodeY": 825,
+  "render": false,
+  "tags": []
+ },
+ "/container1/button1": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "enablecloningpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "h": {
+    "mode": "constant",
+    "value": 50
+   },
+   "reinitextensions": {
+    "mode": "constant",
+    "value": 0
+   },
+   "reinitnet": {
+    "mode": "constant",
+    "value": 0
+   },
+   "repocomp": {
+    "mode": "expression",
+    "value": "me"
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 1
+   },
+   "top": {
+    "mode": "constant",
+    "value": "./bg"
+   },
+   "w": {
+    "mode": "constant",
+    "value": 50
+   },
+   "x": {
+    "mode": "constant",
+    "value": 57
+   }
+  },
+  "json_type": "buttonCOMP",
+  "nodeX": 25,
+  "nodeY": 525,
+  "render": false,
+  "tags": []
+ },
+ "/container1/button1/bg": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "antialias": {
+    "mode": "constant",
+    "value": 0
+   },
+   "armenu": {
+    "mode": "constant",
+    "value": 0
+   },
+   "bgalpha": {
+    "mode": "constant",
+    "value": 1.0
+   },
+   "bgcolorb": {
+    "mode": "expression",
+    "value": "op('color')[int(op('i')['state']+1),'background']"
+   },
+   "bgcolorg": {
+    "mode": "expression",
+    "value": "op('color')[int(op('i')['state']+1),'background']"
+   },
+   "bgcolorr": {
+    "mode": "expression",
+    "value": "op('color')[int(op('i')['state']+1),'background']"
+   },
+   "borderab": {
+    "mode": "expression",
+    "value": "op('color')[int(op('i')['state']+1),'border']"
+   },
+   "borderag": {
+    "mode": "expression",
+    "value": "op('color')[int(op('i')['state']+1),'border']"
+   },
+   "borderar": {
+    "mode": "expression",
+    "value": "op('color')[int(op('i')['state']+1),'border']"
+   },
+   "bottomborder": {
+    "mode": "constant",
+    "value": "bordera"
+   },
+   "dispmethod": {
+    "mode": "constant",
+    "value": 3
+   },
+   "fillmode": {
+    "mode": "constant",
+    "value": "useinput"
+   },
+   "fontcolorb": {
+    "mode": "expression",
+    "value": "op('color')[int(op('i')['state']+1),'font']"
+   },
+   "fontcolorg": {
+    "mode": "expression",
+    "value": "op('color')[int(op('i')['state']+1),'font']"
+   },
+   "fontcolorr": {
+    "mode": "expression",
+    "value": "op('color')[int(op('i')['state']+1),'font']"
+   },
+   "fontsizex": {
+    "mode": "constant",
+    "value": 10.0
+   },
+   "fontsizexunit": {
+    "mode": "constant",
+    "value": 3
+   },
+   "fontsizeyunit": {
+    "mode": "constant",
+    "value": 3
+   },
+   "leftborder": {
+    "mode": "constant",
+    "value": "bordera"
+   },
+   "linespacingunit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "positionunit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "resmenu": {
+    "mode": "constant",
+    "value": 9
+   },
+   "resolutionh": {
+    "mode": "expression",
+    "value": "parent().par.panelh"
+   },
+   "resolutionw": {
+    "mode": "expression",
+    "value": "parent().par.panelw"
+   },
+   "rightborder": {
+    "mode": "constant",
+    "value": "bordera"
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "text": {
+    "mode": "expression",
+    "value": "'Reset\\nscripts'"
+   },
+   "topborder": {
+    "mode": "constant",
+    "value": "bordera"
+   }
+  },
+  "json_type": "textTOP",
+  "nodeX": 280,
+  "nodeY": 250,
+  "render": false,
+  "tags": []
+ },
+ "/container1/button1/color": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "edit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "loadonstartpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "writepulse": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "tableDAT",
+  "nodeX": 290,
+  "nodeY": 360,
+  "render": false,
+  "tags": [],
+  "text": "state\tfont\tbackground\tborder\r\noff\t0.73\t0.23\t0.43\r\non\t0.9\t0.43\t0.6\r\nrollover\t0.73\t0.4\t0.5\r\nrolloveron\t0.9\t0.6\t0.8\r\n"
+ },
+ "/container1/button1/i": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/container1/button1/panel1"
+  ],
+  "json_parameters": {
+   "autoexportroot": {
+    "mode": "expression",
+    "value": "parent()"
+   },
+   "chanperexpr": {
+    "mode": "constant",
+    "value": 2
+   },
+   "expr0": {
+    "mode": "expression",
+    "value": "me.inputVal+2*me.inputs[0][1][0]"
+   },
+   "expr1": {
+    "mode": "expression",
+    "value": "me.inputVal"
+   },
+   "expr2": {
+    "mode": "expression",
+    "value": "me.inputVal"
+   },
+   "expr3": {
+    "mode": "expression",
+    "value": "me.inputVal"
+   },
+   "expr4": {
+    "mode": "expression",
+    "value": "me.inputVal"
+   },
+   "expr5": {
+    "mode": "expression",
+    "value": "me.inputVal"
+   },
+   "limitexpr": {
+    "mode": "constant",
+    "value": true
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "expressionCHOP",
+  "nodeX": 290,
+  "nodeY": 130,
+  "render": false,
+  "tags": []
+ },
+ "/container1/button1/out1": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/container1/button1/select1"
+  ],
+  "json_parameters": {
+   "autoexportroot": {
+    "mode": "expression",
+    "value": "parent()"
+   },
+   "label": {
+    "mode": "expression",
+    "value": "me.name"
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "outCHOP",
+  "nodeX": 460,
+  "nodeY": 20,
+  "render": false,
+  "tags": []
+ },
+ "/container1/button1/panel1": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "autoexportroot": {
+    "mode": "expression",
+    "value": "parent()"
+   },
+   "component": {
+    "mode": "expression",
+    "value": "parent()"
+   },
+   "select": {
+    "mode": "constant",
+    "value": "state rollover select"
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "panelCHOP",
+  "nodeX": 0,
+  "nodeY": 20,
+  "render": false,
+  "tags": []
+ },
+ "/container1/button1/select1": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/container1/button1/panel1"
+  ],
+  "json_parameters": {
+   "autoexportroot": {
+    "mode": "expression",
+    "value": "parent()"
+   },
+   "channames": {
+    "mode": "constant",
+    "value": "state"
+   },
+   "renameto": {
+    "mode": "constant",
+    "value": "v1"
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "selectCHOP",
+  "nodeX": 290,
+  "nodeY": 20,
+  "render": false,
+  "tags": []
+ },
+ "/container1/button2": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "buttontype": {
+    "mode": "constant",
+    "value": "toggledown"
+   },
+   "enablecloningpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "h": {
+    "mode": "constant",
+    "value": 50
+   },
+   "reinitextensions": {
+    "mode": "constant",
+    "value": 0
+   },
+   "reinitnet": {
+    "mode": "constant",
+    "value": 0
+   },
+   "repocomp": {
+    "mode": "expression",
+    "value": "me"
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "top": {
+    "mode": "constant",
+    "value": "./bg"
+   },
+   "w": {
+    "mode": "constant",
+    "value": 50
+   }
+  },
+  "json_type": "buttonCOMP",
+  "nodeX": 25,
+  "nodeY": 800,
+  "render": false,
+  "tags": []
+ },
+ "/container1/button2/bg": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "antialias": {
+    "mode": "constant",
+    "value": 0
+   },
+   "armenu": {
+    "mode": "constant",
+    "value": 0
+   },
+   "bgalpha": {
+    "mode": "constant",
+    "value": 1.0
+   },
+   "bgcolorb": {
+    "mode": "expression",
+    "value": "op('color')[int(op('i')['state']+1),'background']"
+   },
+   "bgcolorg": {
+    "mode": "expression",
+    "value": "op('color')[int(op('i')['state']+1),'background']"
+   },
+   "bgcolorr": {
+    "mode": "expression",
+    "value": "op('color')[int(op('i')['state']+1),'background']"
+   },
+   "borderab": {
+    "mode": "expression",
+    "value": "op('color')[int(op('i')['state']+1),'border']"
+   },
+   "borderag": {
+    "mode": "expression",
+    "value": "op('color')[int(op('i')['state']+1),'border']"
+   },
+   "borderar": {
+    "mode": "expression",
+    "value": "op('color')[int(op('i')['state']+1),'border']"
+   },
+   "bottomborder": {
+    "mode": "constant",
+    "value": "bordera"
+   },
+   "dispmethod": {
+    "mode": "constant",
+    "value": 3
+   },
+   "fillmode": {
+    "mode": "constant",
+    "value": "useinput"
+   },
+   "fontcolorb": {
+    "mode": "expression",
+    "value": "op('color')[int(op('i')['state']+1),'font']"
+   },
+   "fontcolorg": {
+    "mode": "expression",
+    "value": "op('color')[int(op('i')['state']+1),'font']"
+   },
+   "fontcolorr": {
+    "mode": "expression",
+    "value": "op('color')[int(op('i')['state']+1),'font']"
+   },
+   "fontsizex": {
+    "mode": "constant",
+    "value": 10.0
+   },
+   "fontsizexunit": {
+    "mode": "constant",
+    "value": 3
+   },
+   "fontsizeyunit": {
+    "mode": "constant",
+    "value": 3
+   },
+   "leftborder": {
+    "mode": "constant",
+    "value": "bordera"
+   },
+   "linespacingunit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "positionunit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "resmenu": {
+    "mode": "constant",
+    "value": 9
+   },
+   "resolutionh": {
+    "mode": "expression",
+    "value": "parent().par.panelh"
+   },
+   "resolutionw": {
+    "mode": "expression",
+    "value": "parent().par.panelw"
+   },
+   "rightborder": {
+    "mode": "constant",
+    "value": "bordera"
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "text": {
+    "mode": "constant",
+    "value": "Record"
+   },
+   "topborder": {
+    "mode": "constant",
+    "value": "bordera"
+   }
+  },
+  "json_type": "textTOP",
+  "nodeX": 280,
+  "nodeY": 250,
+  "render": false,
+  "tags": []
+ },
+ "/container1/button2/color": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "edit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "loadonstartpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "writepulse": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "tableDAT",
+  "nodeX": 290,
+  "nodeY": 360,
+  "render": false,
+  "tags": [],
+  "text": "state\tfont\tbackground\tborder\r\noff\t0.73\t0.23\t0.43\r\non\t0.9\t0.43\t0.6\r\nrollover\t0.73\t0.4\t0.5\r\nrolloveron\t0.9\t0.6\t0.8\r\n"
+ },
+ "/container1/button2/i": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/container1/button2/panel1"
+  ],
+  "json_parameters": {
+   "autoexportroot": {
+    "mode": "expression",
+    "value": "parent()"
+   },
+   "chanperexpr": {
+    "mode": "constant",
+    "value": 2
+   },
+   "expr0": {
+    "mode": "expression",
+    "value": "me.inputVal+2*me.inputs[0][1][0]"
+   },
+   "expr1": {
+    "mode": "expression",
+    "value": "me.inputVal"
+   },
+   "expr2": {
+    "mode": "expression",
+    "value": "me.inputVal"
+   },
+   "expr3": {
+    "mode": "expression",
+    "value": "me.inputVal"
+   },
+   "expr4": {
+    "mode": "expression",
+    "value": "me.inputVal"
+   },
+   "expr5": {
+    "mode": "expression",
+    "value": "me.inputVal"
+   },
+   "limitexpr": {
+    "mode": "constant",
+    "value": true
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "expressionCHOP",
+  "nodeX": 290,
+  "nodeY": 130,
+  "render": false,
+  "tags": []
+ },
+ "/container1/button2/out1": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/container1/button2/select1"
+  ],
+  "json_parameters": {
+   "autoexportroot": {
+    "mode": "expression",
+    "value": "parent()"
+   },
+   "label": {
+    "mode": "expression",
+    "value": "me.name"
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "outCHOP",
+  "nodeX": 460,
+  "nodeY": 20,
+  "render": false,
+  "tags": []
+ },
+ "/container1/button2/panel1": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "autoexportroot": {
+    "mode": "expression",
+    "value": "parent()"
+   },
+   "component": {
+    "mode": "expression",
+    "value": "parent()"
+   },
+   "select": {
+    "mode": "constant",
+    "value": "state rollover select"
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "panelCHOP",
+  "nodeX": 0,
+  "nodeY": 20,
+  "render": false,
+  "tags": []
+ },
+ "/container1/button2/select1": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/container1/button2/panel1"
+  ],
+  "json_parameters": {
+   "autoexportroot": {
+    "mode": "expression",
+    "value": "parent()"
+   },
+   "channames": {
+    "mode": "constant",
+    "value": "state"
+   },
+   "renameto": {
+    "mode": "constant",
+    "value": "v1"
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "selectCHOP",
+  "nodeX": 290,
+  "nodeY": 20,
+  "render": false,
+  "tags": []
+ },
+ "/container1/count1": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/container1/record"
+  ],
+  "json_parameters": {
+   "autoexportroot": {
+    "mode": "expression",
+    "value": "parent()"
+   },
+   "exporttable": {
+    "mode": "constant",
+    "value": "count1_export"
+   },
+   "resetpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "retriggerunit": {
+    "mode": "constant",
+    "value": 2
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "timeslice": {
+    "mode": "constant",
+    "value": true
+   }
+  },
+  "json_type": "countCHOP",
+  "nodeX": 400,
+  "nodeY": 725,
+  "render": false,
+  "tags": []
+ },
+ "/container1/count1_export": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "edit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "loadonstartpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "writepulse": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "tableDAT",
+  "nodeX": 400,
+  "nodeY": 600,
+  "render": false,
+  "tags": [],
+  "text": "name\tindex\tpath\tparameter\tenable\r\nv1\t0\tmoviefileout1\tn\t1\r\n"
+ },
+ "/container1/moviefileout1": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/container1/select1"
+  ],
+  "json_parameters": {
+   "addframe": {
+    "mode": "constant",
+    "value": 0
+   },
+   "armenu": {
+    "mode": "constant",
+    "value": 0
+   },
+   "audiochop": {
+    "mode": "constant",
+    "value": "../audiodevin"
+   },
+   "file": {
+    "mode": "expression",
+    "value": "'videos/audio_rec.'+str(me.par.n.eval())+'.mov'"
+   },
+   "fillmode": {
+    "mode": "constant",
+    "value": "useinput"
+   },
+   "imagefiletype": {
+    "mode": "constant",
+    "value": 0
+   },
+   "maxthread": {
+    "mode": "constant",
+    "value": 0
+   },
+   "n": {
+    "mode": "export",
+    "value": null
+   },
+   "record": {
+    "mode": "export",
+    "value": null
+   },
+   "resmenu": {
+    "mode": "constant",
+    "value": 9
+   },
+   "resolutionh": {
+    "mode": "constant",
+    "value": 1
+   },
+   "resolutionw": {
+    "mode": "constant",
+    "value": 1
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "type": {
+    "mode": "constant",
+    "value": 0
+   },
+   "videocodec": {
+    "mode": "constant",
+    "value": "mpeg4"
+   }
+  },
+  "json_type": "moviefileoutTOP",
+  "nodeX": 425,
+  "nodeY": 875,
+  "render": false,
+  "tags": []
+ },
+ "/container1/null1": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/container1/out1"
+  ],
+  "json_parameters": {
+   "autoexportroot": {
+    "mode": "expression",
+    "value": "parent()"
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "nullCHOP",
+  "nodeX": 200,
+  "nodeY": 450,
+  "render": false,
+  "tags": []
+ },
+ "/container1/null2_export": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "edit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "loadonstartpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "writepulse": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "tableDAT",
+  "nodeX": 225,
+  "nodeY": 625,
+  "render": false,
+  "tags": [],
+  "text": "name\tindex\tpath\tparameter\tenable\r\nv1\t0\tmoviefileout1\trecord\t1\r\n"
+ },
+ "/container1/record": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/container1/out1"
+  ],
+  "json_parameters": {
+   "autoexportroot": {
+    "mode": "expression",
+    "value": "parent()"
+   },
+   "exporttable": {
+    "mode": "constant",
+    "value": "null2_export"
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "nullCHOP",
+  "nodeX": 225,
+  "nodeY": 725,
+  "render": false,
+  "tags": []
+ },
+ "/container1/select1": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "armenu": {
+    "mode": "constant",
+    "value": 0
+   },
+   "resmenu": {
+    "mode": "constant",
+    "value": 9
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "top": {
+    "mode": "constant",
+    "value": "../out1"
+   }
+  },
+  "json_type": "selectTOP",
+  "nodeX": 225,
+  "nodeY": 875,
+  "render": false,
+  "tags": []
+ },
+ "/hooks": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "edit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "file": {
+    "mode": "constant",
+    "value": "scripts/hooks.py"
+   },
+   "loadonstartpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "writepulse": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "textDAT",
+  "nodeX": 550,
+  "nodeY": 275,
+  "render": false,
+  "tags": [],
+  "text": "import time\n\ndef newJson(json):\n  print(op('container1/record')[0])\n  if op('container1/record')[0] == 1:\n    jsonRecord = op('json_record')\n    jsonRecord[0,0] = int(time.time())\n    jsonRecord[0,1] = json\n    op('json_record_out').par.write.pulse()\n  return\n"
+ },
+ "/json_record": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "cols": {
+    "mode": "constant",
+    "value": 2
+   },
+   "edit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "loadonstartpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "rows": {
+    "mode": "constant",
+    "value": 1
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "writepulse": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "tableDAT",
+  "nodeX": -75,
+  "nodeY": 400,
+  "render": false,
+  "tags": [],
+  "text": "1511754299\t{'/math_1': {'parameters': {'gain': '1.0'}, 'connections': ['/audioIn_0'], 'commands': [], 'text': None, 'ty': 'math'}, '/base_0': {'parameters': {'Separation': 'op(\"analyze_0\")[0]', 'Alignment': '0.5', 'Cohesion': '0.5', 'externaltox': '\"toxes/Visuals/flockingGpu.tox\"', 'Speed': '(0.4+(op(\"analyze_1\")[0]*4.0))'}, 'connections': [], 'commands': [], 'text': None, 'ty': 'base'}, '/selectTop_0_feedbackTop_0': {'parameters': {'top': 'op(\"compositeTop_0_feedbackTop_0\")'}, 'connections': [], 'commands': [], 'text': None, 'ty': 'selectTop'}, '/audioIn_0': {'parameters': {}, 'connections': [], 'commands': [], 'text': None, 'ty': 'audioIn'}, '/scriptDat_0': {'parameters': {'callbacks': 'op(\"textDat_1\")'}, 'connections': ['/table_0'], 'commands': [], 'text': None, 'ty': 'scriptDat'}, '/audioFilter_0': {'parameters': {'filter': '0'}, 'connections': ['/math_0'], 'commands': [], 'text': None, 'ty': 'audioFilter'}, '/textDat_1': {'parameters': {'file': '\"scripts/Visuals/palette_mapper.py\"'}, 'connections': [], 'commands': [{'command': 'pulse', 'args': ['loadonstartpulse', '1', '1']}], 'text': None, 'ty': 'textDat'}, '/levelTop_0_feedbackTop_0': {'parameters': {'opacity': '0.97'}, 'connections': ['/feedbackTop_0'], 'commands': [], 'text': None, 'ty': 'levelTop'}, '/textDat_0': {'parameters': {'file': '\"scripts/Visuals/palette_map.frag\"'}, 'connections': [], 'commands': [{'command': 'pulse', 'args': ['loadonstartpulse', '1', '1']}], 'text': None, 'ty': 'textDat'}, '/analyze_0': {'parameters': {'function': '6'}, 'connections': ['/audioFilter_0'], 'commands': [], 'text': None, 'ty': 'analyze'}, '/math_0': {'parameters': {'gain': '4.0'}, 'connections': ['/audioIn_0'], 'commands': [], 'text': None, 'ty': 'math'}, '/analyze_1': {'parameters': {'function': '6'}, 'connections': ['/math_1'], 'commands': [], 'text': None, 'ty': 'analyze'}, '/table_0': {'parameters': {}, 'connections': [], 'commands': [], 'text': 'A9336B\\n5F2F88\\nCB673D\\n87BB38', 'ty': 'table'}, '/hsvAdjustTop_0': {'parameters': {'valuemult': '1.5'}, 'connections': ['/glslTop_0'], 'commands': [], 'text': None, 'ty': 'hsvAdjustTop'}, '/ramp_0': {'parameters': {'dat': 'op(\"scriptDat_0\")', 'resolutionw': '128', 'resolutionh': '0'}, 'connections': [], 'commands': [], 'text': None, 'ty': 'ramp'}, '/feedbackTop_0': {'parameters': {'top': 'op(\"selectTop_0_feedbackTop_0\")'}, 'connections': ['/base_0'], 'commands': [], 'text': None, 'ty': 'feedbackTop'}, '/outTop_0': {'parameters': {}, 'connections': ['/hsvAdjustTop_0'], 'commands': [], 'text': None, 'ty': 'outTop'}, '/glslTop_0': {'parameters': {'pixeldat': 'op(\"textDat_0\")', 'uniname1': '\"uSamples\"', 'uniname0': '\"uOffset\"', 'resolutionw': '1920', 'value1x': '16.0', 'outputresolution': '9', 'format': '3', 'resolutionh': '1080', 'value0x': '(absTime.seconds*0.3)'}, 'connections': ['/compositeTop_0_feedbackTop_0', '/ramp_0'], 'commands': [], 'text': None, 'ty': 'glslTop'}, '/compositeTop_0_feedbackTop_0': {'parameters': {'operand': '0'}, 'connections': ['/base_0', '/levelTop_0_feedbackTop_0'], 'commands': [], 'text': None, 'ty': 'compositeTop'}}\r\n"
+ },
+ "/json_record_out": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/json_record"
+  ],
+  "json_parameters": {
+   "append": {
+    "mode": "constant",
+    "value": true
+   },
+   "file": {
+    "mode": "constant",
+    "value": "videos/json_output.txt"
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "write": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "fileoutDAT",
+  "nodeX": 100,
+  "nodeY": 400,
+  "render": false,
+  "tags": [],
+  "text": ""
+ },
+ "/lambda": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "enablecloningpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "reinitextensions": {
+    "mode": "constant",
+    "value": 0
+   },
+   "reinitnet": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "baseCOMP",
+  "nodeX": 375,
+  "nodeY": 800,
+  "render": false,
+  "tags": []
+ },
+ "/lambda/analyze_0": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/lambda/math_0"
+  ],
+  "json_parameters": {
+   "autoexportroot": {
+    "mode": "expression",
+    "value": "parent()"
+   },
+   "function": {
+    "mode": "constant",
+    "value": "rmspower"
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "analyzeCHOP",
+  "nodeX": 3120,
+  "nodeY": 0,
+  "render": false,
+  "tags": []
+ },
+ "/lambda/audioIn_0": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "autoexportroot": {
+    "mode": "expression",
+    "value": "parent()"
+   },
+   "chop": {
+    "mode": "constant",
+    "value": "/project1/audiodevin"
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "selectCHOP",
+  "nodeX": 2730,
+  "nodeY": 0,
+  "render": false,
+  "tags": []
+ },
+ "/lambda/blur_0": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/lambda/glslTop_0"
+  ],
+  "json_parameters": {
+   "armenu": {
+    "mode": "constant",
+    "value": 0
+   },
+   "fillmode": {
+    "mode": "constant",
+    "value": "useinput"
+   },
+   "offsetunit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "resmenu": {
+    "mode": "constant",
+    "value": 9
+   },
+   "size": {
+    "mode": "constant",
+    "value": 8
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "blurTOP",
+  "nodeX": 1950,
+  "nodeY": 67,
+  "render": false,
+  "tags": []
+ },
+ "/lambda/chopToTop_0": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "armenu": {
+    "mode": "constant",
+    "value": 0
+   },
+   "chop": {
+    "mode": "expression",
+    "value": "op(\"math_0\")"
+   },
+   "resmenu": {
+    "mode": "constant",
+    "value": 9
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "choptoTOP",
+  "nodeX": 0,
+  "nodeY": 0,
+  "render": false,
+  "tags": []
+ },
+ "/lambda/compositeTop_0": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/lambda/transform_1",
+   "/lambda/transform_2"
+  ],
+  "json_parameters": {
+   "armenu": {
+    "mode": "constant",
+    "value": 0
+   },
+   "fillmode": {
+    "mode": "constant",
+    "value": "useinput"
+   },
+   "operand": {
+    "mode": "constant",
+    "value": "add"
+   },
+   "punit": {
+    "mode": "constant",
+    "value": 1
+   },
+   "resmenu": {
+    "mode": "constant",
+    "value": 9
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "tstepunit": {
+    "mode": "constant",
+    "value": 1
+   },
+   "tunit": {
+    "mode": "constant",
+    "value": 1
+   }
+  },
+  "json_type": "compositeTOP",
+  "nodeX": 585,
+  "nodeY": 135,
+  "render": false,
+  "tags": []
+ },
+ "/lambda/compositeTop_0_feedbackTop_0": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/lambda/glslTop_1",
+   "/lambda/levelTop_0_feedbackTop_0"
+  ],
+  "json_parameters": {
+   "armenu": {
+    "mode": "constant",
+    "value": 0
+   },
+   "fillmode": {
+    "mode": "constant",
+    "value": "useinput"
+   },
+   "operand": {
+    "mode": "constant",
+    "value": "add"
+   },
+   "punit": {
+    "mode": "constant",
+    "value": 1
+   },
+   "resmenu": {
+    "mode": "constant",
+    "value": 9
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "tstepunit": {
+    "mode": "constant",
+    "value": 1
+   },
+   "tunit": {
+    "mode": "constant",
+    "value": 1
+   }
+  },
+  "json_type": "compositeTOP",
+  "nodeX": 1365,
+  "nodeY": 135,
+  "render": false,
+  "tags": []
+ },
+ "/lambda/feedbackTop_0": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/lambda/glslTop_1"
+  ],
+  "json_parameters": {
+   "armenu": {
+    "mode": "constant",
+    "value": 0
+   },
+   "fillmode": {
+    "mode": "constant",
+    "value": "useinput"
+   },
+   "resetpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "resmenu": {
+    "mode": "constant",
+    "value": 9
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "top": {
+    "mode": "expression",
+    "value": "op(\"transform_0_feedbackTop_0\")"
+   }
+  },
+  "json_type": "feedbackTOP",
+  "nodeX": 975,
+  "nodeY": 135,
+  "render": false,
+  "tags": []
+ },
+ "/lambda/glslTop_0": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/lambda/transform_0_feedbackTop_0",
+   "/lambda/ramp_0"
+  ],
+  "json_parameters": {
+   "armenu": {
+    "mode": "constant",
+    "value": 0
+   },
+   "computedat": {
+    "mode": "constant",
+    "value": "glslTop_0_compute"
+   },
+   "format": {
+    "mode": "constant",
+    "value": "rgba16float"
+   },
+   "loaduniformnames": {
+    "mode": "constant",
+    "value": 0
+   },
+   "outputresolution": {
+    "mode": "constant",
+    "value": "custom"
+   },
+   "pixeldat": {
+    "mode": "expression",
+    "value": "op(\"textDat_0\")"
+   },
+   "resmenu": {
+    "mode": "constant",
+    "value": 9
+   },
+   "resolutionh": {
+    "mode": "constant",
+    "value": 1080
+   },
+   "resolutionw": {
+    "mode": "constant",
+    "value": 1920
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "uniname0": {
+    "mode": "expression",
+    "value": "\"uOffset\""
+   },
+   "uniname1": {
+    "mode": "expression",
+    "value": "\"uSamples\""
+   },
+   "value0x": {
+    "mode": "expression",
+    "value": "(absTime.seconds*0.4)"
+   },
+   "value1x": {
+    "mode": "constant",
+    "value": 16.0
+   }
+  },
+  "json_type": "glslmultiTOP",
+  "nodeX": 1755,
+  "nodeY": 67,
+  "render": false,
+  "tags": []
+ },
+ "/lambda/glslTop_0_compute": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "edit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "extension": {
+    "mode": "constant",
+    "value": "glsl"
+   },
+   "loadonstartpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "writepulse": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "textDAT",
+  "nodeX": 160,
+  "nodeY": -120,
+  "render": false,
+  "tags": [],
+  "text": "// Example Compute Shader\n\n// uniform float exampleUniform;\n\nlayout (local_size_x = 8, local_size_y = 8) in;\nvoid main()\n{\n    vec4 color;\n    //color = texelFetch(sTD2DInputs[0], ivec2(gl_GlobalInvocationID.xy), 0);\n    color = vec4(1.0);\n    imageStore(sTDComputeOutputs[0], ivec2(gl_GlobalInvocationID.xy), TDOutputSwizzle(color));\n}\n"
+ },
+ "/lambda/glslTop_0_pixel": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "edit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "extension": {
+    "mode": "constant",
+    "value": "glsl"
+   },
+   "loadonstartpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "writepulse": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "textDAT",
+  "nodeX": 3705,
+  "nodeY": -120,
+  "render": false,
+  "tags": [],
+  "text": "// Example Pixel Shader\n\n// uniform float exampleUniform;\n\nout vec4 fragColor;\nvoid main()\n{\n    // vec4 color = texture(sTD2DInputs[0], vUV.st);\n    vec4 color = vec4(1.0);\n    fragColor = TDOutputSwizzle(color);\n}\n"
+ },
+ "/lambda/glslTop_1": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/lambda/compositeTop_0"
+  ],
+  "json_parameters": {
+   "armenu": {
+    "mode": "constant",
+    "value": 0
+   },
+   "computedat": {
+    "mode": "constant",
+    "value": "glslTop_1_compute"
+   },
+   "format": {
+    "mode": "constant",
+    "value": "rgba16float"
+   },
+   "loaduniformnames": {
+    "mode": "constant",
+    "value": 0
+   },
+   "outputresolution": {
+    "mode": "constant",
+    "value": "custom"
+   },
+   "pixeldat": {
+    "mode": "expression",
+    "value": "op(\"textDat_1\")"
+   },
+   "resmenu": {
+    "mode": "constant",
+    "value": 9
+   },
+   "resolutionh": {
+    "mode": "constant",
+    "value": 1080
+   },
+   "resolutionw": {
+    "mode": "constant",
+    "value": 1920
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "uniname0": {
+    "mode": "expression",
+    "value": "\"uClones\""
+   },
+   "uniname1": {
+    "mode": "expression",
+    "value": "\"uTranslate\""
+   },
+   "uniname2": {
+    "mode": "expression",
+    "value": "\"uScale\""
+   }
+  },
+  "json_type": "glslmultiTOP",
+  "nodeX": 780,
+  "nodeY": 135,
+  "render": false,
+  "tags": []
+ },
+ "/lambda/glslTop_1_compute": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "edit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "extension": {
+    "mode": "constant",
+    "value": "glsl"
+   },
+   "loadonstartpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "writepulse": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "textDAT",
+  "nodeX": 160,
+  "nodeY": -120,
+  "render": false,
+  "tags": [],
+  "text": "// Example Compute Shader\n\n// uniform float exampleUniform;\n\nlayout (local_size_x = 8, local_size_y = 8) in;\nvoid main()\n{\n    vec4 color;\n    //color = texelFetch(sTD2DInputs[0], ivec2(gl_GlobalInvocationID.xy), 0);\n    color = vec4(1.0);\n    imageStore(sTDComputeOutputs[0], ivec2(gl_GlobalInvocationID.xy), TDOutputSwizzle(color));\n}\n"
+ },
+ "/lambda/glslTop_1_pixel": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "edit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "extension": {
+    "mode": "constant",
+    "value": "glsl"
+   },
+   "loadonstartpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "writepulse": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "textDAT",
+  "nodeX": 3900,
+  "nodeY": -120,
+  "render": false,
+  "tags": [],
+  "text": "// Example Pixel Shader\n\n// uniform float exampleUniform;\n\nout vec4 fragColor;\nvoid main()\n{\n    // vec4 color = texture(sTD2DInputs[0], vUV.st);\n    vec4 color = vec4(1.0);\n    fragColor = TDOutputSwizzle(color);\n}\n"
+ },
+ "/lambda/glslTop_2": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/lambda/chopToTop_0"
+  ],
+  "json_parameters": {
+   "armenu": {
+    "mode": "constant",
+    "value": 0
+   },
+   "computedat": {
+    "mode": "constant",
+    "value": "glslTop_2_compute"
+   },
+   "format": {
+    "mode": "constant",
+    "value": "rgba16float"
+   },
+   "loaduniformnames": {
+    "mode": "constant",
+    "value": 0
+   },
+   "outputresolution": {
+    "mode": "constant",
+    "value": "custom"
+   },
+   "pixeldat": {
+    "mode": "expression",
+    "value": "op(\"textDat_2\")"
+   },
+   "resmenu": {
+    "mode": "constant",
+    "value": 9
+   },
+   "resolutionh": {
+    "mode": "constant",
+    "value": 1080
+   },
+   "resolutionw": {
+    "mode": "constant",
+    "value": 1920
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "uniname0": {
+    "mode": "expression",
+    "value": "\"i_volume\""
+   },
+   "uniname1": {
+    "mode": "expression",
+    "value": "\"i_width\""
+   },
+   "uniname2": {
+    "mode": "expression",
+    "value": "\"i_sides\""
+   },
+   "value0x": {
+    "mode": "constant",
+    "value": 0.3
+   }
+  },
+  "json_type": "glslmultiTOP",
+  "nodeX": 195,
+  "nodeY": 0,
+  "render": false,
+  "tags": []
+ },
+ "/lambda/glslTop_2_compute": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "edit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "extension": {
+    "mode": "constant",
+    "value": "glsl"
+   },
+   "loadonstartpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "writepulse": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "textDAT",
+  "nodeX": 160,
+  "nodeY": -120,
+  "render": false,
+  "tags": [],
+  "text": "// Example Compute Shader\n\n// uniform float exampleUniform;\n\nlayout (local_size_x = 8, local_size_y = 8) in;\nvoid main()\n{\n    vec4 color;\n    //color = texelFetch(sTD2DInputs[0], ivec2(gl_GlobalInvocationID.xy), 0);\n    color = vec4(1.0);\n    imageStore(sTDComputeOutputs[0], ivec2(gl_GlobalInvocationID.xy), TDOutputSwizzle(color));\n}\n"
+ },
+ "/lambda/glslTop_2_pixel": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "edit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "extension": {
+    "mode": "constant",
+    "value": "glsl"
+   },
+   "loadonstartpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "writepulse": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "textDAT",
+  "nodeX": 4095,
+  "nodeY": -120,
+  "render": false,
+  "tags": [],
+  "text": "// Example Pixel Shader\n\n// uniform float exampleUniform;\n\nout vec4 fragColor;\nvoid main()\n{\n    // vec4 color = texture(sTD2DInputs[0], vUV.st);\n    vec4 color = vec4(1.0);\n    fragColor = TDOutputSwizzle(color);\n}\n"
+ },
+ "/lambda/hsvAdjustTop_0": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/lambda/transform_0"
+  ],
+  "json_parameters": {
+   "armenu": {
+    "mode": "constant",
+    "value": 0
+   },
+   "fillmode": {
+    "mode": "constant",
+    "value": "useinput"
+   },
+   "resmenu": {
+    "mode": "constant",
+    "value": 9
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "valuemult": {
+    "mode": "constant",
+    "value": 2.0
+   }
+  },
+  "json_type": "hsvadjustTOP",
+  "nodeX": 2340,
+  "nodeY": 67,
+  "render": false,
+  "tags": []
+ },
+ "/lambda/levelTop_0_feedbackTop_0": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/lambda/feedbackTop_0"
+  ],
+  "json_parameters": {
+   "armenu": {
+    "mode": "constant",
+    "value": 0
+   },
+   "fillmode": {
+    "mode": "constant",
+    "value": "useinput"
+   },
+   "opacity": {
+    "mode": "constant",
+    "value": 0.98
+   },
+   "resmenu": {
+    "mode": "constant",
+    "value": 9
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "levelTOP",
+  "nodeX": 1170,
+  "nodeY": 135,
+  "render": false,
+  "tags": []
+ },
+ "/lambda/math_0": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/lambda/audioIn_0"
+  ],
+  "json_parameters": {
+   "autoexportroot": {
+    "mode": "expression",
+    "value": "parent()"
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "mathCHOP",
+  "nodeX": 2925,
+  "nodeY": 0,
+  "render": false,
+  "tags": []
+ },
+ "/lambda/outTop_0": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/lambda/hsvAdjustTop_0"
+  ],
+  "json_parameters": {
+   "armenu": {
+    "mode": "constant",
+    "value": 0
+   },
+   "fillmode": {
+    "mode": "constant",
+    "value": "useinput"
+   },
+   "label": {
+    "mode": "expression",
+    "value": "me.name"
+   },
+   "resmenu": {
+    "mode": "constant",
+    "value": 9
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "outTOP",
+  "nodeX": 2535,
+  "nodeY": 67,
+  "render": false,
+  "tags": []
+ },
+ "/lambda/ramp_0": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "armenu": {
+    "mode": "constant",
+    "value": 0
+   },
+   "color1": {
+    "mode": "constant",
+    "value": 0.183594
+   },
+   "color2": {
+    "mode": "constant",
+    "value": 0.417969
+   },
+   "color3": {
+    "mode": "constant",
+    "value": 0.714844
+   },
+   "color4": {
+    "mode": "constant",
+    "value": 0.0
+   },
+   "dat": {
+    "mode": "expression",
+    "value": "op(\"table_0\")"
+   },
+   "resmenu": {
+    "mode": "constant",
+    "value": 9
+   },
+   "resolutionh": {
+    "mode": "constant",
+    "value": 1
+   },
+   "resolutionw": {
+    "mode": "constant",
+    "value": 128
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "rampTOP",
+  "nodeX": 1560,
+  "nodeY": 0,
+  "render": false,
+  "tags": []
+ },
+ "/lambda/ramp_0_keys": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "edit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "loadonstartpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "writepulse": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "tableDAT",
+  "nodeX": 0,
+  "nodeY": -120,
+  "render": false,
+  "tags": [],
+  "text": "pos\tr\tg\tb\ta\r\n0\t0\t0\t0\t1\r\n1\t1\t1\t1\t1\r\n"
+ },
+ "/lambda/selectTop_0_feedbackTop_0": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "armenu": {
+    "mode": "constant",
+    "value": 0
+   },
+   "resmenu": {
+    "mode": "constant",
+    "value": 9
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "top": {
+    "mode": "expression",
+    "value": "op(\"transform_0_feedbackTop_0\")"
+   }
+  },
+  "json_type": "selectTOP",
+  "nodeX": 3510,
+  "nodeY": 0,
+  "render": false,
+  "tags": []
+ },
+ "/lambda/table_0": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "edit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "loadonstartpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "writepulse": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "tableDAT",
+  "nodeX": 3315,
+  "nodeY": 0,
+  "render": false,
+  "tags": [],
+  "text": "r\tg\tb\ta\r\n0.5859375\t0.4296875\t0.390625\t1.0\r\n0.87109375\t0.55859375\t0.26171875\t1.0\r\n0.296875\t0.28515625\t0.390625\t1.0\r\n0.5703125\t0.4609375\t0.51953125\t1.0\r\n0.64453125\t0.578125\t0.703125\t1.0\r\n"
+ },
+ "/lambda/textDat_0": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "edit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "file": {
+    "mode": "expression",
+    "value": "\"scripts/Visuals/palette_map.frag\""
+   },
+   "loadonstartpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "writepulse": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "textDAT",
+  "nodeX": 4485,
+  "nodeY": 0,
+  "render": false,
+  "tags": [],
+  "text": "out vec4 fragColor;\n\nuniform float uOffset;\n\nvoid main()\n{\n  vec4 tex = texture(sTD2DInputs[0], vUV.st);\n\n  vec4 col = vec4(texture(sTD2DInputs[1], vec2(mod((tex.r + tex.g + tex.b) * 0.33 + uOffset, 1), 0.5)).xyz, tex.w);\n\n  fragColor = TDOutputSwizzle(col);\n}\n"
+ },
+ "/lambda/textDat_1": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "edit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "file": {
+    "mode": "expression",
+    "value": "\"scripts/Visuals/little_planet.frag\""
+   },
+   "loadonstartpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "writepulse": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "textDAT",
+  "nodeX": 4680,
+  "nodeY": 0,
+  "render": false,
+  "tags": [],
+  "text": "out vec4 fragColor;\n\nvec2 cart2Polar(vec2 v) {\n  return vec2(atan(v.y, v.x), sqrt(v.x * v.x + v.y * v.y));\n}\n\nvec2 polar2Cart(vec2 p) {\n  return vec2(p.y * cos(p.x), p.y * sin(p.x));\n}\n\nvoid main() {\n  vec2 pos = vUV.st;\n  //pos.y = 1 - pos.y;\n  pos = (pos - vec2(0.5)) * 2 * uTD2DInfos[0].res.zw / uTD2DInfos[0].res.w;\n  vec2 posp = cart2Polar(pos);\n  posp.x += 3.1415 * 0.5; // Make seam at bottom\n  //if (pos.x < 0 && pos.y > 0) posp.x += 3.1415;\n  if (pos.x < 0 && pos.y < 0) posp.x += 6.28318;\n  // if (pos.x > 0 && pos.y < 0) posp.x += 6.28318;\n  posp.x /= 6.28318;\n  fragColor = texture(sTD2DInputs[0], posp);\n}\n"
+ },
+ "/lambda/textDat_2": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "edit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "file": {
+    "mode": "expression",
+    "value": "\"scripts/Visuals/audio_data.frag\""
+   },
+   "loadonstartpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "writepulse": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "textDAT",
+  "nodeX": 4875,
+  "nodeY": 0,
+  "render": false,
+  "tags": [],
+  "text": "uniform float i_volume;\n\nout vec4 fragColor;\n\nvoid main() {\n\tvec2 audio = texture(sTD2DInputs[0], vec2(vUV.x, 0.25)).xy;\n\n\tfloat audX = audio.y * i_volume + 0.5;\n\n\tfloat clamped = clamp(20 * (0.05 - abs(vUV.y - audX)), 0, 1);\n\n\tfragColor = vec4(clamped);\n}\n"
+ },
+ "/lambda/transform_0": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/lambda/blur_0"
+  ],
+  "json_parameters": {
+   "armenu": {
+    "mode": "constant",
+    "value": 0
+   },
+   "fillmode": {
+    "mode": "constant",
+    "value": "useinput"
+   },
+   "punit": {
+    "mode": "constant",
+    "value": 1
+   },
+   "resmenu": {
+    "mode": "constant",
+    "value": 9
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "sx": {
+    "mode": "expression",
+    "value": "(0.7**-1.0)"
+   },
+   "sy": {
+    "mode": "expression",
+    "value": "(0.7**-1.0)"
+   },
+   "tunit": {
+    "mode": "constant",
+    "value": 1
+   }
+  },
+  "json_type": "transformTOP",
+  "nodeX": 2145,
+  "nodeY": 67,
+  "render": false,
+  "tags": []
+ },
+ "/lambda/transform_0_feedbackTop_0": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/lambda/compositeTop_0_feedbackTop_0"
+  ],
+  "json_parameters": {
+   "armenu": {
+    "mode": "constant",
+    "value": 0
+   },
+   "fillmode": {
+    "mode": "constant",
+    "value": "useinput"
+   },
+   "punit": {
+    "mode": "constant",
+    "value": 1
+   },
+   "resmenu": {
+    "mode": "constant",
+    "value": 9
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "sx": {
+    "mode": "expression",
+    "value": "((1.0+(-0.1*float(op(\"analyze_0\")[0])))**-1.0)"
+   },
+   "sy": {
+    "mode": "expression",
+    "value": "((1.0+(-0.1*float(op(\"analyze_0\")[0])))**-1.0)"
+   },
+   "tunit": {
+    "mode": "constant",
+    "value": 1
+   }
+  },
+  "json_type": "transformTOP",
+  "nodeX": 1560,
+  "nodeY": 135,
+  "render": false,
+  "tags": []
+ },
+ "/lambda/transform_1": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/lambda/glslTop_2"
+  ],
+  "json_parameters": {
+   "armenu": {
+    "mode": "constant",
+    "value": 0
+   },
+   "extend": {
+    "mode": "constant",
+    "value": "mirror"
+   },
+   "fillmode": {
+    "mode": "constant",
+    "value": "useinput"
+   },
+   "punit": {
+    "mode": "constant",
+    "value": 1
+   },
+   "resmenu": {
+    "mode": "constant",
+    "value": 9
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "tunit": {
+    "mode": "constant",
+    "value": 1
+   },
+   "ty": {
+    "mode": "constant",
+    "value": -0.2
+   }
+  },
+  "json_type": "transformTOP",
+  "nodeX": 390,
+  "nodeY": 135,
+  "render": false,
+  "tags": []
+ },
+ "/lambda/transform_2": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/lambda/glslTop_2"
+  ],
+  "json_parameters": {
+   "armenu": {
+    "mode": "constant",
+    "value": 0
+   },
+   "extend": {
+    "mode": "constant",
+    "value": "mirror"
+   },
+   "fillmode": {
+    "mode": "constant",
+    "value": "useinput"
+   },
+   "punit": {
+    "mode": "constant",
+    "value": 1
+   },
+   "resmenu": {
+    "mode": "constant",
+    "value": 9
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "tunit": {
+    "mode": "constant",
+    "value": 1
+   },
+   "ty": {
+    "mode": "constant",
+    "value": 0.3
+   }
+  },
+  "json_type": "transformTOP",
+  "nodeX": 390,
+  "nodeY": -135,
+  "render": false,
+  "tags": []
+ },
+ "/moviefileout1": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/out1"
+  ],
+  "json_parameters": {
+   "addframe": {
+    "mode": "constant",
+    "value": 0
+   },
+   "armenu": {
+    "mode": "constant",
+    "value": 0
+   },
+   "audiochop": {
+    "mode": "constant",
+    "value": "audiodevin"
+   },
+   "file": {
+    "mode": "constant",
+    "value": "videos/squares.mov"
+   },
+   "fillmode": {
+    "mode": "constant",
+    "value": "useinput"
+   },
+   "imagefiletype": {
+    "mode": "constant",
+    "value": 0
+   },
+   "profile": {
+    "mode": "constant",
+    "value": "high"
+   },
+   "resmenu": {
+    "mode": "constant",
+    "value": 9
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "type": {
+    "mode": "constant",
+    "value": 0
+   },
+   "videocodec": {
+    "mode": "constant",
+    "value": "h264nvgpu"
+   }
+  },
+  "json_type": "moviefileoutTOP",
+  "nodeX": 750,
+  "nodeY": 825,
+  "render": false,
+  "tags": []
+ },
+ "/oscin1": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "bundletimestamp": {
+    "mode": "constant",
+    "value": true
+   },
+   "callbacks": {
+    "mode": "constant",
+    "value": "oscin1_callbacks"
+   },
+   "clear": {
+    "mode": "constant",
+    "value": 0
+   },
+   "fromop": {
+    "mode": "expression",
+    "value": "parent()"
+   },
+   "port": {
+    "mode": "constant",
+    "value": 9002
+   },
+   "splitbundle": {
+    "mode": "constant",
+    "value": true
+   },
+   "splitmessage": {
+    "mode": "constant",
+    "value": true
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 1
+   }
+  },
+  "json_type": "oscinDAT",
+  "nodeX": 800,
+  "nodeY": 650,
+  "render": false,
+  "tags": [],
+  "text": "message\tbundle timestamp\tOSC address\targ0\targ1\targ2\targ3\targ4\targ5\targ6\targ7\targ8\targ9\targ10\targ11\targ12\targ13\targ14\targ15\targ16\targ17\targ18\targ19\targ20\targ21\targ22\targ23\targ24\targ25\targ26\targ27\targ28\r\n/json \"{\"/textDat_0\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/palette_map.frag\\\"\"}},\"/transform_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"((0.5*(((math.sin((0.7*absTime.seconds))+1.0)*0.5)%1.0))+0.8)\",\"ty\":\"0.25\",\"extend\":\"3\"}},\"/glslTop_0\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/compositeTop_0\",\"/ramp_0\"],\"text\":null,\"parameters\":{\"value1x\":\"16.0\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_0\\\")\",\"outputresolution\":\"9\",\"uniname1\":\"\\\"uSamples\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uOffset\\\"\",\"value0x\":\"(0.5*absTime.seconds)\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/outTop_0\":{\"commands\":[],\"ty\":\"outTop\",\"connections\":[\"/glslTop_0\"],\"text\":null,\"parameters\":{}},\"/textDat_1\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/clone.frag\\\"\"}},\"/ramp_0\":{\"commands\":[],\"ty\":\"ramp\",\"connections\":[],\"text\":null,\"parameters\":{\"resolutionh\":\"0\",\"dat\":\"op(\\\"table_0\\\")\",\"resolutionw\":\"128\"}},\"/textDat_2\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/shapes.frag\\\"\"}},\"/glslTop_2\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"i_sides\\\"\",\"value1x\":\"0.2\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_2\\\")\",\"outputresolution\":\"9\",\"value2x\":\"4.0\",\"uniname1\":\"\\\"i_width\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"i_size\\\"\",\"value0x\":\"0.2\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/hsvAdjustTop_0\":{\"commands\":[],\"ty\":\"hsvAdjustTop\",\"connections\":[\"/glslTop_1\"],\"text\":null,\"parameters\":{\"valuemult\":\"0.7\"}},\"/flip_0\":{\"commands\":[],\"ty\":\"flip\",\"connections\":[\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"flipy\":\"1\",\"flipx\":\"1\"}},\"/compositeTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/flip_0\",\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/table_0\":{\"commands\":[],\"ty\":\"table\",\"connections\":[],\"text\":\"0.22265625\\t0.18359375\\t0.41796875\\t0.71484375\\n0.38671875\\t0.55859375\\t0.21484375\\t0.23046875\\n1\\t1\\t1\\t1\",\"parameters\":{}},\"/glslTop_1\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/transform_0\"],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"uScale\\\"\",\"value1x\":\"0.2\",\"value2y\":\"-0.2\",\"value1y\":\"0.1\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_1\\\")\",\"outputresolution\":\"9\",\"value2x\":\"-0.2\",\"uniname1\":\"\\\"uTranslate\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uClones\\\"\",\"value0x\":\"3.0\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}}}\"\t0.00000\t/json\t\"{\"/textDat_0\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/palette_map.frag\\\"\"}},\"/transform_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"((0.5*(((math.sin((0.7*absTime.seconds))+1.0)*0.5)%1.0))+0.8)\",\"ty\":\"0.25\",\"extend\":\"3\"}},\"/glslTop_0\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/compositeTop_0\",\"/ramp_0\"],\"text\":null,\"parameters\":{\"value1x\":\"16.0\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_0\\\")\",\"outputresolution\":\"9\",\"uniname1\":\"\\\"uSamples\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uOffset\\\"\",\"value0x\":\"(0.5*absTime.seconds)\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/outTop_0\":{\"commands\":[],\"ty\":\"outTop\",\"connections\":[\"/glslTop_0\"],\"text\":null,\"parameters\":{}},\"/textDat_1\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/clone.frag\\\"\"}},\"/ramp_0\":{\"commands\":[],\"ty\":\"ramp\",\"connections\":[],\"text\":null,\"parameters\":{\"resolutionh\":\"0\",\"dat\":\"op(\\\"table_0\\\")\",\"resolutionw\":\"128\"}},\"/textDat_2\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/shapes.frag\\\"\"}},\"/glslTop_2\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"i_sides\\\"\",\"value1x\":\"0.2\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_2\\\")\",\"outputresolution\":\"9\",\"value2x\":\"4.0\",\"uniname1\":\"\\\"i_width\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"i_size\\\"\",\"value0x\":\"0.2\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/hsvAdjustTop_0\":{\"commands\":[],\"ty\":\"hsvAdjustTop\",\"connections\":[\"/glslTop_1\"],\"text\":null,\"parameters\":{\"valuemult\":\"0.7\"}},\"/flip_0\":{\"commands\":[],\"ty\":\"flip\",\"connections\":[\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"flipy\":\"1\",\"flipx\":\"1\"}},\"/compositeTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/flip_0\",\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/table_0\":{\"commands\":[],\"ty\":\"table\",\"connections\":[],\"text\":\"0.22265625\\t0.18359375\\t0.41796875\\t0.71484375\\n0.38671875\\t0.55859375\\t0.21484375\\t0.23046875\\n1\\t1\\t1\\t1\",\"parameters\":{}},\"/glslTop_1\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/transform_0\"],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"uScale\\\"\",\"value1x\":\"0.2\",\"value2y\":\"-0.2\",\"value1y\":\"0.1\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_1\\\")\",\"outputresolution\":\"9\",\"value2x\":\"-0.2\",\"uniname1\":\"\\\"uTranslate\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uClones\\\"\",\"value0x\":\"3.0\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}}}\"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n/json \"{\"/textDat_0\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/palette_map.frag\\\"\"}},\"/transform_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"((0.5*(((math.sin((0.7*absTime.seconds))+1.0)*0.5)%1.0))+0.8)\",\"ty\":\"0.25\",\"extend\":\"3\"}},\"/glslTop_0\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/compositeTop_0\",\"/ramp_0\"],\"text\":null,\"parameters\":{\"value1x\":\"16.0\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_0\\\")\",\"outputresolution\":\"9\",\"uniname1\":\"\\\"uSamples\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uOffset\\\"\",\"value0x\":\"(0.5*absTime.seconds)\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/outTop_0\":{\"commands\":[],\"ty\":\"outTop\",\"connections\":[\"/glslTop_0\"],\"text\":null,\"parameters\":{}},\"/textDat_1\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/clone.frag\\\"\"}},\"/ramp_0\":{\"commands\":[],\"ty\":\"ramp\",\"connections\":[],\"text\":null,\"parameters\":{\"resolutionh\":\"0\",\"dat\":\"op(\\\"table_0\\\")\",\"resolutionw\":\"128\"}},\"/textDat_2\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/shapes.frag\\\"\"}},\"/glslTop_2\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"i_sides\\\"\",\"value1x\":\"0.2\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_2\\\")\",\"outputresolution\":\"9\",\"value2x\":\"4.0\",\"uniname1\":\"\\\"i_width\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"i_size\\\"\",\"value0x\":\"0.2\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/hsvAdjustTop_0\":{\"commands\":[],\"ty\":\"hsvAdjustTop\",\"connections\":[\"/glslTop_1\"],\"text\":null,\"parameters\":{\"valuemult\":\"0.7\"}},\"/flip_0\":{\"commands\":[],\"ty\":\"flip\",\"connections\":[\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"flipy\":\"1\",\"flipx\":\"1\"}},\"/compositeTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/flip_0\",\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/table_0\":{\"commands\":[],\"ty\":\"table\",\"connections\":[],\"text\":\"0.22265625\\t0.18359375\\t0.41796875\\t0.71484375\\n0.38671875\\t0.55859375\\t0.21484375\\t0.23046875\\n1.0\\t1.0\\t1.0\\t1.0\",\"parameters\":{}},\"/glslTop_1\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/transform_0\"],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"uScale\\\"\",\"value1x\":\"0.2\",\"value2y\":\"-0.2\",\"value1y\":\"0.1\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_1\\\")\",\"outputresolution\":\"9\",\"value2x\":\"-0.2\",\"uniname1\":\"\\\"uTranslate\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uClones\\\"\",\"value0x\":\"3.0\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}}}\"\t0.00000\t/json\t\"{\"/textDat_0\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/palette_map.frag\\\"\"}},\"/transform_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"((0.5*(((math.sin((0.7*absTime.seconds))+1.0)*0.5)%1.0))+0.8)\",\"ty\":\"0.25\",\"extend\":\"3\"}},\"/glslTop_0\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/compositeTop_0\",\"/ramp_0\"],\"text\":null,\"parameters\":{\"value1x\":\"16.0\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_0\\\")\",\"outputresolution\":\"9\",\"uniname1\":\"\\\"uSamples\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uOffset\\\"\",\"value0x\":\"(0.5*absTime.seconds)\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/outTop_0\":{\"commands\":[],\"ty\":\"outTop\",\"connections\":[\"/glslTop_0\"],\"text\":null,\"parameters\":{}},\"/textDat_1\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/clone.frag\\\"\"}},\"/ramp_0\":{\"commands\":[],\"ty\":\"ramp\",\"connections\":[],\"text\":null,\"parameters\":{\"resolutionh\":\"0\",\"dat\":\"op(\\\"table_0\\\")\",\"resolutionw\":\"128\"}},\"/textDat_2\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/shapes.frag\\\"\"}},\"/glslTop_2\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"i_sides\\\"\",\"value1x\":\"0.2\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_2\\\")\",\"outputresolution\":\"9\",\"value2x\":\"4.0\",\"uniname1\":\"\\\"i_width\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"i_size\\\"\",\"value0x\":\"0.2\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/hsvAdjustTop_0\":{\"commands\":[],\"ty\":\"hsvAdjustTop\",\"connections\":[\"/glslTop_1\"],\"text\":null,\"parameters\":{\"valuemult\":\"0.7\"}},\"/flip_0\":{\"commands\":[],\"ty\":\"flip\",\"connections\":[\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"flipy\":\"1\",\"flipx\":\"1\"}},\"/compositeTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/flip_0\",\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/table_0\":{\"commands\":[],\"ty\":\"table\",\"connections\":[],\"text\":\"0.22265625\\t0.18359375\\t0.41796875\\t0.71484375\\n0.38671875\\t0.55859375\\t0.21484375\\t0.23046875\\n1.0\\t1.0\\t1.0\\t1.0\",\"parameters\":{}},\"/glslTop_1\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/transform_0\"],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"uScale\\\"\",\"value1x\":\"0.2\",\"value2y\":\"-0.2\",\"value1y\":\"0.1\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_1\\\")\",\"outputresolution\":\"9\",\"value2x\":\"-0.2\",\"uniname1\":\"\\\"uTranslate\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uClones\\\"\",\"value0x\":\"3.0\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}}}\"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n/json \"{\"/textDat_0\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/palette_map.frag\\\"\"}},\"/transform_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"((0.5*(((math.sin((0.7*absTime.seconds))+1.0)*0.5)%1.0))+0.8)\",\"ty\":\"0.25\",\"extend\":\"3\"}},\"/glslTop_0\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/compositeTop_0\",\"/ramp_0\"],\"text\":null,\"parameters\":{\"value1x\":\"16.0\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_0\\\")\",\"outputresolution\":\"9\",\"uniname1\":\"\\\"uSamples\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uOffset\\\"\",\"value0x\":\"(0.5*absTime.seconds)\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/outTop_0\":{\"commands\":[],\"ty\":\"outTop\",\"connections\":[\"/glslTop_0\"],\"text\":null,\"parameters\":{}},\"/textDat_1\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/clone.frag\\\"\"}},\"/ramp_0\":{\"commands\":[],\"ty\":\"ramp\",\"connections\":[],\"text\":null,\"parameters\":{\"resolutionh\":\"0\",\"dat\":\"op(\\\"table_0\\\")\",\"resolutionw\":\"128\"}},\"/textDat_2\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/shapes.frag\\\"\"}},\"/glslTop_2\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"i_sides\\\"\",\"value1x\":\"0.2\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_2\\\")\",\"outputresolution\":\"9\",\"value2x\":\"4.0\",\"uniname1\":\"\\\"i_width\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"i_size\\\"\",\"value0x\":\"0.2\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/hsvAdjustTop_0\":{\"commands\":[],\"ty\":\"hsvAdjustTop\",\"connections\":[\"/glslTop_1\"],\"text\":null,\"parameters\":{\"valuemult\":\"0.7\"}},\"/flip_0\":{\"commands\":[],\"ty\":\"flip\",\"connections\":[\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"flipy\":\"1\",\"flipx\":\"1\"}},\"/compositeTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/flip_0\",\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/table_0\":{\"commands\":[],\"ty\":\"table\",\"connections\":[],\"text\":\"0.22265625\\t0.38671875\\t1.0\\n0.18359375\\t0.55859375\\t1.0\\n0.41796875\\t0.21484375\\t1.0\\n0.71484375\\t0.23046875\\t1.0\",\"parameters\":{}},\"/glslTop_1\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/transform_0\"],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"uScale\\\"\",\"value1x\":\"0.2\",\"value2y\":\"-0.2\",\"value1y\":\"0.1\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_1\\\")\",\"outputresolution\":\"9\",\"value2x\":\"-0.2\",\"uniname1\":\"\\\"uTranslate\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uClones\\\"\",\"value0x\":\"3.0\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}}}\"\t0.00000\t/json\t\"{\"/textDat_0\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/palette_map.frag\\\"\"}},\"/transform_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"((0.5*(((math.sin((0.7*absTime.seconds))+1.0)*0.5)%1.0))+0.8)\",\"ty\":\"0.25\",\"extend\":\"3\"}},\"/glslTop_0\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/compositeTop_0\",\"/ramp_0\"],\"text\":null,\"parameters\":{\"value1x\":\"16.0\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_0\\\")\",\"outputresolution\":\"9\",\"uniname1\":\"\\\"uSamples\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uOffset\\\"\",\"value0x\":\"(0.5*absTime.seconds)\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/outTop_0\":{\"commands\":[],\"ty\":\"outTop\",\"connections\":[\"/glslTop_0\"],\"text\":null,\"parameters\":{}},\"/textDat_1\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/clone.frag\\\"\"}},\"/ramp_0\":{\"commands\":[],\"ty\":\"ramp\",\"connections\":[],\"text\":null,\"parameters\":{\"resolutionh\":\"0\",\"dat\":\"op(\\\"table_0\\\")\",\"resolutionw\":\"128\"}},\"/textDat_2\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/shapes.frag\\\"\"}},\"/glslTop_2\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"i_sides\\\"\",\"value1x\":\"0.2\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_2\\\")\",\"outputresolution\":\"9\",\"value2x\":\"4.0\",\"uniname1\":\"\\\"i_width\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"i_size\\\"\",\"value0x\":\"0.2\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/hsvAdjustTop_0\":{\"commands\":[],\"ty\":\"hsvAdjustTop\",\"connections\":[\"/glslTop_1\"],\"text\":null,\"parameters\":{\"valuemult\":\"0.7\"}},\"/flip_0\":{\"commands\":[],\"ty\":\"flip\",\"connections\":[\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"flipy\":\"1\",\"flipx\":\"1\"}},\"/compositeTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/flip_0\",\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/table_0\":{\"commands\":[],\"ty\":\"table\",\"connections\":[],\"text\":\"0.22265625\\t0.38671875\\t1.0\\n0.18359375\\t0.55859375\\t1.0\\n0.41796875\\t0.21484375\\t1.0\\n0.71484375\\t0.23046875\\t1.0\",\"parameters\":{}},\"/glslTop_1\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/transform_0\"],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"uScale\\\"\",\"value1x\":\"0.2\",\"value2y\":\"-0.2\",\"value1y\":\"0.1\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_1\\\")\",\"outputresolution\":\"9\",\"value2x\":\"-0.2\",\"uniname1\":\"\\\"uTranslate\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uClones\\\"\",\"value0x\":\"3.0\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}}}\"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n/json \"{\"/textDat_0\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/palette_map.frag\\\"\"}},\"/transform_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"((0.5*(((math.sin((0.7*absTime.seconds))+1.0)*0.5)%1.0))+0.8)\",\"ty\":\"0.25\",\"extend\":\"3\"}},\"/glslTop_0\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/compositeTop_0\",\"/ramp_0\"],\"text\":null,\"parameters\":{\"value1x\":\"16.0\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_0\\\")\",\"outputresolution\":\"9\",\"uniname1\":\"\\\"uSamples\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uOffset\\\"\",\"value0x\":\"(0.5*absTime.seconds)\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/outTop_0\":{\"commands\":[],\"ty\":\"outTop\",\"connections\":[\"/glslTop_0\"],\"text\":null,\"parameters\":{}},\"/textDat_1\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/clone.frag\\\"\"}},\"/ramp_0\":{\"commands\":[],\"ty\":\"ramp\",\"connections\":[],\"text\":null,\"parameters\":{\"resolutionh\":\"0\",\"dat\":\"op(\\\"table_0\\\")\",\"resolutionw\":\"128\"}},\"/textDat_2\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/shapes.frag\\\"\"}},\"/glslTop_2\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"i_sides\\\"\",\"value1x\":\"0.2\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_2\\\")\",\"outputresolution\":\"9\",\"value2x\":\"4.0\",\"uniname1\":\"\\\"i_width\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"i_size\\\"\",\"value0x\":\"0.2\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/hsvAdjustTop_0\":{\"commands\":[],\"ty\":\"hsvAdjustTop\",\"connections\":[\"/glslTop_1\"],\"text\":null,\"parameters\":{\"valuemult\":\"0.7\"}},\"/flip_0\":{\"commands\":[],\"ty\":\"flip\",\"connections\":[\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"flipy\":\"1\",\"flipx\":\"1\"}},\"/compositeTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/flip_0\",\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/table_0\":{\"commands\":[],\"ty\":\"table\",\"connections\":[],\"text\":\"0.22265625\\t0.38671875\\t1.0\\n0.18359375\\t0.55859375\\t1.0\\n0.41796875\\t0.21484375\\t1.0\\n0.71484375\\t0.23046875\\t1.0\",\"parameters\":{}},\"/glslTop_1\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/transform_0\"],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"uScale\\\"\",\"value1x\":\"0.2\",\"value2y\":\"-0.2\",\"value1y\":\"0.1\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_1\\\")\",\"outputresolution\":\"9\",\"value2x\":\"-0.2\",\"uniname1\":\"\\\"uTranslate\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uClones\\\"\",\"value0x\":\"3.0\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}}}\"\t0.00000\t/json\t\"{\"/textDat_0\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/palette_map.frag\\\"\"}},\"/transform_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"((0.5*(((math.sin((0.7*absTime.seconds))+1.0)*0.5)%1.0))+0.8)\",\"ty\":\"0.25\",\"extend\":\"3\"}},\"/glslTop_0\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/compositeTop_0\",\"/ramp_0\"],\"text\":null,\"parameters\":{\"value1x\":\"16.0\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_0\\\")\",\"outputresolution\":\"9\",\"uniname1\":\"\\\"uSamples\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uOffset\\\"\",\"value0x\":\"(0.5*absTime.seconds)\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/outTop_0\":{\"commands\":[],\"ty\":\"outTop\",\"connections\":[\"/glslTop_0\"],\"text\":null,\"parameters\":{}},\"/textDat_1\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/clone.frag\\\"\"}},\"/ramp_0\":{\"commands\":[],\"ty\":\"ramp\",\"connections\":[],\"text\":null,\"parameters\":{\"resolutionh\":\"0\",\"dat\":\"op(\\\"table_0\\\")\",\"resolutionw\":\"128\"}},\"/textDat_2\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/shapes.frag\\\"\"}},\"/glslTop_2\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"i_sides\\\"\",\"value1x\":\"0.2\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_2\\\")\",\"outputresolution\":\"9\",\"value2x\":\"4.0\",\"uniname1\":\"\\\"i_width\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"i_size\\\"\",\"value0x\":\"0.2\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/hsvAdjustTop_0\":{\"commands\":[],\"ty\":\"hsvAdjustTop\",\"connections\":[\"/glslTop_1\"],\"text\":null,\"parameters\":{\"valuemult\":\"0.7\"}},\"/flip_0\":{\"commands\":[],\"ty\":\"flip\",\"connections\":[\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"flipy\":\"1\",\"flipx\":\"1\"}},\"/compositeTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/flip_0\",\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/table_0\":{\"commands\":[],\"ty\":\"table\",\"connections\":[],\"text\":\"0.22265625\\t0.38671875\\t1.0\\n0.18359375\\t0.55859375\\t1.0\\n0.41796875\\t0.21484375\\t1.0\\n0.71484375\\t0.23046875\\t1.0\",\"parameters\":{}},\"/glslTop_1\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/transform_0\"],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"uScale\\\"\",\"value1x\":\"0.2\",\"value2y\":\"-0.2\",\"value1y\":\"0.1\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_1\\\")\",\"outputresolution\":\"9\",\"value2x\":\"-0.2\",\"uniname1\":\"\\\"uTranslate\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uClones\\\"\",\"value0x\":\"3.0\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}}}\"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n/json \"{\"/textDat_0\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/palette_map.frag\\\"\"}},\"/transform_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"((0.5*(((math.sin((0.7*absTime.seconds))+1.0)*0.5)%1.0))+0.8)\",\"ty\":\"0.25\",\"extend\":\"3\"}},\"/glslTop_0\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/compositeTop_0\",\"/ramp_0\"],\"text\":null,\"parameters\":{\"value1x\":\"16.0\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_0\\\")\",\"outputresolution\":\"9\",\"uniname1\":\"\\\"uSamples\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uOffset\\\"\",\"value0x\":\"(0.5*absTime.seconds)\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/outTop_0\":{\"commands\":[],\"ty\":\"outTop\",\"connections\":[\"/glslTop_0\"],\"text\":null,\"parameters\":{}},\"/textDat_1\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/clone.frag\\\"\"}},\"/ramp_0\":{\"commands\":[],\"ty\":\"ramp\",\"connections\":[],\"text\":null,\"parameters\":{\"resolutionh\":\"0\",\"dat\":\"op(\\\"table_0\\\")\",\"resolutionw\":\"128\"}},\"/textDat_2\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/shapes.frag\\\"\"}},\"/glslTop_2\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"i_sides\\\"\",\"value1x\":\"0.2\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_2\\\")\",\"outputresolution\":\"9\",\"value2x\":\"4.0\",\"uniname1\":\"\\\"i_width\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"i_size\\\"\",\"value0x\":\"0.2\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/hsvAdjustTop_0\":{\"commands\":[],\"ty\":\"hsvAdjustTop\",\"connections\":[\"/glslTop_1\"],\"text\":null,\"parameters\":{\"valuemult\":\"0.7\"}},\"/flip_0\":{\"commands\":[],\"ty\":\"flip\",\"connections\":[\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"flipy\":\"1\",\"flipx\":\"1\"}},\"/compositeTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/flip_0\",\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/table_0\":{\"commands\":[],\"ty\":\"table\",\"connections\":[],\"text\":\"0.22265625\\t0.38671875\\t1.0\\n0.18359375\\t0.55859375\\t1.0\\n0.41796875\\t0.21484375\\t1.0\\n0.71484375\\t0.23046875\\t1.0\",\"parameters\":{}},\"/glslTop_1\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/transform_0\"],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"uScale\\\"\",\"value1x\":\"0.2\",\"value2y\":\"-0.2\",\"value1y\":\"0.1\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_1\\\")\",\"outputresolution\":\"9\",\"value2x\":\"-0.2\",\"uniname1\":\"\\\"uTranslate\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uClones\\\"\",\"value0x\":\"3.0\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}}}\"\t0.00000\t/json\t\"{\"/textDat_0\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/palette_map.frag\\\"\"}},\"/transform_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"((0.5*(((math.sin((0.7*absTime.seconds))+1.0)*0.5)%1.0))+0.8)\",\"ty\":\"0.25\",\"extend\":\"3\"}},\"/glslTop_0\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/compositeTop_0\",\"/ramp_0\"],\"text\":null,\"parameters\":{\"value1x\":\"16.0\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_0\\\")\",\"outputresolution\":\"9\",\"uniname1\":\"\\\"uSamples\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uOffset\\\"\",\"value0x\":\"(0.5*absTime.seconds)\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/outTop_0\":{\"commands\":[],\"ty\":\"outTop\",\"connections\":[\"/glslTop_0\"],\"text\":null,\"parameters\":{}},\"/textDat_1\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/clone.frag\\\"\"}},\"/ramp_0\":{\"commands\":[],\"ty\":\"ramp\",\"connections\":[],\"text\":null,\"parameters\":{\"resolutionh\":\"0\",\"dat\":\"op(\\\"table_0\\\")\",\"resolutionw\":\"128\"}},\"/textDat_2\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/shapes.frag\\\"\"}},\"/glslTop_2\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"i_sides\\\"\",\"value1x\":\"0.2\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_2\\\")\",\"outputresolution\":\"9\",\"value2x\":\"4.0\",\"uniname1\":\"\\\"i_width\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"i_size\\\"\",\"value0x\":\"0.2\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/hsvAdjustTop_0\":{\"commands\":[],\"ty\":\"hsvAdjustTop\",\"connections\":[\"/glslTop_1\"],\"text\":null,\"parameters\":{\"valuemult\":\"0.7\"}},\"/flip_0\":{\"commands\":[],\"ty\":\"flip\",\"connections\":[\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"flipy\":\"1\",\"flipx\":\"1\"}},\"/compositeTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/flip_0\",\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/table_0\":{\"commands\":[],\"ty\":\"table\",\"connections\":[],\"text\":\"0.22265625\\t0.38671875\\t1.0\\n0.18359375\\t0.55859375\\t1.0\\n0.41796875\\t0.21484375\\t1.0\\n0.71484375\\t0.23046875\\t1.0\",\"parameters\":{}},\"/glslTop_1\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/transform_0\"],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"uScale\\\"\",\"value1x\":\"0.2\",\"value2y\":\"-0.2\",\"value1y\":\"0.1\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_1\\\")\",\"outputresolution\":\"9\",\"value2x\":\"-0.2\",\"uniname1\":\"\\\"uTranslate\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uClones\\\"\",\"value0x\":\"3.0\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}}}\"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n/json \"{\"/textDat_0\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/palette_map.frag\\\"\"}},\"/transform_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"((0.5*(((math.sin((0.7*absTime.seconds))+1.0)*0.5)%1.0))+0.8)\",\"ty\":\"0.25\",\"extend\":\"3\"}},\"/glslTop_0\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/compositeTop_0\",\"/ramp_0\"],\"text\":null,\"parameters\":{\"value1x\":\"16.0\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_0\\\")\",\"outputresolution\":\"9\",\"uniname1\":\"\\\"uSamples\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uOffset\\\"\",\"value0x\":\"(0.5*absTime.seconds)\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/outTop_0\":{\"commands\":[],\"ty\":\"outTop\",\"connections\":[\"/glslTop_0\"],\"text\":null,\"parameters\":{}},\"/textDat_1\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/clone.frag\\\"\"}},\"/ramp_0\":{\"commands\":[],\"ty\":\"ramp\",\"connections\":[],\"text\":null,\"parameters\":{\"resolutionh\":\"0\",\"dat\":\"op(\\\"table_0\\\")\",\"resolutionw\":\"128\"}},\"/textDat_2\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/shapes.frag\\\"\"}},\"/glslTop_2\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"i_sides\\\"\",\"value1x\":\"0.2\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_2\\\")\",\"outputresolution\":\"9\",\"value2x\":\"4.0\",\"uniname1\":\"\\\"i_width\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"i_size\\\"\",\"value0x\":\"0.2\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/hsvAdjustTop_0\":{\"commands\":[],\"ty\":\"hsvAdjustTop\",\"connections\":[\"/glslTop_1\"],\"text\":null,\"parameters\":{\"valuemult\":\"0.7\"}},\"/flip_0\":{\"commands\":[],\"ty\":\"flip\",\"connections\":[\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"flipy\":\"1\",\"flipx\":\"1\"}},\"/compositeTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/flip_0\",\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/table_0\":{\"commands\":[],\"ty\":\"table\",\"connections\":[],\"text\":\"0.6015625\\t0.19921875\\t0.7109375\\t1.0\\n0.95703125\\t0.9453125\\t0.53125\\t1.0\\n0.734375\\t0.4609375\\t0.82421875\\t1.0\\n0.46875\\t0.73046875\\t0.51171875\\t1.0\",\"parameters\":{}},\"/glslTop_1\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/transform_0\"],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"uScale\\\"\",\"value1x\":\"0.2\",\"value2y\":\"-0.2\",\"value1y\":\"0.1\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_1\\\")\",\"outputresolution\":\"9\",\"value2x\":\"-0.2\",\"uniname1\":\"\\\"uTranslate\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uClones\\\"\",\"value0x\":\"3.0\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}}}\"\t0.00000\t/json\t\"{\"/textDat_0\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/palette_map.frag\\\"\"}},\"/transform_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"((0.5*(((math.sin((0.7*absTime.seconds))+1.0)*0.5)%1.0))+0.8)\",\"ty\":\"0.25\",\"extend\":\"3\"}},\"/glslTop_0\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/compositeTop_0\",\"/ramp_0\"],\"text\":null,\"parameters\":{\"value1x\":\"16.0\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_0\\\")\",\"outputresolution\":\"9\",\"uniname1\":\"\\\"uSamples\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uOffset\\\"\",\"value0x\":\"(0.5*absTime.seconds)\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/outTop_0\":{\"commands\":[],\"ty\":\"outTop\",\"connections\":[\"/glslTop_0\"],\"text\":null,\"parameters\":{}},\"/textDat_1\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/clone.frag\\\"\"}},\"/ramp_0\":{\"commands\":[],\"ty\":\"ramp\",\"connections\":[],\"text\":null,\"parameters\":{\"resolutionh\":\"0\",\"dat\":\"op(\\\"table_0\\\")\",\"resolutionw\":\"128\"}},\"/textDat_2\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/shapes.frag\\\"\"}},\"/glslTop_2\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"i_sides\\\"\",\"value1x\":\"0.2\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_2\\\")\",\"outputresolution\":\"9\",\"value2x\":\"4.0\",\"uniname1\":\"\\\"i_width\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"i_size\\\"\",\"value0x\":\"0.2\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/hsvAdjustTop_0\":{\"commands\":[],\"ty\":\"hsvAdjustTop\",\"connections\":[\"/glslTop_1\"],\"text\":null,\"parameters\":{\"valuemult\":\"0.7\"}},\"/flip_0\":{\"commands\":[],\"ty\":\"flip\",\"connections\":[\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"flipy\":\"1\",\"flipx\":\"1\"}},\"/compositeTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/flip_0\",\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/table_0\":{\"commands\":[],\"ty\":\"table\",\"connections\":[],\"text\":\"0.6015625\\t0.19921875\\t0.7109375\\t1.0\\n0.95703125\\t0.9453125\\t0.53125\\t1.0\\n0.734375\\t0.4609375\\t0.82421875\\t1.0\\n0.46875\\t0.73046875\\t0.51171875\\t1.0\",\"parameters\":{}},\"/glslTop_1\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/transform_0\"],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"uScale\\\"\",\"value1x\":\"0.2\",\"value2y\":\"-0.2\",\"value1y\":\"0.1\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_1\\\")\",\"outputresolution\":\"9\",\"value2x\":\"-0.2\",\"uniname1\":\"\\\"uTranslate\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uClones\\\"\",\"value0x\":\"3.0\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}}}\"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n/json \"{\"/textDat_0\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/palette_map.frag\\\"\"}},\"/transform_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"((0.5*(((math.sin((0.7*absTime.seconds))+1.0)*0.5)%1.0))+0.8)\",\"ty\":\"0.25\",\"extend\":\"3\"}},\"/glslTop_0\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/compositeTop_0\",\"/ramp_0\"],\"text\":null,\"parameters\":{\"value1x\":\"16.0\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_0\\\")\",\"outputresolution\":\"9\",\"uniname1\":\"\\\"uSamples\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uOffset\\\"\",\"value0x\":\"(0.5*absTime.seconds)\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/outTop_0\":{\"commands\":[],\"ty\":\"outTop\",\"connections\":[\"/glslTop_0\"],\"text\":null,\"parameters\":{}},\"/textDat_1\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/clone.frag\\\"\"}},\"/ramp_0\":{\"commands\":[],\"ty\":\"ramp\",\"connections\":[],\"text\":null,\"parameters\":{\"resolutionh\":\"0\",\"dat\":\"op(\\\"table_0\\\")\",\"resolutionw\":\"128\"}},\"/textDat_2\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/shapes.frag\\\"\"}},\"/glslTop_2\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"i_sides\\\"\",\"value1x\":\"0.2\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_2\\\")\",\"outputresolution\":\"9\",\"value2x\":\"4.0\",\"uniname1\":\"\\\"i_width\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"i_size\\\"\",\"value0x\":\"0.2\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/hsvAdjustTop_0\":{\"commands\":[],\"ty\":\"hsvAdjustTop\",\"connections\":[\"/glslTop_1\"],\"text\":null,\"parameters\":{\"valuemult\":\"0.7\"}},\"/flip_0\":{\"commands\":[],\"ty\":\"flip\",\"connections\":[\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"flipy\":\"1\",\"flipx\":\"1\"}},\"/compositeTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/flip_0\",\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/table_0\":{\"commands\":[],\"ty\":\"table\",\"connections\":[],\"text\":\"r\\tg\\tb\\ta\\n0.6015625\\t0.19921875\\t0.7109375\\t1.0\\n0.95703125\\t0.9453125\\t0.53125\\t1.0\\n0.734375\\t0.4609375\\t0.82421875\\t1.0\\n0.46875\\t0.73046875\\t0.51171875\\t1.0\",\"parameters\":{}},\"/glslTop_1\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/transform_0\"],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"uScale\\\"\",\"value1x\":\"0.2\",\"value2y\":\"-0.2\",\"value1y\":\"0.1\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_1\\\")\",\"outputresolution\":\"9\",\"value2x\":\"-0.2\",\"uniname1\":\"\\\"uTranslate\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uClones\\\"\",\"value0x\":\"3.0\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}}}\"\t0.00000\t/json\t\"{\"/textDat_0\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/palette_map.frag\\\"\"}},\"/transform_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"((0.5*(((math.sin((0.7*absTime.seconds))+1.0)*0.5)%1.0))+0.8)\",\"ty\":\"0.25\",\"extend\":\"3\"}},\"/glslTop_0\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/compositeTop_0\",\"/ramp_0\"],\"text\":null,\"parameters\":{\"value1x\":\"16.0\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_0\\\")\",\"outputresolution\":\"9\",\"uniname1\":\"\\\"uSamples\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uOffset\\\"\",\"value0x\":\"(0.5*absTime.seconds)\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/outTop_0\":{\"commands\":[],\"ty\":\"outTop\",\"connections\":[\"/glslTop_0\"],\"text\":null,\"parameters\":{}},\"/textDat_1\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/clone.frag\\\"\"}},\"/ramp_0\":{\"commands\":[],\"ty\":\"ramp\",\"connections\":[],\"text\":null,\"parameters\":{\"resolutionh\":\"0\",\"dat\":\"op(\\\"table_0\\\")\",\"resolutionw\":\"128\"}},\"/textDat_2\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/shapes.frag\\\"\"}},\"/glslTop_2\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"i_sides\\\"\",\"value1x\":\"0.2\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_2\\\")\",\"outputresolution\":\"9\",\"value2x\":\"4.0\",\"uniname1\":\"\\\"i_width\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"i_size\\\"\",\"value0x\":\"0.2\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/hsvAdjustTop_0\":{\"commands\":[],\"ty\":\"hsvAdjustTop\",\"connections\":[\"/glslTop_1\"],\"text\":null,\"parameters\":{\"valuemult\":\"0.7\"}},\"/flip_0\":{\"commands\":[],\"ty\":\"flip\",\"connections\":[\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"flipy\":\"1\",\"flipx\":\"1\"}},\"/compositeTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/flip_0\",\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/table_0\":{\"commands\":[],\"ty\":\"table\",\"connections\":[],\"text\":\"r\\tg\\tb\\ta\\n0.6015625\\t0.19921875\\t0.7109375\\t1.0\\n0.95703125\\t0.9453125\\t0.53125\\t1.0\\n0.734375\\t0.4609375\\t0.82421875\\t1.0\\n0.46875\\t0.73046875\\t0.51171875\\t1.0\",\"parameters\":{}},\"/glslTop_1\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/transform_0\"],\"text\":null,\"parameters\":{\"uniname2\":\"\\\"uScale\\\"\",\"value1x\":\"0.2\",\"value2y\":\"-0.2\",\"value1y\":\"0.1\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_1\\\")\",\"outputresolution\":\"9\",\"value2x\":\"-0.2\",\"uniname1\":\"\\\"uTranslate\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uClones\\\"\",\"value0x\":\"3.0\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}}}\"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n/json \"{\"/textDat_0\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/palette_map.frag\\\"\"}},\"/transform_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/blur_0\"],\"text\":null,\"parameters\":{\"extend\":\"1\",\"sy\":\"(0.7**-1.0)\",\"sx\":\"(0.7**-1.0)\"}},\"/glslTop_0\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/transform_0_feedbackTop_0\",\"/ramp_0\"],\"text\":null,\"parameters\":{\"value1x\":\"16.0\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_0\\\")\",\"outputresolution\":\"9\",\"uniname1\":\"\\\"uSamples\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uOffset\\\"\",\"value0x\":\"(1.0*(((math.sin((-0.2*absTime.seconds))+1.0)*0.5)%1.0))\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/outTop_0\":{\"commands\":[],\"ty\":\"outTop\",\"connections\":[\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{}},\"/textDat_1\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/little_planet.frag\\\"\"}},\"/transform_1\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"0.0\",\"ty\":\"-0.2\",\"extend\":\"3\"}},\"/math_0\":{\"commands\":[],\"ty\":\"math\",\"connections\":[\"/audioIn_0\"],\"text\":null,\"parameters\":{\"gain\":\"1.0\"}},\"/transform_2\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"0.0\",\"ty\":\"0.3\",\"extend\":\"3\"}},\"/ramp_0\":{\"commands\":[],\"ty\":\"ramp\",\"connections\":[],\"text\":null,\"parameters\":{\"resolutionh\":\"0\",\"dat\":\"op(\\\"table_0\\\")\",\"resolutionw\":\"128\"}},\"/transform_0_feedbackTop_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/compositeTop_0_feedbackTop_0\"],\"text\":null,\"parameters\":{\"extend\":\"1\",\"sy\":\"((1.0+(-0.1*float(op(\\\"analyze_0\\\")[0])))**-1.0)\",\"sx\":\"((1.0+(-0.1*float(op(\\\"analyze_0\\\")[0])))**-1.0)\"}},\"/textDat_2\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/audio_data.frag\\\"\"}},\"/compositeTop_0_feedbackTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/glslTop_1\",\"/levelTop_0_feedbackTop_0\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/chopToTop_0\":{\"commands\":[],\"ty\":\"chopToTop\",\"connections\":[],\"text\":null,\"parameters\":{\"chop\":\"op(\\\"math_0\\\")\"}},\"/analyze_0\":{\"commands\":[],\"ty\":\"analyze\",\"connections\":[\"/math_0\"],\"text\":null,\"parameters\":{\"function\":\"6\"}},\"/levelTop_0_feedbackTop_0\":{\"commands\":[],\"ty\":\"levelTop\",\"connections\":[\"/feedbackTop_0\"],\"text\":null,\"parameters\":{\"opacity\":\"0.98\"}},\"/feedbackTop_0\":{\"commands\":[],\"ty\":\"feedbackTop\",\"connections\":[\"/glslTop_1\"],\"text\":null,\"parameters\":{\"top\":\"op(\\\"transform_0_feedbackTop_0\\\")\"}},\"/glslTop_2\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/chopToTop_0\"],\"text\":null,\"parameters\":{\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_2\\\")\",\"outputresolution\":\"9\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"i_volume\\\"\",\"value0x\":\"0.3\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/hsvAdjustTop_0\":{\"commands\":[],\"ty\":\"hsvAdjustTop\",\"connections\":[\"/transform_0\"],\"text\":null,\"parameters\":{\"valuemult\":\"2.0\"}},\"/compositeTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/transform_1\",\"/transform_2\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/table_0\":{\"commands\":[],\"ty\":\"table\",\"connections\":[],\"text\":\"r\\tg\\tb\\ta\\n0.5859375\\t0.4296875\\t0.390625\\t3.90625e-3\\n0.87109375\\t0.55859375\\t0.26171875\\t3.90625e-3\\n0.296875\\t0.28515625\\t0.390625\\t3.90625e-3\\n0.5703125\\t0.4609375\\t0.51953125\\t3.90625e-3\\n0.64453125\\t0.578125\\t0.703125\\t3.90625e-3\",\"parameters\":{}},\"/glslTop_1\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/compositeTop_0\"],\"text\":null,\"parameters\":{\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_1\\\")\",\"outputresolution\":\"9\",\"outputaspect\":\"1\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/audioIn_0\":{\"commands\":[],\"ty\":\"audioIn\",\"connections\":[],\"text\":null,\"parameters\":{}},\"/blur_0\":{\"commands\":[],\"ty\":\"blur\",\"connections\":[\"/glslTop_0\"],\"text\":null,\"parameters\":{\"size\":\"8.0\"}},\"/selectTop_0_feedbackTop_0\":{\"commands\":[],\"ty\":\"selectTop\",\"connections\":[],\"text\":null,\"parameters\":{\"top\":\"op(\\\"transform_0_feedbackTop_0\\\")\"}}}\"\t0.00000\t/json\t\"{\"/textDat_0\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/palette_map.frag\\\"\"}},\"/transform_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/blur_0\"],\"text\":null,\"parameters\":{\"extend\":\"1\",\"sy\":\"(0.7**-1.0)\",\"sx\":\"(0.7**-1.0)\"}},\"/glslTop_0\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/transform_0_feedbackTop_0\",\"/ramp_0\"],\"text\":null,\"parameters\":{\"value1x\":\"16.0\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_0\\\")\",\"outputresolution\":\"9\",\"uniname1\":\"\\\"uSamples\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uOffset\\\"\",\"value0x\":\"(1.0*(((math.sin((-0.2*absTime.seconds))+1.0)*0.5)%1.0))\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/outTop_0\":{\"commands\":[],\"ty\":\"outTop\",\"connections\":[\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{}},\"/textDat_1\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/little_planet.frag\\\"\"}},\"/transform_1\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"0.0\",\"ty\":\"-0.2\",\"extend\":\"3\"}},\"/math_0\":{\"commands\":[],\"ty\":\"math\",\"connections\":[\"/audioIn_0\"],\"text\":null,\"parameters\":{\"gain\":\"1.0\"}},\"/transform_2\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"0.0\",\"ty\":\"0.3\",\"extend\":\"3\"}},\"/ramp_0\":{\"commands\":[],\"ty\":\"ramp\",\"connections\":[],\"text\":null,\"parameters\":{\"resolutionh\":\"0\",\"dat\":\"op(\\\"table_0\\\")\",\"resolutionw\":\"128\"}},\"/transform_0_feedbackTop_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/compositeTop_0_feedbackTop_0\"],\"text\":null,\"parameters\":{\"extend\":\"1\",\"sy\":\"((1.0+(-0.1*float(op(\\\"analyze_0\\\")[0])))**-1.0)\",\"sx\":\"((1.0+(-0.1*float(op(\\\"analyze_0\\\")[0])))**-1.0)\"}},\"/textDat_2\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/audio_data.frag\\\"\"}},\"/compositeTop_0_feedbackTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/glslTop_1\",\"/levelTop_0_feedbackTop_0\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/chopToTop_0\":{\"commands\":[],\"ty\":\"chopToTop\",\"connections\":[],\"text\":null,\"parameters\":{\"chop\":\"op(\\\"math_0\\\")\"}},\"/analyze_0\":{\"commands\":[],\"ty\":\"analyze\",\"connections\":[\"/math_0\"],\"text\":null,\"parameters\":{\"function\":\"6\"}},\"/levelTop_0_feedbackTop_0\":{\"commands\":[],\"ty\":\"levelTop\",\"connections\":[\"/feedbackTop_0\"],\"text\":null,\"parameters\":{\"opacity\":\"0.98\"}},\"/feedbackTop_0\":{\"commands\":[],\"ty\":\"feedbackTop\",\"connections\":[\"/glslTop_1\"],\"text\":null,\"parameters\":{\"top\":\"op(\\\"transform_0_feedbackTop_0\\\")\"}},\"/glslTop_2\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/chopToTop_0\"],\"text\":null,\"parameters\":{\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_2\\\")\",\"outputresolution\":\"9\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"i_volume\\\"\",\"value0x\":\"0.3\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/hsvAdjustTop_0\":{\"commands\":[],\"ty\":\"hsvAdjustTop\",\"connections\":[\"/transform_0\"],\"text\":null,\"parameters\":{\"valuemult\":\"2.0\"}},\"/compositeTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/transform_1\",\"/transform_2\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/table_0\":{\"commands\":[],\"ty\":\"table\",\"connections\":[],\"text\":\"r\\tg\\tb\\ta\\n0.5859375\\t0.4296875\\t0.390625\\t3.90625e-3\\n0.87109375\\t0.55859375\\t0.26171875\\t3.90625e-3\\n0.296875\\t0.28515625\\t0.390625\\t3.90625e-3\\n0.5703125\\t0.4609375\\t0.51953125\\t3.90625e-3\\n0.64453125\\t0.578125\\t0.703125\\t3.90625e-3\",\"parameters\":{}},\"/glslTop_1\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/compositeTop_0\"],\"text\":null,\"parameters\":{\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_1\\\")\",\"outputresolution\":\"9\",\"outputaspect\":\"1\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/audioIn_0\":{\"commands\":[],\"ty\":\"audioIn\",\"connections\":[],\"text\":null,\"parameters\":{}},\"/blur_0\":{\"commands\":[],\"ty\":\"blur\",\"connections\":[\"/glslTop_0\"],\"text\":null,\"parameters\":{\"size\":\"8.0\"}},\"/selectTop_0_feedbackTop_0\":{\"commands\":[],\"ty\":\"selectTop\",\"connections\":[],\"text\":null,\"parameters\":{\"top\":\"op(\\\"transform_0_feedbackTop_0\\\")\"}}}\"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n/json \"{\"/textDat_0\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/palette_map.frag\\\"\"}},\"/transform_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/blur_0\"],\"text\":null,\"parameters\":{\"extend\":\"1\",\"sy\":\"(0.7**-1.0)\",\"sx\":\"(0.7**-1.0)\"}},\"/glslTop_0\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/transform_0_feedbackTop_0\",\"/ramp_0\"],\"text\":null,\"parameters\":{\"value1x\":\"16.0\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_0\\\")\",\"outputresolution\":\"9\",\"uniname1\":\"\\\"uSamples\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uOffset\\\"\",\"value0x\":\"(1.0*(((math.sin((-0.2*absTime.seconds))+1.0)*0.5)%1.0))\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/outTop_0\":{\"commands\":[],\"ty\":\"outTop\",\"connections\":[\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{}},\"/textDat_1\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/little_planet.frag\\\"\"}},\"/transform_1\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"0.0\",\"ty\":\"-0.2\",\"extend\":\"3\"}},\"/math_0\":{\"commands\":[],\"ty\":\"math\",\"connections\":[\"/audioIn_0\"],\"text\":null,\"parameters\":{\"gain\":\"1.0\"}},\"/transform_2\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"0.0\",\"ty\":\"0.3\",\"extend\":\"3\"}},\"/ramp_0\":{\"commands\":[],\"ty\":\"ramp\",\"connections\":[],\"text\":null,\"parameters\":{\"resolutionh\":\"0\",\"dat\":\"op(\\\"table_0\\\")\",\"resolutionw\":\"128\"}},\"/transform_0_feedbackTop_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/compositeTop_0_feedbackTop_0\"],\"text\":null,\"parameters\":{\"extend\":\"1\",\"sy\":\"((1.0+(-0.1*float(op(\\\"analyze_0\\\")[0])))**-1.0)\",\"sx\":\"((1.0+(-0.1*float(op(\\\"analyze_0\\\")[0])))**-1.0)\"}},\"/textDat_2\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/audio_data.frag\\\"\"}},\"/compositeTop_0_feedbackTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/glslTop_1\",\"/levelTop_0_feedbackTop_0\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/chopToTop_0\":{\"commands\":[],\"ty\":\"chopToTop\",\"connections\":[],\"text\":null,\"parameters\":{\"chop\":\"op(\\\"math_0\\\")\"}},\"/analyze_0\":{\"commands\":[],\"ty\":\"analyze\",\"connections\":[\"/math_0\"],\"text\":null,\"parameters\":{\"function\":\"6\"}},\"/levelTop_0_feedbackTop_0\":{\"commands\":[],\"ty\":\"levelTop\",\"connections\":[\"/feedbackTop_0\"],\"text\":null,\"parameters\":{\"opacity\":\"0.98\"}},\"/feedbackTop_0\":{\"commands\":[],\"ty\":\"feedbackTop\",\"connections\":[\"/glslTop_1\"],\"text\":null,\"parameters\":{\"top\":\"op(\\\"transform_0_feedbackTop_0\\\")\"}},\"/glslTop_2\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/chopToTop_0\"],\"text\":null,\"parameters\":{\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_2\\\")\",\"outputresolution\":\"9\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"i_volume\\\"\",\"value0x\":\"0.3\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/hsvAdjustTop_0\":{\"commands\":[],\"ty\":\"hsvAdjustTop\",\"connections\":[\"/transform_0\"],\"text\":null,\"parameters\":{\"valuemult\":\"2.0\"}},\"/compositeTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/transform_1\",\"/transform_2\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/table_0\":{\"commands\":[],\"ty\":\"table\",\"connections\":[],\"text\":\"r\\tg\\tb\\ta\\n0.5859375\\t0.4296875\\t0.390625\\t1.0\\n0.87109375\\t0.55859375\\t0.26171875\\t1.0\\n0.296875\\t0.28515625\\t0.390625\\t1.0\\n0.5703125\\t0.4609375\\t0.51953125\\t1.0\\n0.64453125\\t0.578125\\t0.703125\\t1.0\",\"parameters\":{}},\"/glslTop_1\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/compositeTop_0\"],\"text\":null,\"parameters\":{\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_1\\\")\",\"outputresolution\":\"9\",\"outputaspect\":\"1\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/audioIn_0\":{\"commands\":[],\"ty\":\"audioIn\",\"connections\":[],\"text\":null,\"parameters\":{}},\"/blur_0\":{\"commands\":[],\"ty\":\"blur\",\"connections\":[\"/glslTop_0\"],\"text\":null,\"parameters\":{\"size\":\"8.0\"}},\"/selectTop_0_feedbackTop_0\":{\"commands\":[],\"ty\":\"selectTop\",\"connections\":[],\"text\":null,\"parameters\":{\"top\":\"op(\\\"transform_0_feedbackTop_0\\\")\"}}}\"\t0.00000\t/json\t\"{\"/textDat_0\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/palette_map.frag\\\"\"}},\"/transform_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/blur_0\"],\"text\":null,\"parameters\":{\"extend\":\"1\",\"sy\":\"(0.7**-1.0)\",\"sx\":\"(0.7**-1.0)\"}},\"/glslTop_0\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/transform_0_feedbackTop_0\",\"/ramp_0\"],\"text\":null,\"parameters\":{\"value1x\":\"16.0\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_0\\\")\",\"outputresolution\":\"9\",\"uniname1\":\"\\\"uSamples\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uOffset\\\"\",\"value0x\":\"(1.0*(((math.sin((-0.2*absTime.seconds))+1.0)*0.5)%1.0))\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/outTop_0\":{\"commands\":[],\"ty\":\"outTop\",\"connections\":[\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{}},\"/textDat_1\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/little_planet.frag\\\"\"}},\"/transform_1\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"0.0\",\"ty\":\"-0.2\",\"extend\":\"3\"}},\"/math_0\":{\"commands\":[],\"ty\":\"math\",\"connections\":[\"/audioIn_0\"],\"text\":null,\"parameters\":{\"gain\":\"1.0\"}},\"/transform_2\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"0.0\",\"ty\":\"0.3\",\"extend\":\"3\"}},\"/ramp_0\":{\"commands\":[],\"ty\":\"ramp\",\"connections\":[],\"text\":null,\"parameters\":{\"resolutionh\":\"0\",\"dat\":\"op(\\\"table_0\\\")\",\"resolutionw\":\"128\"}},\"/transform_0_feedbackTop_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/compositeTop_0_feedbackTop_0\"],\"text\":null,\"parameters\":{\"extend\":\"1\",\"sy\":\"((1.0+(-0.1*float(op(\\\"analyze_0\\\")[0])))**-1.0)\",\"sx\":\"((1.0+(-0.1*float(op(\\\"analyze_0\\\")[0])))**-1.0)\"}},\"/textDat_2\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/audio_data.frag\\\"\"}},\"/compositeTop_0_feedbackTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/glslTop_1\",\"/levelTop_0_feedbackTop_0\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/chopToTop_0\":{\"commands\":[],\"ty\":\"chopToTop\",\"connections\":[],\"text\":null,\"parameters\":{\"chop\":\"op(\\\"math_0\\\")\"}},\"/analyze_0\":{\"commands\":[],\"ty\":\"analyze\",\"connections\":[\"/math_0\"],\"text\":null,\"parameters\":{\"function\":\"6\"}},\"/levelTop_0_feedbackTop_0\":{\"commands\":[],\"ty\":\"levelTop\",\"connections\":[\"/feedbackTop_0\"],\"text\":null,\"parameters\":{\"opacity\":\"0.98\"}},\"/feedbackTop_0\":{\"commands\":[],\"ty\":\"feedbackTop\",\"connections\":[\"/glslTop_1\"],\"text\":null,\"parameters\":{\"top\":\"op(\\\"transform_0_feedbackTop_0\\\")\"}},\"/glslTop_2\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/chopToTop_0\"],\"text\":null,\"parameters\":{\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_2\\\")\",\"outputresolution\":\"9\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"i_volume\\\"\",\"value0x\":\"0.3\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/hsvAdjustTop_0\":{\"commands\":[],\"ty\":\"hsvAdjustTop\",\"connections\":[\"/transform_0\"],\"text\":null,\"parameters\":{\"valuemult\":\"2.0\"}},\"/compositeTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/transform_1\",\"/transform_2\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/table_0\":{\"commands\":[],\"ty\":\"table\",\"connections\":[],\"text\":\"r\\tg\\tb\\ta\\n0.5859375\\t0.4296875\\t0.390625\\t1.0\\n0.87109375\\t0.55859375\\t0.26171875\\t1.0\\n0.296875\\t0.28515625\\t0.390625\\t1.0\\n0.5703125\\t0.4609375\\t0.51953125\\t1.0\\n0.64453125\\t0.578125\\t0.703125\\t1.0\",\"parameters\":{}},\"/glslTop_1\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/compositeTop_0\"],\"text\":null,\"parameters\":{\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_1\\\")\",\"outputresolution\":\"9\",\"outputaspect\":\"1\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/audioIn_0\":{\"commands\":[],\"ty\":\"audioIn\",\"connections\":[],\"text\":null,\"parameters\":{}},\"/blur_0\":{\"commands\":[],\"ty\":\"blur\",\"connections\":[\"/glslTop_0\"],\"text\":null,\"parameters\":{\"size\":\"8.0\"}},\"/selectTop_0_feedbackTop_0\":{\"commands\":[],\"ty\":\"selectTop\",\"connections\":[],\"text\":null,\"parameters\":{\"top\":\"op(\\\"transform_0_feedbackTop_0\\\")\"}}}\"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n/json \"{\"/textDat_0\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/palette_map.frag\\\"\"}},\"/transform_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/blur_0\"],\"text\":null,\"parameters\":{\"extend\":\"1\",\"sy\":\"(0.7**-1.0)\",\"sx\":\"(0.7**-1.0)\"}},\"/glslTop_0\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/transform_0_feedbackTop_0\",\"/ramp_0\"],\"text\":null,\"parameters\":{\"value1x\":\"16.0\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_0\\\")\",\"outputresolution\":\"9\",\"uniname1\":\"\\\"uSamples\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uOffset\\\"\",\"value0x\":\"(absTime.seconds*0.4)\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/outTop_0\":{\"commands\":[],\"ty\":\"outTop\",\"connections\":[\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{}},\"/textDat_1\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/little_planet.frag\\\"\"}},\"/transform_1\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"0.0\",\"ty\":\"-0.2\",\"extend\":\"3\"}},\"/math_0\":{\"commands\":[],\"ty\":\"math\",\"connections\":[\"/audioIn_0\"],\"text\":null,\"parameters\":{\"gain\":\"1.0\"}},\"/transform_2\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"0.0\",\"ty\":\"0.3\",\"extend\":\"3\"}},\"/ramp_0\":{\"commands\":[],\"ty\":\"ramp\",\"connections\":[],\"text\":null,\"parameters\":{\"resolutionh\":\"0\",\"dat\":\"op(\\\"table_0\\\")\",\"resolutionw\":\"128\"}},\"/transform_0_feedbackTop_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/compositeTop_0_feedbackTop_0\"],\"text\":null,\"parameters\":{\"extend\":\"1\",\"sy\":\"((1.0+(-0.1*float(op(\\\"analyze_0\\\")[0])))**-1.0)\",\"sx\":\"((1.0+(-0.1*float(op(\\\"analyze_0\\\")[0])))**-1.0)\"}},\"/textDat_2\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/audio_data.frag\\\"\"}},\"/compositeTop_0_feedbackTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/glslTop_1\",\"/levelTop_0_feedbackTop_0\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/chopToTop_0\":{\"commands\":[],\"ty\":\"chopToTop\",\"connections\":[],\"text\":null,\"parameters\":{\"chop\":\"op(\\\"math_0\\\")\"}},\"/analyze_0\":{\"commands\":[],\"ty\":\"analyze\",\"connections\":[\"/math_0\"],\"text\":null,\"parameters\":{\"function\":\"6\"}},\"/levelTop_0_feedbackTop_0\":{\"commands\":[],\"ty\":\"levelTop\",\"connections\":[\"/feedbackTop_0\"],\"text\":null,\"parameters\":{\"opacity\":\"0.98\"}},\"/feedbackTop_0\":{\"commands\":[],\"ty\":\"feedbackTop\",\"connections\":[\"/glslTop_1\"],\"text\":null,\"parameters\":{\"top\":\"op(\\\"transform_0_feedbackTop_0\\\")\"}},\"/glslTop_2\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/chopToTop_0\"],\"text\":null,\"parameters\":{\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_2\\\")\",\"outputresolution\":\"9\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"i_volume\\\"\",\"value0x\":\"0.3\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/hsvAdjustTop_0\":{\"commands\":[],\"ty\":\"hsvAdjustTop\",\"connections\":[\"/transform_0\"],\"text\":null,\"parameters\":{\"valuemult\":\"2.0\"}},\"/compositeTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/transform_1\",\"/transform_2\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/table_0\":{\"commands\":[],\"ty\":\"table\",\"connections\":[],\"text\":\"r\\tg\\tb\\ta\\n0.5859375\\t0.4296875\\t0.390625\\t1.0\\n0.87109375\\t0.55859375\\t0.26171875\\t1.0\\n0.296875\\t0.28515625\\t0.390625\\t1.0\\n0.5703125\\t0.4609375\\t0.51953125\\t1.0\\n0.64453125\\t0.578125\\t0.703125\\t1.0\",\"parameters\":{}},\"/glslTop_1\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/compositeTop_0\"],\"text\":null,\"parameters\":{\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_1\\\")\",\"outputresolution\":\"9\",\"outputaspect\":\"1\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/audioIn_0\":{\"commands\":[],\"ty\":\"audioIn\",\"connections\":[],\"text\":null,\"parameters\":{}},\"/blur_0\":{\"commands\":[],\"ty\":\"blur\",\"connections\":[\"/glslTop_0\"],\"text\":null,\"parameters\":{\"size\":\"8.0\"}},\"/selectTop_0_feedbackTop_0\":{\"commands\":[],\"ty\":\"selectTop\",\"connections\":[],\"text\":null,\"parameters\":{\"top\":\"op(\\\"transform_0_feedbackTop_0\\\")\"}}}\"\t0.00000\t/json\t\"{\"/textDat_0\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/palette_map.frag\\\"\"}},\"/transform_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/blur_0\"],\"text\":null,\"parameters\":{\"extend\":\"1\",\"sy\":\"(0.7**-1.0)\",\"sx\":\"(0.7**-1.0)\"}},\"/glslTop_0\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/transform_0_feedbackTop_0\",\"/ramp_0\"],\"text\":null,\"parameters\":{\"value1x\":\"16.0\",\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_0\\\")\",\"outputresolution\":\"9\",\"uniname1\":\"\\\"uSamples\\\"\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"uOffset\\\"\",\"value0x\":\"(absTime.seconds*0.4)\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/outTop_0\":{\"commands\":[],\"ty\":\"outTop\",\"connections\":[\"/hsvAdjustTop_0\"],\"text\":null,\"parameters\":{}},\"/textDat_1\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/little_planet.frag\\\"\"}},\"/transform_1\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"0.0\",\"ty\":\"-0.2\",\"extend\":\"3\"}},\"/math_0\":{\"commands\":[],\"ty\":\"math\",\"connections\":[\"/audioIn_0\"],\"text\":null,\"parameters\":{\"gain\":\"1.0\"}},\"/transform_2\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/glslTop_2\"],\"text\":null,\"parameters\":{\"tx\":\"0.0\",\"ty\":\"0.3\",\"extend\":\"3\"}},\"/ramp_0\":{\"commands\":[],\"ty\":\"ramp\",\"connections\":[],\"text\":null,\"parameters\":{\"resolutionh\":\"0\",\"dat\":\"op(\\\"table_0\\\")\",\"resolutionw\":\"128\"}},\"/transform_0_feedbackTop_0\":{\"commands\":[],\"ty\":\"transform\",\"connections\":[\"/compositeTop_0_feedbackTop_0\"],\"text\":null,\"parameters\":{\"extend\":\"1\",\"sy\":\"((1.0+(-0.1*float(op(\\\"analyze_0\\\")[0])))**-1.0)\",\"sx\":\"((1.0+(-0.1*float(op(\\\"analyze_0\\\")[0])))**-1.0)\"}},\"/textDat_2\":{\"commands\":[{\"command\":\"pulse\",\"args\":[\"loadonstartpulse\",\"1\",\"1\"]}],\"ty\":\"textDat\",\"connections\":[],\"text\":null,\"parameters\":{\"file\":\"\\\"scripts/Visuals/audio_data.frag\\\"\"}},\"/compositeTop_0_feedbackTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/glslTop_1\",\"/levelTop_0_feedbackTop_0\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/chopToTop_0\":{\"commands\":[],\"ty\":\"chopToTop\",\"connections\":[],\"text\":null,\"parameters\":{\"chop\":\"op(\\\"math_0\\\")\"}},\"/analyze_0\":{\"commands\":[],\"ty\":\"analyze\",\"connections\":[\"/math_0\"],\"text\":null,\"parameters\":{\"function\":\"6\"}},\"/levelTop_0_feedbackTop_0\":{\"commands\":[],\"ty\":\"levelTop\",\"connections\":[\"/feedbackTop_0\"],\"text\":null,\"parameters\":{\"opacity\":\"0.98\"}},\"/feedbackTop_0\":{\"commands\":[],\"ty\":\"feedbackTop\",\"connections\":[\"/glslTop_1\"],\"text\":null,\"parameters\":{\"top\":\"op(\\\"transform_0_feedbackTop_0\\\")\"}},\"/glslTop_2\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/chopToTop_0\"],\"text\":null,\"parameters\":{\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_2\\\")\",\"outputresolution\":\"9\",\"outputaspect\":\"1\",\"uniname0\":\"\\\"i_volume\\\"\",\"value0x\":\"0.3\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/hsvAdjustTop_0\":{\"commands\":[],\"ty\":\"hsvAdjustTop\",\"connections\":[\"/transform_0\"],\"text\":null,\"parameters\":{\"valuemult\":\"2.0\"}},\"/compositeTop_0\":{\"commands\":[],\"ty\":\"compositeTop\",\"connections\":[\"/transform_1\",\"/transform_2\"],\"text\":null,\"parameters\":{\"operand\":\"0\"}},\"/table_0\":{\"commands\":[],\"ty\":\"table\",\"connections\":[],\"text\":\"r\\tg\\tb\\ta\\n0.5859375\\t0.4296875\\t0.390625\\t1.0\\n0.87109375\\t0.55859375\\t0.26171875\\t1.0\\n0.296875\\t0.28515625\\t0.390625\\t1.0\\n0.5703125\\t0.4609375\\t0.51953125\\t1.0\\n0.64453125\\t0.578125\\t0.703125\\t1.0\",\"parameters\":{}},\"/glslTop_1\":{\"commands\":[],\"ty\":\"glslTop\",\"connections\":[\"/compositeTop_0\"],\"text\":null,\"parameters\":{\"format\":\"3\",\"pixeldat\":\"op(\\\"textDat_1\\\")\",\"outputresolution\":\"9\",\"outputaspect\":\"1\",\"resolutionh\":\"1080\",\"resolutionw\":\"1920\"}},\"/audioIn_0\":{\"commands\":[],\"ty\":\"audioIn\",\"connections\":[],\"text\":null,\"parameters\":{}},\"/blur_0\":{\"commands\":[],\"ty\":\"blur\",\"connections\":[\"/glslTop_0\"],\"text\":null,\"parameters\":{\"size\":\"8.0\"}},\"/selectTop_0_feedbackTop_0\":{\"commands\":[],\"ty\":\"selectTop\",\"connections\":[],\"text\":null,\"parameters\":{\"top\":\"op(\\\"transform_0_feedbackTop_0\\\")\"}}}\"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n"
+ },
+ "/oscin1_callbacks": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "edit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "file": {
+    "mode": "constant",
+    "value": "scripts/osc_callbacks.py"
+   },
+   "loadonstart": {
+    "mode": "constant",
+    "value": true
+   },
+   "loadonstartpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "writepulse": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "textDAT",
+  "nodeX": 775,
+  "nodeY": 500,
+  "render": false,
+  "tags": [],
+  "text": "# me - this DAT\n# \n# dat - the DAT that received a message\n# rowIndex - the row number the message was placed into\n# message - an ascii representation of the data\n#           Unprintable characters and unicode characters will\n#           not be preserved. Use the 'bytes' parameter to get\n#           the raw bytes that were sent.\n# bytes - a byte array of the message.\n# timeStamp - the arrival time component the OSC message\n# address - the address component of the OSC message\n# args - a list of values contained within the OSC message\n# peer - a Peer object describing the originating message\n#   peer.close()    #close the connection\n#   peer.owner  #the operator to whom the peer belongs\n#   peer.address    #network address associated with the peer\n#   peer.port       #network port associated with the peer\n#\n\nimport scripts\nimport hooks\nimport json\n\ndef receiveOSC(dat, rowIndex, message, bytes, timeStamp, address, args, peer):\n\n  if address == \"/json\":\n    scripts.apply(json.loads(args[0]))\n    hooks.newJson(json.loads(args[0]))\n    return\n\n  addr = \"/project1/lambda\" + address\n  if args[0] == \"create\":\n    clazz = scripts.getClass(args[1], 'none')\n    if clazz == \"none\":\n      print(\"Couldn't find \" + args[1])\n      return\n\n    name = addr[(addr.rfind('/') + 1):]\n    par = addr[:(addr.rfind('/'))]\n\n    if op(addr) != None:\n      op(addr).destroy()\n\n    # Special case things that can't have duplicates\n    if clazz[1] == 'audiodevin' or clazz[1] == 'videodevin':\n      if op(clazz[1]) == None:\n        parent().create(clazz[0], clazz[1])\n      if clazz[2] == \"CHOP\":\n        selOp = selectCHOP\n        selPar = 'chop'\n      elif clazz[2] == \"TOP\":\n        selOp = selectTOP\n        selPar = 'top'\n\n      op(par).create(selOp, name)\n      op(addr).pars(selPar)[0].val = '/project1/' + clazz[1]\n      return\n\n    op(par).create(clazz[0], name)\n\n    # TODO: Figure out a clean way to not special case these\n    if clazz[1] == 'out' and clazz[2] == 'SOP':\n      op(addr).render = True\n      op(addr).display = True\n\n    if clazz[1] == 'geo':\n      op(addr + \"/torus1\").destroy()\n\n  elif args[0] == \"connect\" and op(addr):\n    op(\"/project1/lambda\" + args[2]).outputConnectors[0].connect(op(addr).inputConnectors[args[1]])\n\n  elif (args[0] == \"parameter\" or args[0] == \"custompar\") and op(addr):\n    pars = op(addr).pars(args[1])\n    if len(pars) > 0:\n      if isfloat(args[2]):\n        if pars[0].isMenu:\n          pars[0].menuIndex = args[2]\n        else:\n          pars[0].val = float(args[2])\n      else:\n        pars[0].expr = args[2]\n    if args[1] == \"externaltox\":\n      op(addr).par.reinitnet.pulse()\n\n  elif args[0] == \"command\" and op(addr):\n    if args[1] == \"pulse\":\n      pars = op(addr).pars(args[2])\n      if len(pars) > 0:\n        if isfloat(args[3]):\n          pars[0].pulse(float(args[3]), frames=float(args[4]))\n        else:\n          pars[0].pulse(args[3])\n    elif args[1] == \"store\":\n      op(addr).store(args[2], args[3])\n\n  elif args[0] == \"text\" and op(addr):\n    op(addr).text = args[1]\n\n  return\n\ndef isfloat(value):\n  try:\n    float(value)\n    return True\n  except ValueError:\n    return False\n"
+ },
+ "/out1": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [
+   "/outTop_0"
+  ],
+  "json_parameters": {
+   "armenu": {
+    "mode": "constant",
+    "value": 0
+   },
+   "fillmode": {
+    "mode": "constant",
+    "value": "useinput"
+   },
+   "label": {
+    "mode": "expression",
+    "value": "me.name"
+   },
+   "resmenu": {
+    "mode": "constant",
+    "value": 9
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "outTOP",
+  "nodeX": 550,
+  "nodeY": 800,
+  "render": false,
+  "tags": []
+ },
+ "/scripts": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "edit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "file": {
+    "mode": "constant",
+    "value": "scripts/scripts.py"
+   },
+   "loadonstart": {
+    "mode": "constant",
+    "value": true
+   },
+   "loadonstartpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "writepulse": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "textDAT",
+  "nodeX": 575,
+  "nodeY": 650,
+  "render": false,
+  "tags": [],
+  "text": "from dictdiffer import diff, dot_lookup\nfrom collections import deque\n\nclasses = {\n  'blur' : (blurTOP, 'blur', 'TOP'),\n  'chopToTop' : (choptoTOP, 'chopto', 'TOP'),\n  'circleTop' : (circleTOP, 'circle', 'TOP'),\n  'compositeTop' : (compositeTOP, 'comp', 'TOP'),\n  'crop' : (cropTOP, 'crop', 'TOP'),\n  'displace' : (displaceTOP, 'displace', 'TOP'),\n  'edges' : (edgeTOP, 'edge', 'TOP'),\n  'feedbackTop' : (feedbackTOP, 'feedback', 'TOP'),\n  'flip' : (flipTOP, 'flip', 'TOP'),\n  'glslTop' : (glslmultiTOP, 'glslMulti', 'TOP'),\n  'movieFileIn' : (moviefileinTOP, 'moviefilein', 'TOP'),\n  'inTop' : (inTOP, 'in', 'TOP'),\n  'nullTop' : (nullTOP, 'null', 'TOP'),\n  'outTop' : (outTOP, 'out', 'TOP'),\n  'rectangleTop' : (rectangleTOP, 'rectangle', 'TOP'),\n  'render' : (renderTOP, 'render', 'TOP'),\n  'hsvAdjustTop' : (hsvadjustTOP, 'hsvadj', 'TOP'),\n  'levelTop' : (levelTOP, 'level', 'TOP'),\n  'transform' : (transformTOP, 'transform', 'TOP'),\n  'noiseTop' : (noiseTOP, 'noise', 'TOP'),\n  'ndiinTop' : (ndiinTOP, 'ndiin', 'TOP'),\n  'ramp' : (rampTOP, 'ramp', 'TOP'),\n  'switchTop' : (switchTOP, 'switch', 'TOP'),\n  'selectTop' : (selectTOP, 'select', 'TOP'),\n  'textTop' : (textTOP, 'text', 'TOP'),\n  'videoDeviceIn' : (videodeviceinTOP, 'videodevin', 'TOP'),\n\n  'analyze' : (analyzeCHOP, 'analyze', 'CHOP'),\n  'audioDevOut' : (audiodeviceoutCHOP, 'audiodevout', 'CHOP'),\n  'audioFileIn' : (audiofileinCHOP, 'audiofilein', 'CHOP'),\n  'audioFilter' : (audiofilterCHOP, 'audiofilter', 'CHOP'),\n  'audioIn' : (audiodeviceinCHOP, 'audiodevin', 'CHOP'),\n  'audioMovie' : (audiomovieCHOP, 'audiomovie', 'CHOP'),\n  'audioSpectrum' : (audiospectrumCHOP, 'audiospect', 'CHOP'),\n  'chopToDat' : (choptoDAT, 'chopto', 'DAT'),\n  'constantChop' : (constantCHOP, 'constant', 'CHOP'),\n  'count' : (countCHOP, 'count', 'CHOP'),\n  'datToChop' : (dattoCHOP, 'datto', 'CHOP'),\n  'delay' : (delayCHOP, 'delay', 'CHOP'),\n  'expressionChop' : (expressionCHOP, 'expression', 'CHOP'),\n  'fan' : (fanCHOP, 'fan', 'CHOP'),\n  'feedbackChop' : (feedbackCHOP, 'feedback', 'CHOP'),\n  'hold' : (holdCHOP, 'hold', 'CHOP'),\n  'lag' : (lagCHOP, 'lag', 'CHOP'),\n  'logic' : (logicCHOP, 'logic', 'CHOP'),\n  'inChop' : (inCHOP, 'in', 'CHOP'),\n  'math' : (mathCHOP, 'math', 'CHOP'),\n  'mergeChop' : (mergeCHOP, 'merge', 'CHOP'),\n  'midiIn' : (midiinmapCHOP, 'midiinmap', 'CHOP'),\n  'nullChop' : (nullCHOP, 'null', 'CHOP'),\n  'noiseChop' : (noiseCHOP, 'noise', 'CHOP'),\n  'oscInChop' : (oscinCHOP, 'oscin', 'CHOP'),\n  'outChop' : (outCHOP, 'out', 'CHOP'),\n  'renameChop' : (renameCHOP, 'rename', 'CHOP'),\n  'replaceChop' : (replaceCHOP, 'replace', 'CHOP'),\n  'resampleChop' : (resampleCHOP, 'resample', 'CHOP'),\n  'scriptChop' : (scriptCHOP, 'script', 'CHOP'),\n  'selectChop' : (selectCHOP, 'select', 'CHOP'),\n  'sopToChop' : (soptoCHOP, 'sopto', 'CHOP'),\n  'shuffleChop' : (shuffleCHOP, 'shuffle', 'CHOP'),\n  'switchChop' : (switchCHOP, 'switch', 'CHOP'),\n  'stretchChop' : (stretchCHOP, 'stretch', 'CHOP'),\n  'topToChop' : (toptoCHOP, 'topto', 'CHOP'),\n  'timer' : (timerCHOP, 'timer', 'CHOP'),\n  'waveChop' : (waveCHOP, 'wave', 'CHOP'),\n\n  'boxSop' : (boxSOP, 'box', 'SOP'),\n  'chopToSop' : (choptoSOP, 'chopto', 'SOP'),\n  'circleSop' : (circleSOP, 'circle', 'SOP'),\n  'gridSop' : (gridSOP, 'grid', 'SOP'),\n  'lineSop' : (lineSOP, 'line', 'SOP'),\n  'mergeSop' : (mergeSOP, 'merge', 'SOP'),\n  'metaball' : (metaballSOP, 'metaball', 'SOP'),\n  'noiseSop' : (noiseSOP, 'noise', 'SOP'),\n  'inSop' : (inSOP, 'in', 'SOP'),\n  'outSop' : (outSOP, 'out', 'SOP'),\n  'sphere' : (sphereSOP, 'sphere', 'SOP'),\n  'torusSop' : (torusSOP, 'torus', 'SOP'),\n  'sweep' : (sweepSOP, 'sweep', 'SOP'),\n  'transformSop' : (transformSOP, 'transform', 'SOP'),\n  'tubeSop' : (tubeSOP, 'tube', 'SOP'),\n\n  'inMat' : (inMAT, 'in', 'MAT'),\n  'wireframeMat' : (wireframeMAT, 'wireframe', 'MAT'),\n  'outMat' : (outMAT, 'out', 'MAT'),\n  'pbrMat' : (pbrMAT, 'pbr', 'MAT'),\n  'constMat' : (constantMAT, 'constant', 'MAT'),\n\n  'chopExec' : (chopexecuteDAT, 'chopexecute', 'DAT'),\n  'datExec' : (datexecuteDAT, 'datexecute', 'DAT'),\n  'inDat' : (inDAT, 'in', 'DAT'),\n  'oscInDat' : (oscinDAT, 'oscin', 'DAT'),\n  'outDat' : (outDAT, 'out', 'DAT'),\n  'scriptDat' : (scriptDAT, 'script', 'DAT'),\n  'selectDat' : (selectDAT, 'select', 'DAT'),\n  'table' : (tableDAT, 'table', 'DAT'),\n  'textDat' : (textDAT, 'text', 'DAT'),\n  'tcpip' : (tcpipDAT, 'tcpip', 'DAT'),\n\n  'camera' : (cameraCOMP, 'cam', 'COMP'),\n  'geo' : (geometryCOMP, 'geo', 'COMP'),\n  'light' : (lightCOMP, 'light', 'COMP'),\n  'base' : (baseCOMP, 'base', 'COMP')\n}\n\ndef getClass(opname, default):\n  return classes.get(opname, default)\n\nstate = {}\ndiffs = []\n\ndef apply(newState):\n  global state\n  print(newState)\n  # Step 1: create new nodes\n  prevState = state\n  state = newState\n  ddiff = diff(prevState, state)\n  diffs.append(ddiff)\n\n  for diffi in list(reversed(list(ddiff))):\n    splits = diffi[1].split('.') if isinstance(diffi[1], str) else diffi[1]\n    if diffi[1] == '':\n      if diffi[0] == 'add':\n        addAll(diffi[2])\n      elif diffi[0] == 'remove':\n        for key,value in diffi[2]:\n          curop = op(\"/project1/lambda\" + key)\n          if curop != None:\n            curop.destroy()\n    elif splits[1] == 'connections':\n      concatname = [str(x) for x in diffi[1] if isinstance(x, str)]\n      diffip = diffi[1] if isinstance(diffi[1], str) or diffi[1] == '' else \".\".join(concatname)\n      item = dot_lookup(state, diffip, parent=True)\n      curop = op(getName(splits[0]))\n      for connector in curop.inputConnectors:\n        connector.disconnect()\n      for i, conn in enumerate(item['connections']):\n        op(getName(conn)).outputConnectors[0].connect(curop.inputConnectors[i])\n    elif splits[1] == 'parameters':\n      curop = op(getName(splits[0]))\n      if diffi[0] == 'add':\n        for k,v in diffi[2]:\n          addParameter(curop, k, v)\n      elif diffi[0] == 'change':\n        addParameter(curop, splits[2], diffi[2][1])\n      elif diffi[0] == 'remove':\n        for param in diffi[2]:\n          print(param[0])\n          if(param[0] == 'tx'):\n            curop.par.tx = 0\n          elif param[0] == 'ty':\n            curop.par.ty = 0\n          par = curop.pars(param[0])[0]\n          print(\"val: \" + str(par.val))\n          if par.val:\n            print(\"def: \" + str(par.default))\n            par.val = par.default\n\n    elif splits[1] == 'text':\n      op(getName(splits[0])).text = diffi[2][1]\n\n    elif splits[1] == 'commands' and diffi[0] == 'add':\n      runCommand(op(getName(splits[0])), diffi[2][0][1]['command'], diffi[2][0][1]['args'])\n\n\ndef getName(name):\n  return \"/project1/lambda\" + name\n\ndef addAll(state):\n  connections = []\n  queue = deque(state)\n  i = 0\n  while len(queue) > 0:\n    (key, value) = queue.popleft()\n    addr = getName(key)\n    par = addr[:(addr.rfind('/'))]\n    if op(par) != None:\n      connections.extend(list(addChange(key, value)))\n    else:\n      queue.append((key, value))\n\n  for conn in connections:\n    if conn[0] == '' or op(getName(conn[0])) == None:\n      continue\n    if conn[2] == 0:\n      for connector in op(conn[1]).inputConnectors:\n        connector.disconnect()\n    op(getName(conn[0])).outputConnectors[0].connect(op(conn[1]).inputConnectors[conn[2]])\n\ndef addChange(key, value):\n  addr = getName(key)\n\n  newOp = createOp(addr, value['ty'])\n\n  if 'parameters' in value:\n    pars = value['parameters'].items()\n    tox = next((x for x in pars if x[0] == 'externaltox'), None)\n    if tox != None:\n      pars = [x for x in pars if x[0] != 'externaltox']\n      pars.insert(0, tox)\n\n    for k,v in pars:\n      addParameter(newOp, k, v)\n\n  if 'commands' in value:\n    coms = value['commands']\n    for comm in coms:\n      runCommand(newOp, comm['command'], comm['args'])\n\n  if 'text' in value and value['text'] != None:\n    newOp.text = value['text']\n\n  if 'connections' in value:\n    return ((c, addr, i) for i,c in enumerate(value['connections']))\n\n\ndef createOp(addr, ty):\n  clazz = getClass(ty, 'none')\n  if clazz == \"none\":\n    print(\"Couldn't find \" + ty)\n    return\n\n  name = addr[(addr.rfind('/') + 1):]\n  par = addr[:(addr.rfind('/'))]\n\n  if op(addr) != None:\n    op(addr).destroy()\n\n  # Special case things that can't have duplicates\n  if clazz[1] == 'audiodevin' or clazz[1] == 'videodevin' or clazz[1] == 'ndiin':\n    if op(clazz[1]) == None:\n      parent().create(clazz[0], clazz[1])\n    if clazz[2] == \"CHOP\":\n      selOp = selectCHOP\n      selPar = 'chop'\n    elif clazz[2] == \"TOP\":\n      selOp = selectTOP\n      selPar = 'top'\n\n    op(par).create(selOp, name)\n    op(addr).pars(selPar)[0].val = '/project1/' + clazz[1]\n  else:\n    op(par).create(clazz[0], name)\n\n  if clazz[1] == 'feedback' and clazz[2] == \"CHOP\":\n    op(par).reset()\n\n  newOp = op(addr)\n\n  # TODO: Figure out a clean way to not special case these\n  if clazz[1] == 'out' and clazz[2] == 'SOP':\n    newOp.render = True\n    newOp.display = True\n\n  if clazz[1] == 'geo':\n    op(addr + \"/torus1\").destroy()\n\n  return newOp\n\ndef addParameter(newOp, name, value):\n  pars = newOp.pars(name)\n  if len(pars) == 0:\n    return\n\n  par = pars[0]\n  if isfloat(value):\n    if par.isMenu:\n      par.menuIndex = value\n    else:\n      par.val = float(value)\n  else:\n    par.expr = value\n\n  # Special case loading tox as soon as we know source\n  if name == \"externaltox\":\n    newOp.par.reinitnet.pulse()\n  elif name == 'file' and (newOp.type == \"text\" or newOp.type == \"table\"):\n    newOp.par.loadonstartpulse.pulse()\n\ndef runCommand(newOp, command, args):\n    if command == \"pulse\":\n      pars = newOp.pars(args[0])\n      if len(pars) > 0:\n        if isfloat(args[1]):\n          pars[0].pulse(float(args[1]), frames=float(args[2]))\n        else:\n          pars[0].pulse(args[1])\n    elif command == \"store\":\n      newOp.store(args[0], args[1])\n\ndef isfloat(value):\n  try:\n    float(value)\n    return True\n  except ValueError:\n    return False\n"
+ },
+ "/text1": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "edit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "loadonstartpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "writepulse": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "textDAT",
+  "nodeX": 300,
+  "nodeY": 625,
+  "render": false,
+  "tags": [],
+  "text": "# op('/project1/displace0').inputConnectors[0].connect(op('movieFileIn0'))\n\n# print(families['SOP']['add'])\n\nprint(op('constant1').type)"
+ },
+ "/text2": {
+  "bypass": false,
+  "display": true,
+  "json_connections": [],
+  "json_parameters": {
+   "edit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "file": {
+    "mode": "constant",
+    "value": "scripts/differ.py"
+   },
+   "loadonstart": {
+    "mode": "constant",
+    "value": true
+   },
+   "loadonstartpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "writepulse": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "textDAT",
+  "nodeX": 75,
+  "nodeY": 900,
+  "render": false,
+  "tags": [],
+  "text": "import scripts\nfrom deepdiff import DeepDiff\n\nstate = {}\n\ndef apply(newState):\n  # Step 1: create new nodes\n  state = newState\n  connections = []\n\n  for key,value in state.items():\n    addr = \"/project1/lambda/\" + key\n\n    newOp = createOp(addr, value['ty'])\n\n    if 'connections' in value:\n      connections.extend(list(map(lambda c: c.append(addr), value['connections'])))\n\n    if 'parameters' in value:\n      for k,v in value['parameters']:\n        addParameter(newOp, k, v)\n\n    if 'commands' in value:\n      for comm in value['commands']:\n        runCommand(newOp, comm['command'], comm['args'])\n\n    if 'text' in value:\n      newOp.text = value['text']\n\n  for key,conn in connections:\n    op(\"/project1/lambda\" + conn[0]).outputConnectors[0].connect(op(conn[1]).inputConnectors[key])\n\ndef createOp(addr, ty):\n  clazz = scripts.getClass(ty, 'none')\n  if clazz == \"none\":\n    print(\"Couldn't find \" + ty)\n    return\n\n  name = addr[(addr.rfind('/') + 1):]\n  par = addr[:(addr.rfind('/'))]\n\n  if op(addr) != None:\n    op(addr).destroy()\n\n  # Special case things that can't have duplicates\n  if clazz[1] == 'audiodevin' or clazz[1] == 'videodevin':\n    if op(clazz[1]) == None:\n      parent().create(clazz[0], clazz[1])\n    if clazz[2] == \"CHOP\":\n      selOp = selectCHOP\n      selPar = 'chop'\n    elif clazz[2] == \"TOP\":\n      selOp = selectTOP\n      selPar = 'top'\n\n    op(par).create(selOp, name)\n    op(addr).pars(selPar)[0].val = '/project1/' + clazz[1]\n  else:\n    op(par).create(clazz[0], name)\n\n  newOp = op(addr)\n\n  # TODO: Figure out a clean way to not special case these\n  if clazz[1] == 'out' and clazz[2] == 'SOP':\n    newOp.render = True\n    newOp.display = True\n\n  if clazz[1] == 'geo':\n    op(addr + \"/torus1\").destroy()\n\n  return newOp\n\ndef addParameter(newOp, name, value):\n  pars = newOp.pars(name)\n  if len(pars) > 0:\n    par = pars[0]\n    if isfloat(value):\n      if par.isMenu:\n        par.menuIndex = value\n      else:\n        par.val = float(value)\n    else:\n      par.expr = value\n\n  # Special case loading tox as soon as we know source\n  if name == \"externaltox\":\n    op(addr).par.reinitnet.pulse()\n\ndef runCommand(newOp, command, args):\n    if command == \"pulse\":\n      pars = op(addr).pars(args[0])\n      if len(pars) > 0:\n        if isfloat(args[1]):\n          pars[0].pulse(float(args[1]), frames=float(args[2]))\n        else:\n          pars[0].pulse(args[1])\n    elif command == \"store\":\n      op(addr).store(args[0], args[1])\n\ndef isfloat(value):\n  try:\n    float(value)\n    return True\n  except ValueError:\n    return False\n"
+ },
+ "/text3": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "edit": {
+    "mode": "constant",
+    "value": 0
+   },
+   "loadonstartpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "writepulse": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "textDAT",
+  "nodeX": 75,
+  "nodeY": 750,
+  "render": false,
+  "tags": [],
+  "text": "import text2\n\nstate = { \"test\": {\n\"ty\": \"circleSop\"\n}\n}\n\ntext2.apply(state)"
+ },
+ "/videodevin": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "armenu": {
+    "mode": "constant",
+    "value": 0
+   },
+   "device": {
+    "mode": "constant",
+    "value": "V1|||\\\\?\\usb#vid_1bcf&pid_2b95&mi_00#6&1ca786e2&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\\global|||1|||0|||Integrated Webcam"
+   },
+   "options": {
+    "mode": "constant",
+    "value": 0
+   },
+   "resmenu": {
+    "mode": "constant",
+    "value": 9
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "videodeviceinTOP",
+  "nodeX": -100,
+  "nodeY": 675,
+  "render": false,
+  "tags": []
+ },
+ "/window1": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "alwaysontop": {
+    "mode": "constant",
+    "value": true
+   },
+   "borders": {
+    "mode": "constant",
+    "value": false
+   },
+   "enablecloningpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "opendialog": {
+    "mode": "constant",
+    "value": 0
+   },
+   "performance": {
+    "mode": "constant",
+    "value": 0
+   },
+   "reinitextensions": {
+    "mode": "constant",
+    "value": 0
+   },
+   "reinitnet": {
+    "mode": "constant",
+    "value": 0
+   },
+   "setperform": {
+    "mode": "constant",
+    "value": 0
+   },
+   "size": {
+    "mode": "constant",
+    "value": "custom"
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "title": {
+    "mode": "expression",
+    "value": "me"
+   },
+   "update": {
+    "mode": "constant",
+    "value": 0
+   },
+   "winclose": {
+    "mode": "constant",
+    "value": 0
+   },
+   "winh": {
+    "mode": "expression",
+    "value": "300"
+   },
+   "winopen": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "windowCOMP",
+  "nodeX": 375,
+  "nodeY": 950,
+  "render": false,
+  "tags": []
+ },
+ "/window3": {
+  "bypass": false,
+  "display": false,
+  "json_connections": [],
+  "json_parameters": {
+   "enablecloningpulse": {
+    "mode": "constant",
+    "value": 0
+   },
+   "opendialog": {
+    "mode": "constant",
+    "value": 0
+   },
+   "performance": {
+    "mode": "constant",
+    "value": 0
+   },
+   "reinitextensions": {
+    "mode": "constant",
+    "value": 0
+   },
+   "reinitnet": {
+    "mode": "constant",
+    "value": 0
+   },
+   "setperform": {
+    "mode": "constant",
+    "value": 0
+   },
+   "stdswitcher1": {
+    "mode": "constant",
+    "value": 0
+   },
+   "title": {
+    "mode": "expression",
+    "value": "me"
+   },
+   "update": {
+    "mode": "constant",
+    "value": 0
+   },
+   "winclose": {
+    "mode": "constant",
+    "value": 0
+   },
+   "winop": {
+    "mode": "constant",
+    "value": "container1"
+   },
+   "winopen": {
+    "mode": "constant",
+    "value": 0
+   }
+  },
+  "json_type": "windowCOMP",
+  "nodeX": -625,
+  "nodeY": 700,
+  "render": false,
+  "tags": []
+ }
+}

@@ -42,6 +42,13 @@ highvc = chan0f highv
 bandv b = analyze (int 6) $ bandPass b ain
 bandvc = chan0f . bandv
 
+lmf h fing xyz = leapmotion & selectC' (selectCNames ?~ str ("hand" ++ show h ++ "/finger" ++ show fing ++ ":t" ++ xyz))
+lmf0 h fing = chan0f . lmf h fing
+lmp h v = leapmotion & selectC' (selectCNames ?~ str ("hand" ++ show h ++ "/palm:" ++ v))
+lmp0 h = chan0f . lmp h
+lms = leapmotion & selectC' (selectCNames ?~ str "swipe0:tracking")
+lms0 = chan0f $ lms
+
 cTSMod tf s = chopToS' ((chopToSResample ?~ bool True) . (chopToSopAttrScope ?~ str "P")) (tf (sopToC s)) (Just s)
 
 amult t = math' ((mathAlign ?~ int 7) . (mathCombChops ?~ int 3)) [t, math' ((mathAddPost ?~ (float 1)) . (mathMult ?~ float 2)) [ain]]
@@ -55,6 +62,18 @@ mnoise t s = noiseC' ((noiseCType ?~ int 2) .
                          (noiseCTranslate._2 ?~ t) .
                          (chopTimeSlice ?~ bool True))
 mnoisec t s = chan0f $ mnoise t s
+
+tapbeat i = 
+  let
+    beat = constC [i] & logic' (logicPreop ?~ int 5) . (:[])
+    beatdelay = beat & delay (int 1)
+    beatspeed = expressionC [ternary (chan0f (opInput (int 0)) !> float 2) (float 0) (chan0f (opInput (int 0)))] 
+                  [speedC (beatdelay & logic' (logicPreop ?~ int 1) . (:[])) (Just beatdelay)]
+    beathold = hold beatspeed beat
+    beattrail = trailC' ((trailActive ?~ chan0f beat !== float 1) . (trailWindowLengthFrames ?~ int 10) . (trailCapture ?~ int 1)) beathold
+    beataccum = speedC (math' (mathPostOp ?~ int 5) . (:[]) $ analyze (int 0) beattrail) (Just beat)
+  in
+    expressionC [castf $ ((chan0f $ opInput (int 0)) !% float 1 !> float 0) !&& ((chan0f $ opInput (int 0)) !% float 1 !< float 0.16)] [beataccum]
 
 launchmapping = strobe (float 10 !* mchan "s1c")
   $ scalexy (float 0.2 !* mchan "s1b")
@@ -141,7 +160,7 @@ movie s f = movieFileIn' ((moviePlayMode ?~ int 1) .
                           (movieIndex ?~ casti s) .
                           (topResolution .~ iv2 (1920, 1080))) $ str $ "videos/" ++ f
 
-geoT tr sc top sop = render (geo' ((geoTranslate .~ tr) . (geoScale .~ sc) . (geoMat ?~ topM top)) (outS sop)) cam
+geoT tr sc top sop = render [geo' ((geoTranslate .~ tr) . (geoScale .~ sc) . (geoMat ?~ topM top)) (outS sop)] cam
 commandCode t = textT' ( (topResolution .~ (Just $ int 1920, Just $ int 1080))
                          . (textFontSize ?~ float 16)
                          . (textAlign .~ iv2 (0, 0))
@@ -171,7 +190,7 @@ lineGeo ty rz sx sy sop width instances mat =
     volume = analyze (int 6) ain
     volc = chan0f volume
   in
-    render sgeo (centerCam (v3 (float 0) (float 0) (float 50)) emptyV3)
+    render [sgeo] (centerCam (v3 (float 0) (float 0) (float 50)) emptyV3)
 
 spiralGeo inst speed sop =
   let
@@ -184,7 +203,7 @@ spiralGeo inst speed sop =
     tz = waveC' (waveCNames ?~ str "tz") instances $ instanceIter 10 !* float 1 !- float 50
     centerCam t r = cam' ((camTranslate .~ t) . (camPivot .~ v3mult (float (-1)) t) . (camRotate .~ r))
   in
-    render sgeo (centerCam (v3 (float 0) (float 0) (float 5)) emptyV3)
+    render [sgeo] (centerCam (v3 (float 0) (float 0) (float 5)) emptyV3)
 
 -- vidIn
 
@@ -235,7 +254,7 @@ strobe = strobe' id
 transformext' f e = transformT' (f . (transformExtend ?~ (int e)))
 transformscale' f s e = transformext' (f . (transformScale .~ ((!^ (float (-1))) <$> fst s, (!^ (float (-1))) <$> snd s) )) e
 transformscale = transformscale' id
-translate' f t = transformT' ((transformExtend ?~ int 3) . (transformTranslate .~ t) . f)
+translate' f t = transformT' (f . (transformExtend ?~ int 3) . (transformTranslate .~ t))
 translate (a, b) = translate' id (Just a, Just b)
 translatex' f x = translate' f $ (Just x, Just $ float 0)
 translatex = translatex' id
@@ -253,7 +272,7 @@ multops = compT 27
 overops = compT 31
 triggerops f tops = switchT (chan0f $
                              count' ((countThresh ?~ float 0.5) .
-                                     (countLimMax ?~ float (fromIntegral $ length tops)) .
+                                     (countLimMax ?~ float (fromIntegral $ length tops - 1)) .
                                      (countLimType ?~ int 1)
                                     ) f
                             ) tops
@@ -284,7 +303,7 @@ tres = (topResolution .~ (Just $ int 1920, Just $ int 1080)) . (pixelFormat ?~ i
 scr = (++) "scripts/Visuals/"
 frag = frag' id
 frag' f s = glslTP' (tres . f) (scr s)
-rendered g = render' (renderLight ?~ light) g cam
+rendered g = render' (renderLight .~ [light]) [g] cam
 tdata v t = frag "audio_data.frag" [("i_volume", xV4 v)] [t]
 palette (Palette colors) = ramp' (topResolution .~ iv2 (128, 0)) . table
   . fromLists $ ["r", "g", "b", "a", "pos"]:(zipWith (colorToBS (length colors)) [0..] colors)
