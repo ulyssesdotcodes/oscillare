@@ -20,6 +20,8 @@ def onFrameUpdate(frame):
         # blist = list(map(lambda v: int(v * 254).to_bytes(1, byteorder='big')[0], op(leddataop)[0].vals))
         # blist.insert(0, 0xff)
         # bs = bytes(blist)
+        bs = bytes(map(lambda v: int(v * 254).to_bytes(1, byteorder='big')[0], op(leddataop)[0].vals[:450]))
+        # print(len(bs))
         op(arduinoop).sendBytes(0xff)
-        op(arduinoop).sendBytes(bytes(map(lambda v: int(v * 254).to_bytes(1, byteorder='big')[0], op(leddataop)[0].vals[:450])))
+        op(arduinoop).sendBytes(bs)
     return

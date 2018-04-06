@@ -90,8 +90,47 @@ r $ addops [commandCode {Command}
                  & fade (float 0.95)
              ]
            ]
+           
+-- LED light check
+
+r $ 
+  ( constC' (constCEndFrames ?~ int 450) [seconds !% float 1]
+  , shapes (float 3) (float 0.3 !+ volc) (float 0.3)
+    & repeatTxy (float 30)
+    & translatex (seconds !* float 0.1)
+  )
+  
+-- LED stuff  
+let colorconst f = constC' (constCEndFrames ?~ int 151) [f]
+
+let ledswitch n t = constled (castf $ (chan0f $ triggercount t 2) !== float n) 15
+
+let rgbledswitch f = rgbled (ledswitch 0 f) (ledswitch 1 f) (ledswitch 2 f)
+
+r $ shapes (float 3) (float 0.3 !+ volc) (float 0.3)
+    & repeatTxy (float 30)
+    & translatex (seconds !* float 0.1)
+    & translatey (seconds !* float 0.02)
+    & palettecycle buddhist (float 0.2 !* seconds)
+    & bottomLedSplit 150
+
+    & crop' ((cropTop ?~ float 0.92))
+    & topToC
+    & selectC' (selectCNames ?~ str "r g b")
+    & stretchC (int 150)
+    & shuffleC (int 6)
+  , shapes (float 3) (float 0.3 !+ volc) (float 0.3)
+    & repeatTxy (float 30)
+    & translatex (seconds !* float 0.1)
+    & translatey (seconds !* float 0.02)
+    & fade (float 0.96)
+    & palettemap buddhist (float 0.2 !* seconds)
+  )
 
 
+    & math' (mathCombChops ?~ int 3) . (:[ain & stretchC (int 451) ])
+
+  
 -- Rotating adatas
 let
   adatat x y = adata (float (y * 0.2)) & translatey ((x !* seconds) !% float 1) & rotate (x !* float 180 !* seconds)
@@ -418,7 +457,7 @@ r $ addops [adata (float 1)
   & val (lowvc !* float (4))
   & translatey (float (-0.2))
   & scalexy (float 0.4)
-  & fade' id (scalexy (volc !* float (-0.04)) . translatey (float 0.02)) (float 0.99)
+  & fade' id (scalexy (float 1 !- (volc !* float (-0.04))) . translatey (float 0.02)) (float 0.99)
   & palettemap neon ((volc !* float 0.3) !+ (seconds !* float 0.4))
   & val (float 0.4)
   & fade (float 0.7)

@@ -48,6 +48,7 @@ classes = {
   'hold' : (holdCHOP, 'hold', 'CHOP'),
   'lag' : (lagCHOP, 'lag', 'CHOP'),
   'leapmotion' : (leapmotionCHOP, 'leapmotion', 'CHOP'),
+  'limitChop' : (limitCHOP, 'limit', 'CHOP'),
   'logic' : (logicCHOP, 'logic', 'CHOP'),
   'inChop' : (inCHOP, 'in', 'CHOP'),
   'math' : (mathCHOP, 'math', 'CHOP'),
@@ -69,6 +70,7 @@ classes = {
   'speedChop' : (speedCHOP, 'speed', 'CHOP'),
   'topToChop' : (toptoCHOP, 'topto', 'CHOP'),
   'timer' : (timerCHOP, 'timer', 'CHOP'),
+  'timesliceChop' : (timesliceCHOP, 'timeslice', 'CHOP'),
   'trailChop' : (trailCHOP, 'trail', 'CHOP'),
   'waveChop' : (waveCHOP, 'wave', 'CHOP'),
 

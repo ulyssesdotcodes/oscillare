@@ -25,6 +25,16 @@ data VoteEffect = VoteEffect VoteType BS.ByteString BS.ByteString BS.ByteString 
 compRunner :: IO ((Tree CHOP, Tree TOP) -> IO ())
 compRunner = do init <- newIORef mempty
                 return $ \(a, b) -> run2 init [outT $ b] [outC $ a]
+
+ledRunner :: IO ((Tree CHOP, Tree TOP) -> IO ())
+ledRunner = 
+  let
+    leddata a = a & math' (mathPostOp ?~ int 2) . (:[]) & limitC (int 1) (float 0) (float 1)
+    sendleddata a = fileD' (datVars .~ [("leddata", Resolve $ leddata a), ("arduino", Resolve $ arduino "COM10" 6)]) "scripts/sendleddata.py"                                   
+    execArduino a = executeD' ((executeDatFrameend ?~ "mod(me.fetch(\"sendleddata\")[1:]).onFrameUpdate(frame)") . (datVars .~ [("sendleddata", Resolve $ sendleddata a)])) []
+  in do init <- newIORef mempty
+        return $ \(a, b) -> run2 init [execArduino a] [outT $ b]
+
 ain' m = math' (mathMult ?~ float m) [audioIn]
 ain = ain' 1
 atex = chopToT $ ain
@@ -270,17 +280,29 @@ addops = compT 0
 fadeops f = switchT' (switchTBlend ?~ bool True) f
 multops = compT 27
 overops = compT 31
-triggerops f tops = switchT (chan0f $
-                             count' ((countThresh ?~ float 0.5) .
-                                     (countLimMax ?~ float (fromIntegral $ length tops - 1)) .
+triggercount f l = count' ((countThresh ?~ float 0.5) .
+                                     (countLimMax ?~ float (fromIntegral $ l)) .
                                      (countLimType ?~ int 1)
                                     ) f
-                            ) tops
+triggerops f tops = switchT (chan0f $ triggercount f (length tops - 1)) tops
 showwork g es =
   let
     scans = scanl (\g e -> e g) g es
   in
     addops $ (head $ reverse scans):(zipWith (\i -> (translate (float (-0.45) !+ (float 0.1 !* float i), float 0.4)) . scalexy (float 10)) [0..] (take (length es) $ scans))
+
+-- led
+(>>>) = flip (.)
+constled f n = constC' (constCEndFrames ?~ int n) [f]
+rgbled n r g b = mergeC [r & stretchC (int n), g & stretchC (int n), b & stretchC (int n)]
+               & shuffleC (int 6) 
+topToLed n = 
+    crop' ((cropTop ?~ float 0.00008))
+    >>> topToC
+    >>> selectC' (selectCNames ?~ str "r g b")
+    >>> stretchC (int n)
+    >>> shuffleC (int 6)
+bottomLedSplit n t = (topToLed n t, t)
 
 -- palettes
 
