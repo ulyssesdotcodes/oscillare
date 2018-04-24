@@ -29,7 +29,7 @@ compRunner = do init <- newIORef mempty
 ledRunner :: IO ((Tree CHOP, Tree TOP) -> IO ())
 ledRunner = 
   let
-    leddata a = a & math' (mathPostOp ?~ int 2) . (:[]) & limitC (int 1) (float 0) (float 1)
+    leddata a = a & shuffleC (int 6) & limitC (int 1) (float 0) (float 1)
     sendleddata a = fileD' (datVars .~ [("leddata", Resolve $ leddata a), ("arduino", Resolve $ arduino "COM10" 6)]) "scripts/sendleddata.py"                                   
     execArduino a = executeD' ((executeDatFrameend ?~ "mod(me.fetch(\"sendleddata\")[1:]).onFrameUpdate(frame)") . (datVars .~ [("sendleddata", Resolve $ sendleddata a)])) []
   in do init <- newIORef mempty
@@ -303,6 +303,7 @@ topToLed n =
     >>> stretchC (int n)
     >>> shuffleC (int 6)
 bottomLedSplit n t = (topToLed n t, t)
+ledPalette p = flip lookupC (topToC' (topToChopAName ?~ str "") $ palette p)
 
 -- palettes
 
@@ -317,6 +318,7 @@ sunset = Palette [RGB 185 117 19, RGB 228 187 108, RGB 251 162 1, RGB 255 243 20
 coolpink = Palette [RGB 215 40 26, RGB 157 60 121, RGB 179 83 154, RGB 187 59 98]
 darkestred = Palette [RGB 153 7 17, RGB 97 6 11, RGB 49 7 8, RGB 13 7 7, RGB 189 5 13]
 nature = Palette [RGB 63 124 7, RGB 201 121 66, RGB 213 101 23, RGB 177 201 80, RGB 180 207 127]
+greenpurple = Palette [RGB 42 4 74, RGB 11 46 89, RGB 13 103 89, RGB 122 179 23, RGB 160 197 95]
 
 ------------------------
 
@@ -343,3 +345,11 @@ colorToBS n i (Hex str) =
     catMaybes $ (hextorgb <$> (toHex <$> hexes (show str))) ++ [Just "1.0", Just . BS.pack . show $ fromIntegral i / fromIntegral n]
 colorToBS n i (RGB r g b) =
   (++ [BS.pack . show $ fromIntegral i / fromIntegral n]) $ fmap (BS.pack . show . (/ 256) . fromIntegral) [r, g, b, 256]
+
+
+------------------------------
+-- Randos
+
+tidalmessages = oscinD' (oscInDAddressScope ?~ str "/vis") 7010 & selectD' ((selectDRStartI ?~ int 1) . (selectDREndI ?~ int 1) . (selectDCStartI ?~ int 5) . (selectDCEndI ?~ int 5))
+tidalvis = tox "toxes/tidal_patterns.tox" [] (Just tidalmessages)
+tidalvistop = tidalvis & nullC & chopToT' (chopToTopFormat ?~ int 2)
