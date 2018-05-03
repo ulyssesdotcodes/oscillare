@@ -1,0 +1,98 @@
+-- Let's talk about types, live coding, and TouchDesigner
+
+
+-- Each line of text is function that produces a node
+-- Functions in this system are just ways of relating types to one another
+-- For example, rectangle is a function that takes a 2d vector and makes a TOP
+-- in Haskell notation - rectangle :: Vec2 -> TOP (the last one is the return type)
+-- the `r $` is syntactic sugar that adds an Out TOP to everything
+
+r $ rectangle (v2 (float 0.2) (float 0.2))
+
+
+-- We can chain functions together in the same way we chain nodes together
+-- translatex :: Float -> TOP -> TOP
+-- The `&` applies what came before it as the last argument of what comes after
+
+r $ rectangle (v2 (float 0.2) (float 0.2))
+  & translatex (float 0.2)
+
+
+-- Since translatex :: Float -> TOP -> TOP, types tell us that
+-- we can replace (float 0.2) with any float
+-- Let's use one that changes over time, seconds
+
+r $ rectangle (v2 (float 0.2) (float 0.2))
+  & translatex (seconds)
+
+
+-- We can replace any part of this so long as the types match up
+-- `shapes :: Float -> Float -> Float -> TOP` is a shader that makes 
+-- n-dimensional shapes with float width and float hole in the middle
+
+r $ shapes (float 3) (float 0.2) (float 0.2)
+  & translatex (seconds)
+
+
+-- What happens if the types don't match up? We get an error
+-- This is super useful for live-coding where you can make a mistake at any time
+
+r $ audioIn
+  & translatex (seconds)
+
+
+-- But we can make a chop chain if we convert it to a float
+-- `chan0f :: CHOP -> Float` by casting the first channel
+
+r $ shapes (float 3) (chan0f $ audioIn & analyze (int 6)) (float 0.2)
+  & translatex (float 0)
+
+
+-- And since it's just a float, we can do float things to it
+
+r $ shapes (float 3) (float 10 !* (chan0f $ audioIn & analyze (int 6))) (float 0.2)
+  & translatex (float 0)
+
+
+-- We can also create new functions on the fly
+-- Think of this like super quick toxes
+
+let { translatedTriangle width xpos = 
+      shapes (float 3) (width) (float 0.2) 
+      & translatex (xpos)
+    }
+
+r $ translatedTriangle (volc) (float 0.2)
+
+-- These are handy if we want to combine a bunch of them
+-- addops is a CompositeTOP with the add operator
+
+r $ addops 
+        [ translatedTriangle (float 0.1) (float (-0.2))
+        , translatedTriangle (float 0.1) (float 0)
+        , translatedTriangle (float 0.1) (float 0.2)
+        ]
+
+
+-- Types let us use regular haskell on our stuff too
+-- `<$>` is a map operator that takes our function and applies it to all the elem
+
+r $ addops $ translatedTriangle (volc) . float <$> [-0.2, 0, 0.2]
+
+
+-- One of my favorite demonstrations of this is to show 
+-- the different stages of a TOP chain
+
+let {
+    scans g es= scanl (\g e -> e g) g es;
+    showwork g es = addops $ (head $ reverse (scans g es)):(zipWith (\i -> (translate (float (-0.4) !+ (float 0.2 !* float i), float 0.4)) . scalexy (float 5)) [0..] (take (length es) $ (scans g es)));
+}
+
+r $ showwork (translatedTriangle (volc !+ float 0.1) (float (-0.2)))
+    [ edges
+    , translate (float 0.2, float 0.2)
+    , mirror
+    , palettecycle buddhist (seconds !* float 0.5)
+    , fade (float 0.98)
+    ]
+
