@@ -7,7 +7,8 @@
 -- in Haskell notation - rectangle :: Vec2 -> TOP (the last one is the return type)
 -- the `r $` is syntactic sugar that adds an Out TOP to everything
 
-r $ rectangle (v2 (float 0.2) (float 0.2))
+r $ shapes (float 3) (float 0.2) (float 0.2)
+  & translatex (seconds)
 
 
 -- We can chain functions together in the same way we chain nodes together
@@ -62,7 +63,7 @@ let { translatedTriangle width xpos =
       & translatex (xpos)
     }
 
-r $ translatedTriangle (volc) (float 0.2)
+r $ translatedTriangle (float 0.2) (float 0.3)
 
 -- These are handy if we want to combine a bunch of them
 -- addops is a CompositeTOP with the add operator
@@ -77,7 +78,8 @@ r $ addops
 -- Types let us use regular haskell on our stuff too
 -- `<$>` is a map operator that takes our function and applies it to all the elem
 
-r $ addops $ translatedTriangle (volc) . float <$> [-0.2, 0, 0.2]
+r $ (addops $ translatedTriangle (volc) . float <$> [-0.2, 0, 0.2])
+    & translatey (seconds !* float 0.5)
 
 
 -- One of my favorite demonstrations of this is to show 
