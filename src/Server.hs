@@ -46,7 +46,7 @@ servePath path wmgr = withSocketsDo $ do
 
 evalLD :: FilePath -> InterpreterT IO String
 evalLD file = do
-  loadModules [file]
+  loadModules [file, "src/Visuals.hs", "LambdaDesigner"]
   setImports [takeBaseName file]
   eval "network"
 

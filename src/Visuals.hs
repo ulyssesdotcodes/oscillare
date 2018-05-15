@@ -4,7 +4,6 @@
 module Visuals where
 
 import Prelude hiding (floor, mod, lines)
-import OSCServer
 
 import LambdaDesigner.Op
 import LambdaDesigner.Lib
@@ -23,18 +22,6 @@ import qualified Data.List as L
 data VoteType = Movie | Effect deriving Eq
 data VoteEffect = VoteEffect VoteType BS.ByteString BS.ByteString BS.ByteString deriving Eq
 
-compRunner :: IO ((Tree CHOP, Tree TOP) -> IO ())
-compRunner = do init <- newIORef mempty
-                return $ \(a, b) -> run2 init [outT $ b] [outC $ a]
-
-ledRunner :: IO ((Tree CHOP, Tree TOP) -> IO ())
-ledRunner = 
-  let
-    leddata a = a & shuffleC (int 6) & limitC (int 1) (float 0) (float 1)
-    sendleddata a = fileD' (datVars .~ [("leddata", Resolve $ leddata a), ("arduino", Resolve $ arduino "COM10" 6)]) "scripts/sendleddata.py"                                   
-    execArduino a = executeD' ((executeDatFrameend ?~ "mod(me.fetch(\"sendleddata\")[1:]).onFrameUpdate(frame)") . (datVars .~ [("sendleddata", Resolve $ sendleddata a)])) []
-  in do init <- newIORef mempty
-        return $ \(a, b) -> run2 init [execArduino a] [outT $ b]
 
 ain' m = math' (mathMult ?~ float m) [audioIn]
 ain = ain' 1
