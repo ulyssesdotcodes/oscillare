@@ -1,0 +1,5 @@
+{
+    "port": "COM10",
+    "board": "arduino:avr:diecimila",
+    "configuration": "cpu=atmega328"
+}

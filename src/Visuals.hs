@@ -3,6 +3,9 @@
 
 module Visuals where
 
+import Prelude hiding (floor, mod, lines)
+import OSCServer
+
 import LambdaDesigner.Op
 import LambdaDesigner.Lib
 import Data.Char
@@ -10,8 +13,6 @@ import Data.IORef
 import Data.List.Split
 import Data.Maybe
 import Debug.Trace
-
-import Prelude hiding (floor, mod, lines)
 
 import Control.Lens
 import Data.Matrix

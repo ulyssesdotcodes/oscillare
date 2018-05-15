@@ -15,13 +15,31 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Visuals
+  exposed-modules:     OSCServer,
+                       Visuals,
+                       Server
   build-depends: base >= 4.7 && < 5
                , LambdaDesigner
+               , aeson
                , bytestring
+               , bytestring-trie
+               , filepath
+               , fsnotify
+               , hint
+               , hosc
                , lens
                , matrix
+               , network
                , split
+               , transformers
+  default-language:    Haskell2010
+
+executable Oscillare
+  hs-source-dirs:      app
+  main-is:             Main.hs
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -fwarn-incomplete-patterns
+  build-depends:       base
+                     , oscillare
   default-language:    Haskell2010
 
 source-repository head
