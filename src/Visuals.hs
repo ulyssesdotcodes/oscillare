@@ -298,7 +298,7 @@ ledPalette p = flip lookupC (topToC' (topToChopAName ?~ str "") $ palette p)
 data Palette = Palette [Color]
 data Color = Hex BS.ByteString | RGB Int Int Int
 neon = Palette $ Hex <$> ["A9336B", "5F2F88", "CB673D", "87BB38"]
-fire = Palette $ Hex . BS.pack . fmap toUpper <$> ["f07f13", "800909", "f27d0c", "fdcf58"]
+fire = Palette $ Hex . BS.pack . fmap toUpper <$> ["F07F13", "800909", "F27D0C", "FDCF58"]
 buddhist = Palette $ Hex . BS.pack . fmap toUpper <$> ["0000FF", "FFFF00", "FF0000", "FFFFFF", "FF9800"]
 tealcontrast = Palette [RGB 188 242 246, RGB 50 107 113, RGB 211 90 30, RGB 209 122 43, RGB 188 242 246]
 purplish = Palette [RGB 150 110 100, RGB 223 143 67, RGB 76 73 100 , RGB 146 118 133, RGB 165 148 180]
@@ -323,10 +323,10 @@ palette (Palette colors) = ramp' (topResolution .~ iv2 (128, 0)) . table
 colorToBS :: Int -> Int -> Color -> [BS.ByteString]
 colorToBS n i (Hex str) =
   let
-    hexes = chunksOf 2 . drop 1
+    hexes = take 3 . chunksOf 2 . drop 1
     todig = flip L.elemIndex "0123456789ABCDEF"
     toIntList = fmap todig
-    toInt = foldr (\i acc -> acc * 16 + i) 0
+    toInt = foldl (\acc i -> acc * 16 + i) 0
     toHex = fmap toInt . sequence . toIntList
     hextorgb = fmap (BS.pack . show . (/ 256) . fromIntegral)
   in
