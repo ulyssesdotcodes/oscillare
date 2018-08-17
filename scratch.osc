@@ -4,6 +4,8 @@ r <- compRunner
 
 -- Initialization check
 
+r $ choptoTOP (choptoTOPchop ?~ mathCHOP (mathCHOPgain ?~ float 10) $ audiospectrumCHOP id . (:[]) $ audiodeviceinCHOP id [])
+
 r $ shapes (float 3) (float 0.3 !+ volc) (float 0.3)
   & repeatTxy (float 30)
   & translatex (seconds !* float 0.1)
@@ -11,8 +13,14 @@ r $ shapes (float 3) (float 0.3 !+ volc) (float 0.3)
 -- Color check
 
 r $ adata (float 1)
+  & fade (float 0.9)
+  & palettemap purplish (float 0 !* seconds)
+
+r $ rectangleTOP (rectangleTOPsize . _1 ?~ seconds !% float 0.5) []
+
+r $ particlemover (float 1) (float 1) buddhist (acirc) (
+  & val (float 0.06)
   & fade (float 0.96)
-  & palettemap buddhist (float 0 !* seconds)
 
 -------------------------------------------------------------------------
 -- For shows
@@ -36,7 +44,7 @@ r $ addops
       [ adata (float 0.8)
         & rotate (float 90)
         & scalexy (float 0.7)
-        & edges
+        & edgeTOP id
         & noisedisplace (lowvc !* float 10)
         & fade (float 0.4)
         & palettemap buddhist (float 0.2 !* seconds)
@@ -51,7 +59,7 @@ r $ addops [ commandCode {Command}
             [ adata (float 1)
               & rotate (float 30 !* seconds)
               & translatex (seconds !* float 0.7 !+ lowvc)
-              & edges
+              & edgeTOP id
               & fade (float 0.96)
               & palettemap buddhist (seconds !* float 5)
             , shapes ((seconds !% float 8) !+ float 3) (volc !* float 6) (float 0.1)
@@ -70,6 +78,13 @@ r $ addops [ commandCode {Command}
            ]
 
 r $ tidalvistop
+
+r $ adata (float 10)
+  & translatey (float (-0.2))
+  & littleplanet
+  & palettecycle buddhist (seconds !* float 0.2)
+  & fade' id (scalexy $ float 1 !- (volc)) (float 0.99)
+  & blurTOP (blurTOPsize ?~ int 16) 
 
 
 
@@ -110,7 +125,7 @@ r $ addops [commandCode {Command}
              & fade' id (translatex $ lmp0 0 "tx" !* float 0.1) (float 0.95)
              , addops [ adata (float 0.7) & translatey (float 0.3 !* seconds) & palettecycle neon (seconds !* float 0.5) & fade ((volc !* float 0.3) !+ float 0.6)
                      , adata (float 1) & mosaic (seconds) (float 80)
-                     , adata (float 1) & translatey (float (-0.4) !* seconds) & edges & noisedisplace (volc !* float 10) & val (float 0.3)
+                     , adata (float 1) & translatey (float (-0.4) !* seconds) & edgeTOP id & noisedisplace (volc !* float 10) & val (float 0.3)
                      ]
                  & fade' id (scalexy (float 0.01 !* volc !+ float 1)) (float 0.9)
              , flocking (float 0.5, float 3 !* volc !* (float 0.2 !+ lmp0 0 "tx")) (float 1 !* (float 1 !- (float 2 !* lmp0 0 "ty")))
@@ -231,7 +246,7 @@ r $ addops [ commandCode {Command}
 -- Crossing adatas
 r $ addops [ adata (float 0.7) & translatey (float 0.3 !* seconds) & palettecycle neon (seconds !* float 0.5) & fade ((volc !* float 0.3) !+ float 0.6)
            , adata (float 1) & mosaic (seconds) (float 80)
-           , adata (float 1) & translatey (float (-0.4) !* seconds) & edges & noisedisplace (volc !* float 10) & val (float 0.3)
+           , adata (float 1) & translatey (float (-0.4) !* seconds) & edgeTOP id & noisedisplace (volc !* float 10) & val (float 0.3)
            ]
       & fade' id (scalexy (float 0.01 !* volc !+ float 1)) (float 0.9)
 
@@ -281,7 +296,7 @@ r $ addops [ addops [ adata (float 4)
 r $ flocking (float 1, float 3 !* volc) (float 3 !* volc)
               & fade ((volc !* float 0.85) !+ float 0.5)
               & mirror
-              & edges
+              & edgeTOP id
               & lumidots
               & noisedisplace (volc !* float 32)
               & val (volc !* float 4)
@@ -359,15 +374,50 @@ r $ addops [adatat 0.3 0.5, adatat 0.5 1, adatat 0.7 1.3, adatat 1.5 1.3]
 r $ addops [adatat 0.4 0.2 , adatat 1.5 0.2]
   & translate (seconds !* float 0.1, float 0)
   & mirror
-  & edges
+  & edgeTOP id
   & val (float 0.5)
   & translate (seconds !* float 0.1, float 0)
   & littleplanet
   & translate (float 0.2 !* seconds, float 0.1)
   & mirror
-  & palettecycle forest (sincycle 0.7 0.3 !+ float 0)
+  & palettecycle buddhist (sincycle 0.7 0.3 !+ float 0)
   & fade (float 0.9)
   & val (float 3)
+
+senselchop = sensel & selectCHOP (selectCHOPchannames ?~ str "chan") . (:[]) & shuffleCHOP ((shuffleCHOPmethod ?~ int 8) . (shuffleCHOPnval ?~ int 185)) 
+senseltop = choptoTOP (choptoTOPchop ?~ senselchop) & flipTOP (flipTOPflipy ?~ bool True)
+senseltouches = sensel & selectCHOP (selectCHOPchannames ?~ str "chan1") . (:[]) & deleteCHOP ((deleteCHOPdelsamples ?~ bool True)) . (:[])
+
+r $ senseltop id
+  & palettecycle buddhist (seconds !* float 2)
+  & fade (float 0.99)
+
+
+let gesture mchan = gestureCHOP id [sensel & selectCHOP (selectCHOPchannames ?~ str "chan") . (:[]) & shuffleCHOP (shuffleCHOPmethod ?~ int 1), midichanop mchan] & shuffleCHOP ((shuffleCHOPmethod ?~ int 4) . (shuffleCHOPnval ?~ int 185) . (shuffleCHOPfirstsample ?~ bool True))
+
+r $ choptoTOP (choptoTOPchop ?~ (gestureCHOP id [sensel & selectCHOP (selectCHOPchannames ?~ str "chan") . (:[]) & shuffleCHOP (shuffleCHOPmethod ?~ int 1), senseltouches & logicCHOP id . (:[])] & shuffleCHOP ((shuffleCHOPmethod ?~ int 4) . (shuffleCHOPnval ?~ int 185) . (shuffleCHOPfirstsample ?~ bool True))))
+  & resolutionTOP ((resolutionTOPresolutionw ?~ int 1920) . (resolutionTOPresolutionh ?~ int 1080))
+
+r $ addops [choptoTOP (choptoTOPchop ?~ gesture "b1") 
+      & resolutionTOP ((resolutionTOPresolutionw ?~ int 1920) . (resolutionTOPresolutionh ?~ int 1080))
+      , choptoTOP (choptoTOPchop ?~ gesture "b2") 
+      & resolutionTOP ((resolutionTOPresolutionw ?~ int 1920) . (resolutionTOPresolutionh ?~ int 1080))
+      & mirror]
+      & fade' id ((scalexy $ float 1 !- (float 0.03))) (float 0.97)
+      & flowermod (seconds !* float 0.2)
+      & edgeTOP id
+      & palettemap buddhist (float 0.4 !* seconds)
+      & littleplanet
+      & scalexy (float 0.5)
+    & val (float 1 !+ (float 6 !* (chan0f $ lagCHOP id $ tapbeat $ mchan "b9")))
+
+    , choptoTOP (choptoTOPchop ?~ gesture "b1") 
+      & resolutionTOP ((resolutionTOPresolutionw ?~ int 1920) . (resolutionTOPresolutionh ?~ int 1080))
+      & flipTOP (flipTOPflipy ?~ bool True)
+      & palettemap darkestred (seconds !* float 0.5)
+
+r $ adata (float 1) 
+  & val (chan0f $ lagCHOP id $ tapbeat $ mchan "b9")
 
 
 r $ triggerops (tapbeat $ mchan "b9") [
@@ -449,11 +499,11 @@ r $ multops
 r $ adata (float 1)
   & val (float 0)
 
-r $ movie ((lowvc !+ seconds) !* float 30 !+ float 1800) "highway.mp4" & edges & val (mchan "b1")
+r $ movie ((lowvc !+ seconds) !* float 30 !+ float 1800) "highway.mp4" & edgeTOP id & val (mchan "b1")
   
 
 r $ addops [movie (float 60 !+ (lowvc !* float 300)) "Purple flowers.mp4"
-  & edges
+  & edgeTOP id
   & mirror
   & fade (mchan "s1")
   , adata (float 1) & palettecycle fire & translate (Just $ float 0, Just $ float 0.5) & val (mchan "b1")
@@ -474,7 +524,18 @@ in
     & fade (float 0.97)
     & palettemap nature (volc !* float 10)
     & val (seconds !% float 1)
-    & fade' id (scalexy (float 0.02 !* volc !+ float 1)) (float 0.7)
+    & fade' id (scalexy (float 1 !- (float 0.02 !* volc))) (float 0.7)
+
+let
+  adatat x y = adata (float (y * 0.2)) & translatey (scycle x 1) & rotate (float (x * 180) !* seconds)
+in 
+  r $ addops [adatat 0.2 10 & flowermod (seconds !* float 0.04) & scalexy (float 0.3), choptoTOP (choptoTOPchop ?~ gesture "b1") 
+      & resolutionTOP ((resolutionTOPresolutionw ?~ int 1920) . (resolutionTOPresolutionh ?~ int 1080)) & mirror & fade (float 0.97) & val (float 0.2) & blurTOP (blurTOPsize ?~ int 8)
+]
+    & palettemap buddhist (seconds !* float 0.4)
+    & blurTOP (blurTOPsize ?~ int 32)
+    & val (float 5 !* mchan "s1c")
+    & sat (float 10 !* mchan "s1a")
 
 -- chaos adata
 
@@ -502,8 +563,6 @@ r $ addops [adata (float 1)
   & scalexy (float 0.4)
   & fade' id (scalexy (float 1 !- (volc !* float (-0.04))) . translatey (float 0.02)) (float 0.99)
   & palettemap neon ((volc !* float 0.3) !+ (seconds !* float 0.4))
-  & val (float 0.4)
-  & fade (float 0.7)
 
 r $ flocking (float 1, float 3 !* volc) (float 3 !* volc)
     & fade (float 0.95)
@@ -514,14 +573,14 @@ r $ flocking (float 1, float 3 !* volc) (float 3 !* volc)
 
 
 r $ multops [ stringtheory (volc !* float 0.4) (volc)
-              & edges
+              & edgeTOP id
               & translatex (seconds !* float 0.2)
               & repeatTxy (float 3)
               & fade (float 0.95 !+ (lowvc !* float (-0.2)))
               & translatey (seconds !* float 0.3)
               & littleplanet
               & scalexy (float 0.7)
-            , lines (float 0.4 !* volc) (float 0.2)
+            , Visuals.lines (float 0.4 !* volc) (float 0.2)
               & fade (float 0.95)
               & translatex (seconds !* float 0.2)
               & mirror
@@ -561,30 +620,30 @@ r $ (audioIn & math' ((mathAdd ?~ float 0) . (mathMult ?~ float 2)) . (:[]) & le
 
 -- spiral mult
 
-    multops [ adata (float 1)
-             & rotate (float 45)
-             & val (float 1.5)
-             & rotate (float 45 !* seconds)
-             & scalexy (float 0.7)
-             & flowermod (seconds)
-             & edges
-             & fade (float 0.97)
-             & palettemap buddhist (seconds !* float 0.4)
-            , adata (float 1)
-             & rotate (float 45)
-             & val (float 1.5)
-             & rotate (float 45 !* seconds)
-             & scalexy (float 0.7)
-             & flowermod (seconds)
-             & edges
-             & fade (float 0.97)
-            , shapes (float 2) (float 0.2) (float 0.2)
-              & repeatTxy (float 2)
-              & rotate (float 10)
-              & blur (float 32)
-              & translatey (float 0.6 !* seconds)
-              & fade (float 0.94)
-              & littleplanet
-              & scalexy (float 0.5)
-           ]
-        & scalexy (float 0.7)
+r $ multops [ adata (float 1)
+          & rotate (float 45)
+          & val (float 1.5)
+          & rotate (float 45 !* seconds)
+          & scalexy (float 0.7)
+          & flowermod (seconds)
+          & edgeTOP id
+          & fade (float 0.97)
+          & palettemap buddhist (seconds !* float 0.4)
+        , adata (float 1)
+          & rotate (float 45)
+          & val (float 1.5)
+          & rotate (float 45 !* seconds)
+          & scalexy (float 0.7)
+          & flowermod (seconds)
+          & edgeTOP id
+          & fade (float 0.97)
+        , shapes (float 2) (float 0.2) (float 0.2)
+          & repeatTxy (float 2)
+          & rotate (float 10)
+          & blurTOP (blurTOPsize ?~ int 16)
+          & translatey (float 0.6 !* seconds)
+          & fade (float 0.94)
+          & littleplanet
+          & scalexy (float 0.5)
+        ]
+    & scalexy (float 0.7)

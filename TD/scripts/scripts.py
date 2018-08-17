@@ -1,121 +1,8 @@
 from dictdiffer import diff, dot_lookup
 from collections import deque
 
-classes = {
-  'blur' : (blurTOP, 'blur', 'TOP'),
-  'chopToTop' : (choptoTOP, 'chopto', 'TOP'),
-  'circleTop' : (circleTOP, 'circle', 'TOP'),
-  'compositeTop' : (compositeTOP, 'comp', 'TOP'),
-  'crop' : (cropTOP, 'crop', 'TOP'),
-  'displace' : (displaceTOP, 'displace', 'TOP'),
-  'edges' : (edgeTOP, 'edge', 'TOP'),
-  'feedbackTop' : (feedbackTOP, 'feedback', 'TOP'),
-  'flip' : (flipTOP, 'flip', 'TOP'),
-  'glslTop' : (glslmultiTOP, 'glslMulti', 'TOP'),
-  'movieFileIn' : (moviefileinTOP, 'moviefilein', 'TOP'),
-  'inTop' : (inTOP, 'in', 'TOP'),
-  'nullTop' : (nullTOP, 'null', 'TOP'),
-  'outTop' : (outTOP, 'out', 'TOP'),
-  'rectangleTop' : (rectangleTOP, 'rectangle', 'TOP'),
-  'render' : (renderTOP, 'render', 'TOP'),
-  'hsvAdjustTop' : (hsvadjustTOP, 'hsvadj', 'TOP'),
-  'levelTop' : (levelTOP, 'level', 'TOP'),
-  'transform' : (transformTOP, 'transform', 'TOP'),
-  'noiseTop' : (noiseTOP, 'noise', 'TOP'),
-  'ndiinTop' : (ndiinTOP, 'ndiin', 'TOP'),
-  'ramp' : (rampTOP, 'ramp', 'TOP'),
-  'switchTop' : (switchTOP, 'switch', 'TOP'),
-  'selectTop' : (selectTOP, 'select', 'TOP'),
-  'textTop' : (textTOP, 'text', 'TOP'),
-  'videoDeviceIn' : (videodeviceinTOP, 'videodevin', 'TOP'),
+from classes import classes
 
-  'analyze' : (analyzeCHOP, 'analyze', 'CHOP'),
-  'audioDevOut' : (audiodeviceoutCHOP, 'audiodevout', 'CHOP'),
-  'audioFileIn' : (audiofileinCHOP, 'audiofilein', 'CHOP'),
-  'audioFilter' : (audiofilterCHOP, 'audiofilter', 'CHOP'),
-  'audioIn' : (audiodeviceinCHOP, 'audiodevin', 'CHOP'),
-  'audioMovie' : (audiomovieCHOP, 'audiomovie', 'CHOP'),
-  'audioSpectrum' : (audiospectrumCHOP, 'audiospect', 'CHOP'),
-  'chopToDat' : (choptoDAT, 'chopto', 'DAT'),
-  'constantChop' : (constantCHOP, 'constant', 'CHOP'),
-  'count' : (countCHOP, 'count', 'CHOP'),
-  'datToChop' : (dattoCHOP, 'datto', 'CHOP'),
-  'delay' : (delayCHOP, 'delay', 'CHOP'),
-  'deleteChop' : (deleteCHOP, 'delete', 'CHOP'),
-  'expressionChop' : (expressionCHOP, 'expression', 'CHOP'),
-  'fan' : (fanCHOP, 'fan', 'CHOP'),
-  'feedbackChop' : (feedbackCHOP, 'feedback', 'CHOP'),
-  'hold' : (holdCHOP, 'hold', 'CHOP'),
-  'lag' : (lagCHOP, 'lag', 'CHOP'),
-  'leapmotion' : (leapmotionCHOP, 'leapmotion', 'CHOP'),
-  'limitChop' : (limitCHOP, 'limit', 'CHOP'),
-  'logic' : (logicCHOP, 'logic', 'CHOP'),
-  'lookupChop' : (lookupCHOP, 'lookup', 'CHOP'),
-  'inChop' : (inCHOP, 'in', 'CHOP'),
-  'math' : (mathCHOP, 'math', 'CHOP'),
-  'mergeChop' : (mergeCHOP, 'merge', 'CHOP'),
-  'midiIn' : (midiinmapCHOP, 'midiinmap', 'CHOP'),
-  'nullChop' : (nullCHOP, 'null', 'CHOP'),
-  'noiseChop' : (noiseCHOP, 'noise', 'CHOP'),
-  'oscInChop' : (oscinCHOP, 'oscin', 'CHOP'),
-  'outChop' : (outCHOP, 'out', 'CHOP'),
-  'renameChop' : (renameCHOP, 'rename', 'CHOP'),
-  'replaceChop' : (replaceCHOP, 'replace', 'CHOP'),
-  'resampleChop' : (resampleCHOP, 'resample', 'CHOP'),
-  'scriptChop' : (scriptCHOP, 'script', 'CHOP'),
-  'selectChop' : (selectCHOP, 'select', 'CHOP'),
-  'sopToChop' : (soptoCHOP, 'sopto', 'CHOP'),
-  'shiftChop' : (shiftCHOP, 'shift', 'CHOP'),
-  'shuffleChop' : (shuffleCHOP, 'shuffle', 'CHOP'),
-  'switchChop' : (switchCHOP, 'switch', 'CHOP'),
-  'stretchChop' : (stretchCHOP, 'stretch', 'CHOP'),
-  'speedChop' : (speedCHOP, 'speed', 'CHOP'),
-  'topToChop' : (toptoCHOP, 'topto', 'CHOP'),
-  'timer' : (timerCHOP, 'timer', 'CHOP'),
-  'timesliceChop' : (timesliceCHOP, 'timeslice', 'CHOP'),
-  'trailChop' : (trailCHOP, 'trail', 'CHOP'),
-  'waveChop' : (waveCHOP, 'wave', 'CHOP'),
-
-  'boxSop' : (boxSOP, 'box', 'SOP'),
-  'chopToSop' : (choptoSOP, 'chopto', 'SOP'),
-  'circleSop' : (circleSOP, 'circle', 'SOP'),
-  'gridSop' : (gridSOP, 'grid', 'SOP'),
-  'lineSop' : (lineSOP, 'line', 'SOP'),
-  'mergeSop' : (mergeSOP, 'merge', 'SOP'),
-  'metaball' : (metaballSOP, 'metaball', 'SOP'),
-  'noiseSop' : (noiseSOP, 'noise', 'SOP'),
-  'inSop' : (inSOP, 'in', 'SOP'),
-  'outSop' : (outSOP, 'out', 'SOP'),
-  'sphere' : (sphereSOP, 'sphere', 'SOP'),
-  'torusSop' : (torusSOP, 'torus', 'SOP'),
-  'sweep' : (sweepSOP, 'sweep', 'SOP'),
-  'transformSop' : (transformSOP, 'transform', 'SOP'),
-  'tubeSop' : (tubeSOP, 'tube', 'SOP'),
-
-  'inMat' : (inMAT, 'in', 'MAT'),
-  'wireframeMat' : (wireframeMAT, 'wireframe', 'MAT'),
-  'outMat' : (outMAT, 'out', 'MAT'),
-  'pbrMat' : (pbrMAT, 'pbr', 'MAT'),
-  'constMat' : (constantMAT, 'constant', 'MAT'),
-
-  'chopExec' : (chopexecuteDAT, 'chopexecute', 'DAT'),
-  'executeDat' : (executeDAT, 'execute', 'DAT'),
-  'datExec' : (datexecuteDAT, 'datexecute', 'DAT'),
-  'inDat' : (inDAT, 'in', 'DAT'),
-  'oscInDat' : (oscinDAT, 'oscin', 'DAT'),
-  'outDat' : (outDAT, 'out', 'DAT'),
-  'scriptDat' : (scriptDAT, 'script', 'DAT'),
-  'selectDat' : (selectDAT, 'select', 'DAT'),
-  'serialDat' : (serialDAT, 'serial', 'DAT'),
-  'table' : (tableDAT, 'table', 'DAT'),
-  'textDat' : (textDAT, 'text', 'DAT'),
-  'tcpip' : (tcpipDAT, 'tcpip', 'DAT'),
-
-  'camera' : (cameraCOMP, 'cam', 'COMP'),
-  'geo' : (geometryCOMP, 'geo', 'COMP'),
-  'light' : (lightCOMP, 'light', 'COMP'),
-  'base' : (baseCOMP, 'base', 'COMP')
-}
 
 def getClass(opname, default):
   return classes.get(opname, default)
@@ -125,7 +12,6 @@ diffs = []
 
 def apply(newState):
   global state
-  print(newState)
   # Step 1: create new nodes
   prevState = state
   state = newState
@@ -165,6 +51,8 @@ def apply(newState):
             curop.par.tx = 0
           elif param[0] == 'ty':
             curop.par.ty = 0
+          elif param[0] == 'rotate':
+            curop.par.rotate = 0
           par = curop.pars(param[0])[0]
           print("val: " + str(par.val))
           if par.val:
@@ -210,6 +98,7 @@ def addChange(key, value):
   addr = getName(key)
 
   newOp = createOp(addr, value['ty'])
+  print("Adding op " + value['ty'])
 
   if 'parameters' in value:
     pars = value['parameters'].items()
@@ -246,7 +135,7 @@ def createOp(addr, ty):
     op(addr).destroy()
 
   # Special case things that can't have duplicates
-  if clazz[1] == 'audiodevin' or clazz[1] == 'videodevin' or clazz[1] == 'ndiin' or clazz[1] == 'leapmotion':
+  if clazz[1] == 'audiodevicein' or clazz[1] == 'videodevicein' or clazz[1] == 'ndiin' or clazz[1] == 'leapmotion' or clazz[1] == 'cplusplus':
     if op(clazz[1]) == None:
       parent().create(clazz[0], clazz[1])
     if clazz[2] == "CHOP":
