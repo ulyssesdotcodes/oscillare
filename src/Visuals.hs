@@ -49,8 +49,8 @@ bandvc = chan0f . bandv
 mchan :: String -> Tree Float
 mchan s = chanNamef s $ midiinmapCHOP id
 
-midichanop :: String -> Tree CHOP
-midichanop s = midiinmapCHOP id & selectCHOP (selectCHOPchannames ?~ str s) . (:[])
+mchop :: String -> Tree CHOP
+mchop s = midiinmapCHOP id & selectCHOP (selectCHOPchannames ?~ str s) . (:[])
 
 lmf h fing xyz = leapmotionCHOP id & selectCHOP (selectCHOPchannames ?~ str ("hand" ++ show h ++ "/finger" ++ show fing ++ ":t" ++ xyz)) . (:[])
 lmf0 h fing = chan0f . lmf h fing
@@ -78,18 +78,6 @@ mnoise t s = noiseCHOP ((noiseCHOPtype ?~ int 2) .
                         (noiseCHOPt . _2 ?~ t) .
                         (noiseCHOPtimeslice ?~ bool True)) []
 mnoisec t s = chan0f $ mnoise t s
-
-tapbeat i = 
-  let
-    beat = constantCHOP (constantCHOPvalue0 ?~ i) [] & logicCHOP (logicCHOPpreop ?~ int 5) . (:[])
-    beatdelay = beat & delayCHOP (delayCHOPdelay ?~ float 1)
-    beatspeed = expressionCHOP (expressionCHOPexpr0 ?~ ternary (chan0f (opInput (int 0)) !> float 2) (float 0) (chan0f (opInput (int 0)))) 
-                  [speedCHOP id [beatdelay & logicCHOP (logicCHOPpreop ?~ int 1) . (:[]), beatdelay]]
-    beathold = holdCHOP id [beatspeed, beat]
-    beattrail = trailCHOP ((trailCHOPactive ?~ chan0f beat !== float 1) . (trailCHOPwlength ?~ float 10) . (trailCHOPcapture ?~ int 1)) [beathold]
-    beataccum = speedCHOP id [mathCHOP (mathCHOPpostop ?~ int 5) . (:[]) $ analyze 0 beattrail, beat]
-  in
-    expressionCHOP (expressionCHOPexpr0 ?~ (castf $ ((chan0f $ opInput (int 0)) !% float 1 !> float 0) !&& ((chan0f $ opInput (int 0)) !% float 1 !< float 0.16))) [beataccum]
 
 -- launchmapping = strobe (float 10 !* mchan "s1c")
 --   $ scalexy (float 0.2 !* mchan "s1b")
@@ -385,12 +373,52 @@ senseltop f =
   & reorderTOP ((reorderTOPformat ?~ int 26) . (reorderTOPoutputalphachan ?~ int 0)) . (:[])
 senseltouches = sensel & selectCHOP (selectCHOPchannames ?~ str "chan1") . (:[]) & deleteCHOP ((deleteCHOPdelsamples ?~ bool True)) . (:[])
 
+-- beats
+data Beat = 
+    Beat 
+        { beatpulse :: Tree CHOP
+        , bps :: Tree CHOP
+        }
+
+tapbeat :: Tree Float -> Beat
+tapbeat i = 
+  let
+    const1 = constantCHOP (constantCHOPvalue0 ?~ float 1) []
+    beat = constantCHOP (constantCHOPvalue0 ?~ i) [] & logicCHOP (logicCHOPpreop ?~ int 5) . (:[])
+    beathold = holdCHOP id [speedCHOP id [const1, beat] & delayCHOP ((delayCHOPdelay ?~ float 1) . (delayCHOPdelayunit ?~ int 1)), beat] & nullCHOP (nullCHOPcooktype ?~ int 2)
+    beattrail = 
+        trailCHOP ((trailCHOPwlength ?~ float 8) . (trailCHOPwlengthunit ?~ int 1) . (trailCHOPcapture ?~ int 1)) [beathold]
+        & deleteCHOP ((deleteCHOPdelsamples ?~ bool True) . (deleteCHOPcondition ?~ int 5) . (deleteCHOPinclvalue1 ?~ bool False)) . (:[])
+    bps = mathCHOP (mathCHOPpostop ?~ int 5) . (:[]) $ analyze 0 beattrail
+    beataccum = speedCHOP id [bps, beat]
+    finalbeat = 
+        beataccum 
+            & limitCHOP ((limitCHOPmax ?~ float 1) . (limitCHOPtype ?~ int 2) . (limitCHOPmin ?~ float 0)) 
+            & logicCHOP ((logicCHOPboundmax ?~ float 0.08) . (logicCHOPpreop ?~ int 5) . (logicCHOPconvert ?~ int 2)) . (:[])
+  in
+    Beat finalbeat bps
+
+beatramp :: Beat -> Tree CHOP
+beatramp (Beat beat bps) = speedCHOP (speedCHOPresetcondition ?~ int 2) [bps, beat]
+
+beatxcount :: Float -> Tree CHOP -> Beat -> Tree CHOP
+beatxcount x reset (Beat beat _) = countCHOP ((countCHOPoutput ?~ int 1) . (countCHOPlimitmax ?~ float (x - 1))) [beat, reset]
+
+beatxpulse :: Float -> Tree CHOP -> Beat -> Tree CHOP
+beatxpulse x reset = logicCHOP (logicCHOPpreop ?~ int 6) . (:[]) . beatxcount x reset
+
+beatxramp :: Float -> Tree CHOP -> Beat -> Tree CHOP
+beatxramp x reset beat@(Beat bpulse bps) = speedCHOP id [bps & mathCHOP (mathCHOPgain ?~ float (1/x)) . (:[]), beatxpulse x reset beat]
+
+
 -- dj midi clock
 
-midi = midiinCHOP ((midiinCHOPid ?~ str "2") . (midiinCHOPsimplified ?~ bool False) . (midiinCHOPpulsename ?~ str "beat"))
-beat = midi & selectCHOP (selectCHOPchannames ?~ str "beat") . (:[])
+midi = midiinCHOP (
+        (midiinCHOPid ?~ str "2") . 
+        (midiinCHOPsimplified ?~ bool False) . 
+        (midiinCHOPpulsename ?~ str "beat") .
+        (midiinCHOPchannel ?~ str "1-8") .
+        (midiinCHOPcontrolind ?~ str "1-16")
+        )
+midisyncbeat = tapbeat (chan0f $ midi & selectCHOP (selectCHOPchannames ?~ str "beat") . (:[]))
 const1 = constantCHOP (constantCHOPvalue0 ?~ float 1) []
-bar = countCHOP ((countCHOPoutput ?~ int 1) . (countCHOPlimitmax ?~ float 3)) [beat]
-beatramp = speedCHOP id [const1, beat]
-dividebyone c = mathCHOP (mathCHOPchopop ?~ int 4) [const1, c]
-barramp = speedCHOP (speedCHOPresetcondition ?~ int 2) [beatramp & trailCHOP id . (:[]) & analyzeCHOP (analyzeCHOPfunction ?~ int 1) & dividebyone, bar] 
