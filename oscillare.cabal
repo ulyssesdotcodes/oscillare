@@ -23,6 +23,7 @@ library
                , aeson
                , bytestring
                , bytestring-trie
+               , containers
                , filepath
                , fsnotify
                , hint

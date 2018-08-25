@@ -20,7 +20,7 @@ import qualified Sound.OSC as OSC
 
 compRunner :: IO ((Tree CHOP, Tree TOP) -> IO ())
 compRunner = do init <- newIORef mempty
-                return $ \(a, b) -> run2 init [outTOP id $ b] [outCHOP id $ a]
+                return $ \(a, b) -> run2 init [outTOP id $ b] [a]
 
 -- ledRunner :: IO ((Tree CHOP, Tree TOP) -> IO ())
 -- ledRunner = 

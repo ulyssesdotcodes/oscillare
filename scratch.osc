@@ -416,8 +416,23 @@ r $ addops [choptoTOP (choptoTOPchop ?~ gesture "b1")
       & flipTOP (flipTOPflipy ?~ bool True)
       & palettemap darkestred (seconds !* float 0.5)
 
-r $ adata (float 1) 
-  & val (chan0f $ lagCHOP id $ tapbeat $ mchan "b9")
+r $ ( sendDmx (paletteDmxList (paletteClampColor $ buddhist $ tapbeatm9sec !* float 1) homeDmx)
+    , adata (float 1) 
+      & fade (float 0.98)
+      & palettemap (paletteClampColor $ neon $ tapbeatm9sec !* float 0.5)
+    )
+
+r $ ( const1
+    , shapes (float 5) (float 0.2) (float 0.3)
+      & translatex (float (0.33))
+      & clone (float 3) (float 0.33, float 0) (float 0, float 0)
+      & scalexy (float 0.5)
+      & repeatTxy (float 4)
+      & translatey (float 4 !* (chan0f $ beatxramp 8 (mchop "b10") tapbeatm9))
+      & val (chan0f $ beatpulse tapbeatm9)
+      & palettecycle (paletteClampColor $ neon $ tapbeatm9sec !* float 2)
+      & Visuals.fade (float 0.95)
+    )
 
 
 r $ triggerops (tapbeat $ mchan "b9") [

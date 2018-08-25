@@ -64,6 +64,7 @@ midisyncbeat = Network.tapbeat (chan0f $ Network.midi & selectCHOP (selectCHOPch
 
 mchop = midichanop
 
+
 network :: BS.ByteString
 network =
     -- let
@@ -124,15 +125,15 @@ network =
 
 -- sensel
     -- let 
-    --     sensel = cplusplusCHOP ( (cplusplusCHOPplugin ?~ str "C:/Users/ulyssesp/Development/SenselCHOP/Release/CPlusPlusCHOPExample.dll")) []
+    --     sensel = cplusplusCHOP ( (cplusplusCHOPplugin ?~ str" "C:/Users/ulyssesp/Development/SenselCHOP/Release/CPlusPlusCHOPExample.dll")) []
     --     senselchop = sensel & selectCHOP (selectCHOPchannames ?~ str "chan") . (:[]) & shuffleCHOP ((shuffleCHOPmethod ?~ int 8) . (shuffleCHOPnval ?~ int 185)) 
     --     senseltop = choptoTOP (choptoTOPchop ?~ senselchop) & flipTOP (flipTOPflipy ?~ bool True)
-    --     senseltouches = sensel & selectCHOP (selectCHOPchannames ?~ str "chan1") . (:[]) & deleteCHOP ((deleteCHOPdelsamples ?~ bool True)) . (:[])
+    --     senseltouches = sensel & selectCHOP (selectCHOPchannames ?~ str chan1") . (:[]) & deleteCHOP ((deleteCHOPdelsamples ?~ bool True)) . (:[])
     -- in 
-    --     printMessages $ compile ([outCHOP id $ senseltouches]) ([outTOP id $ fade (float 0.97) senseltop]) mempty
-
 
 -- endTops :: (Tree TOP, Tree CHOP)
+    --     printMessages $ compile ([outCHOP id $ senseltouches]) ([outTOP id $ fade (float 0.97) senseltop]) mempty
+
 -- endTops = 
 --     ( tgal & repeatTxy (float 10)
 --     , midi 
