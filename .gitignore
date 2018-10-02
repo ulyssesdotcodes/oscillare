@@ -26,6 +26,7 @@ test.*
 *.mp4
 *.mov
 json_output.txt
+TD/videos/
 
 # package  
 rtmidi/

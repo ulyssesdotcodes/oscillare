@@ -33,8 +33,9 @@ def apply(newState):
       diffip = diffi[1] if isinstance(diffi[1], str) or diffi[1] == '' else ".".join(concatname)
       item = dot_lookup(state, diffip, parent=True)
       curop = op(getName(splits[0]))
-      for connector in curop.inputConnectors:
-        connector.disconnect()
+      if hasattr(curop, 'inputConnectors'):
+        for connector in curop.inputConnectors:
+          connector.disconnect()
       for i, conn in enumerate(item['connections']):
         op(getName(conn)).outputConnectors[0].connect(curop.inputConnectors[i])
     elif splits[1] == 'parameters':
@@ -46,6 +47,7 @@ def apply(newState):
         addParameter(curop, splits[2], diffi[2][1])
       elif diffi[0] == 'remove':
         for param in diffi[2]:
+          print("remove")
           print(param[0])
           if(param[0] == 'tx'):
             curop.par.tx = 0
@@ -53,6 +55,8 @@ def apply(newState):
             curop.par.ty = 0
           elif param[0] == 'rotate':
             curop.par.rotate = 0
+          elif str.startswith(param[0], "name"):
+            curop.pars(param[0])[0].val = ""
           par = curop.pars(param[0])[0]
           print("val: " + str(par.val))
           if par.val:
@@ -63,7 +67,7 @@ def apply(newState):
       op(getName(splits[0])).text = diffi[2][1]
 
     elif splits[1] == 'commands' and diffi[0] == 'add':
-      runCommand(op(getName(splits[0])), diffi[2][0][1]['command'], diffi[2][0][1]['args'])
+      runCommand(getName(splits[0]), diffi[2][0][1]['command'], diffi[2][0][1]['args'])
 
 
 def getName(name):
@@ -113,7 +117,7 @@ def addChange(key, value):
   if 'commands' in value:
     coms = value['commands']
     for comm in coms:
-      runCommand(newOp, comm['command'], comm['args'])
+      runCommand(addr, comm['command'], comm['args'])
 
   if 'text' in value and value['text'] != None:
     newOp.text = value['text']
@@ -182,8 +186,9 @@ def addParameter(newOp, name, value):
   elif name == 'file' and (newOp.type == "text" or newOp.type == "table"):
     newOp.par.loadonstartpulse.pulse()
 
-def runCommand(newOp, command, args):
+def runCommand(newOpName, command, args):
     if command == "pulse":
+      newOp = op(newOpName)
       pars = newOp.pars(args[0])
       if len(pars) > 0:
         if isfloat(args[1]):

@@ -49,6 +49,16 @@ constnamevalfuncs =
     , constantCHOPname17
     , constantCHOPname18
     , constantCHOPname19
+    , constantCHOPname20
+    , constantCHOPname21
+    , constantCHOPname22
+    , constantCHOPname23
+    , constantCHOPname24
+    , constantCHOPname25
+    , constantCHOPname26
+    , constantCHOPname27
+    , constantCHOPname28
+    , constantCHOPname29
     ]
     [ constantCHOPvalue0
     , constantCHOPvalue1
@@ -70,6 +80,16 @@ constnamevalfuncs =
     , constantCHOPvalue17
     , constantCHOPvalue18
     , constantCHOPvalue19
+    , constantCHOPvalue20
+    , constantCHOPvalue21
+    , constantCHOPvalue22
+    , constantCHOPvalue23
+    , constantCHOPvalue24
+    , constantCHOPvalue25
+    , constantCHOPvalue26
+    , constantCHOPvalue27
+    , constantCHOPvalue28
+    , constantCHOPvalue29
     ]
  
 constnameval :: Int -> String -> Tree Float -> (CHOP -> CHOP)
@@ -82,6 +102,8 @@ constnamesvals namevals =
     zipWith (\(s, f) (n, v) -> (n ?~ str s) . (v ?~ f)) namevals constnamevalfuncs
 
 const1 = constantCHOP (constantCHOPvalue0 ?~ float 1) []
+constx x = constantCHOP (constantCHOPvalue0 ?~ x) [] 
+constxr x r = constnamesvals $ zip (repeat "a") (replicate r x)
 
 selChans :: String -> Tree CHOP -> Tree CHOP
 selChans n c = selectCHOP (selectCHOPchannames ?~ str n) [c]
@@ -231,15 +253,20 @@ stringtheory t a = frag "string_theory.frag" [ ("i_time", xV4 t)
                                              , ("i_angle_delta", xV4 $ float 0.2)
                                              , ("i_xoff", xV4 $ float 0)
                                              ] []
--- movie s f = movieFileIn' ((moviePlayMode ?~ int 1) .
---                           (movieIndex ?~ casti s) .
---                           (topResolution .~ iv2 (1920, 1080))) $ str $ "videos/" ++ f
+movie s f = moviefileinTOP ((moviefileinTOPplaymode ?~ int 1) .
+                            (moviefileinTOPindex ?~ castf s) .
+                            (moviefileinTOPresolutionw ?~ int 1920) .
+                            (moviefileinTOPresolutionh ?~ int 1080) .
+                            (moviefileinTOPfile ?~ (str $ "videos/" ++ f)))
 
 -- geoT tr sc top sop = render [geo' ((geoTranslate .~ tr) . (geoScale .~ sc) . (geoMat ?~ topM top)) (outS sop)] cam
--- commandCode t = textT' ( (topResolution .~ (Just $ int 1920, Just $ int 1080))
---                          . (textFontSize ?~ float 16)
---                          . (textAlign .~ iv2 (0, 0))
---                          ) (str t)
+commandCode t = textTOP ((textTOPresolutionw ?~ int 1920) 
+                         . (textTOPresolutionh ?~ int 1080)
+                         . (textTOPfontsizey ?~ float 16)
+                         . (textTOPalignx ?~ int 2)
+                         . (textTOPaligny ?~ int 0)
+                         . (textTOPtext ?~ str t)
+                         ) []
 
 -- -- Geometry generators and utilities
 
@@ -390,6 +417,9 @@ darkestred = Palette [RGB 153 7 17, RGB 97 6 11, RGB 49 7 8, RGB 13 7 7, RGB 189
 nature = Palette [RGB 63 124 7, RGB 201 121 66, RGB 213 101 23, RGB 177 201 80, RGB 180 207 127]
 greenpurple = Palette [RGB 42 4 74, RGB 11 46 89, RGB 13 103 89, RGB 122 179 23, RGB 160 197 95]
 tealblue = Palette [RGB 188 242 246, RGB 50 107 113, RGB 188 242 246, RGB 165 148 180]
+flower = Palette $ Hex <$> ["000E00", "003D00", "E4A900", "FEDEEF", "C99CB8"]
+bluepink = Palette $ Hex <$> ["F2C6F2", "F8F0F0", "A6D1FF", "3988E1", "4C8600"]
+lime = Palette $ Hex <$> ["FF4274", "DCD549", "ABDFAB", "437432", "033B45"]
 
 palettergb :: Palette -> Tree CHOP
 palettergb (Palette colors sel) = 
@@ -462,6 +492,8 @@ senseltop f =
   & reorderTOP ((reorderTOPformat ?~ int 26) . (reorderTOPoutputalphachan ?~ int 0)) . (:[])
 senseltouches = sensel & selectCHOP (selectCHOPchannames ?~ str "chan1") . (:[]) & deleteCHOP ((deleteCHOPdelsamples ?~ bool True)) . (:[])
 
+gesture mchan = gestureCHOP id [sensel & selectCHOP (selectCHOPchannames ?~ str "chan") . (:[]) & shuffleCHOP (shuffleCHOPmethod ?~ int 1), mchop mchan] & shuffleCHOP ((shuffleCHOPmethod ?~ int 4) . (shuffleCHOPnval ?~ int 185) . (shuffleCHOPfirstsample ?~ bool True))
+
 -- beats
 data Beat = 
     Beat 
@@ -517,7 +549,7 @@ midi = midiinCHOP (
         (midiinCHOPchannel ?~ str "1-8") .
         (midiinCHOPcontrolind ?~ str "1-16")
         )
-midisyncbeat = tapbeat (chan0f $ midi & selectCHOP (selectCHOPchannames ?~ str "beat") . (:[]))
+midisyncbeat = tapbeat (chan0f $ midi & selectCHOP (selectCHOPchannames ?~ str "beat") . (:[])) (float 2 !^ (floor $ (mchan "s1a" !- float 0.5) !* float 4))
 
 -- DMX
 
@@ -526,6 +558,9 @@ data DMX =
     COLORado (Tree CHOP) DMXColor
     | GenericRGB DMXColor
     | Laluce (Tree CHOP) DMXColor (Tree CHOP)
+    | Fill Int
+    | FillVal Int Float
+    | StormFX (Tree CHOP) (Tree CHOP) (Tree CHOP) (Tree CHOP)
 
 
 dmxToChop :: DMX -> Tree CHOP
@@ -543,9 +578,29 @@ dmxToChop (Laluce dim (DMXColor color) white) =
         , white
         , constnamesvals $ (, float 0) <$> ["hopping", "strobe", "macro"] 
         ]
+dmxToChop (Fill i) = constnamesvals $ zip (repeat "a") (replicate i (float 0))
+dmxToChop (FillVal i f) = constnamesvals $ zip (repeat "a") (replicate i (float f))
+dmxToChop (StormFX ledp ledstrobe lasers laserstrobe) =
+  mergeCHOP id
+    [ constnamesvals [("auto", float 1)]
+    , ledp
+    , constnamesvals [("auto_speed", float 1)]
+    , ledstrobe
+    , constnamesvals [("white", float 1)]
+    , lasers
+    , laserstrobe
+    , constnamesvals [("mled", float 0), ("mlaser", float 0)]
+    ]
 
 dmxColor = DMXColor $ constnamesvals [("r", float 0), ("g", float 0), ("b", float 0)]
 laluce = Laluce (const1) dmxColor (constnamesvals [("w", float 0)]) 
+colorado = COLORado (const1) dmxColor
+stormfx = 
+  StormFX 
+    (constnamesvals [("led", float (160.0/255.0))]) 
+    (constnamesvals [("ledstrobe", float 0.5)]) 
+    (constnamesvals [("lasers", float (160.0/255.0))]) 
+    (constnamesvals [("laserstrobe", float 0.5)]) 
 
 dmxColorRGB :: Tree Float -> Tree Float -> Tree Float -> DMXColor
 dmxColorRGB r g b = DMXColor $ constnamesvals [("r", r), ("g", g), ("b", b)]
@@ -554,11 +609,13 @@ dimDmx :: Tree CHOP -> DMX -> DMX
 dimDmx f (COLORado dim c) = COLORado (multchops [dim, f]) c
 dimDmx f (Laluce dim c w) = Laluce (multchops [dim, f]) c w
 dimDmx f (GenericRGB (DMXColor tch)) = GenericRGB (DMXColor $ multchops [tch, f])
+dimDmx _ d = d
 
 dmxMapColor :: (DMXColor -> DMXColor) -> DMX -> DMX
 dmxMapColor f (COLORado dim dmxc) = COLORado dim (f dmxc)
 dmxMapColor f (GenericRGB dmxc) = GenericRGB (f dmxc)
 dmxMapColor f (Laluce dim dmxc w) = Laluce dim (f dmxc) w
+dmxMapColor _ d = d
 
 dmxColorMapR :: (Tree CHOP -> Tree CHOP) -> DMXColor -> DMXColor
 dmxColorMapR f (DMXColor c) = DMXColor $ overChans "r" f c
@@ -572,8 +629,6 @@ dmxColorMapB f (DMXColor c) = DMXColor $ overChans "b" f c
 dmxColorMapAll :: (Tree CHOP -> Tree CHOP) -> DMXColor -> DMXColor
 dmxColorMapAll f (DMXColor c) = DMXColor $ overChans "r g b" f c
 
-homeDmx = [laluce]
-
 sendDmx :: [DMX] -> Tree CHOP
 sendDmx = dmxoutCHOP (
   (dmxoutCHOPinterface ?~ int 3) . 
@@ -586,3 +641,47 @@ paletteDmx p d = dmxMapColor (dmxColorMapAll (const $ palettergb p)) d
 
 paletteDmxList :: Palette -> [DMX] -> [DMX]
 paletteDmxList p@(Palette _ f) ds = zipWith (\i -> paletteDmx (paletteMapSel ((!+) (float $ fromIntegral i / fromIntegral (length ds))) p)) [0..] ds
+
+-- DMX configs
+
+homeDmx = [laluce]
+bizarre = 
+  [ colorado, Fill 23
+  , colorado, Fill 23
+  , colorado, Fill 23
+  , colorado, Fill 23
+  , colorado, Fill 23
+  , colorado, Fill 23
+  , colorado, Fill 23
+  , colorado, Fill 23
+  , colorado, Fill 23
+  ]
+
+bizarremessedup = 
+  [ GenericRGB dmxColor
+  , GenericRGB dmxColor
+  , GenericRGB dmxColor
+  ]
+
+holo =
+  [ GenericRGB dmxColor
+  , GenericRGB dmxColor
+  , GenericRGB dmxColor
+  , GenericRGB dmxColor
+  , GenericRGB dmxColor
+  , GenericRGB dmxColor
+  , GenericRGB dmxColor
+  , GenericRGB dmxColor
+  , FillVal 1 0
+  , FillVal 1 1
+  , GenericRGB dmxColor
+  , GenericRGB dmxColor
+  , GenericRGB dmxColor
+  , GenericRGB dmxColor
+  , GenericRGB dmxColor
+  , GenericRGB dmxColor
+  , GenericRGB dmxColor
+  , GenericRGB dmxColor
+  , FillVal 1 0
+  , FillVal 1 1
+  ]
